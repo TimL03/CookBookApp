@@ -1,9 +1,12 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Library, Utensils, Settings } from 'lucide-react-native'
 import { Link, Tabs } from 'expo-router';
+
 import { Pressable, useColorScheme } from 'react-native';
 
 import Colors from '../../constants/Colors';
+import React, { useState } from 'react';
 
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
@@ -15,8 +18,17 @@ function TabBarIcon(props: {
   return <MaterialCommunityIcons size={28} style={{ marginBottom: 5 }} {...props} />;
 }
 
+function settingsModal() {
+  console.log("settings modal");
+}
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const settingsModal = () => {
+    setModalVisible(true);
+  }
 
   return (
     <Tabs
@@ -32,14 +44,16 @@ export default function TabLayout() {
         },
         headerTintColor: Colors.dark.text,
         headerStyle: {
-          
           backgroundColor: Colors.dark.mainColorDark,
         },
         tabBarItemStyle: {
           backgroundColor: Colors.dark.mainColorDark,
-          padding: 4,
-          
-        }
+          padding: 4, 
+        },
+        headerTitleStyle: {
+          fontFamily: 'Alata',
+          fontSize: 24,
+        },
       }}>
       <Tabs.Screen
         name="index"
@@ -48,20 +62,12 @@ export default function TabLayout() {
           tabBarLabelStyle: {
             fontFamily: 'Alata'
           },
-          tabBarIcon: ({ color }) => <TabBarIcon name="silverware-fork-knife" color={color} />,
+          tabBarIcon: ({ color }) => <Utensils color={color} size={28} style={{ marginBottom: -5 }} />,
           headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color= {Colors.dark.text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
+            <Pressable onPress={settingsModal}>
+                  <Settings color={Colors.dark.text} size={28} style={{ marginRight: 15 }} />
+            </Pressable>
+                    
           ),
         }}
       />
@@ -72,9 +78,10 @@ export default function TabLayout() {
           tabBarLabelStyle: {
             fontFamily: 'Alata'
           },
-          tabBarIcon: ({ color }) => <TabBarIcon name="bookshelf" color={color} />,
+          tabBarIcon: ({ color }) => <Library color={color} size={28} style={{ marginBottom: -5 }} />,
         }}
       />
+
     </Tabs>
   );
 }

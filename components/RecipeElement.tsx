@@ -1,6 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Carrot, Soup } from 'lucide-react-native';
+
+
 
 import Colors from '../constants/Colors';
 import { DarkTheme } from '@react-navigation/native';
@@ -27,8 +30,8 @@ export default function Recipe({ item }: RecipeProps) {
                 <AlataMedium>{item.cookTime}</AlataMedium>
             </View>
             <View style={styles.icons}>
-                    <MaterialCommunityIcons name="food-steak-off" size={20} style={{ marginBottom: 5 }} color={Colors.dark.text}/>
-                    <MaterialCommunityIcons name="food-apple-outline" size={20} style={{ marginBottom: 5 }} color={Colors.dark.text}/>
+                    <Soup color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />
+                    <Carrot color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />
             </View>
             
 
