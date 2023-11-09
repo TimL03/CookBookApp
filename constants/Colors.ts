@@ -9,7 +9,7 @@ const tintColorDark = '#8ED3AE';
 
 
 export default {
-  green: {
+  light: {
     text: '#fff',
     background: '#7ea296',
     mainColorDark: '#55776C',

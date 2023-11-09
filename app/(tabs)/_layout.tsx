@@ -2,7 +2,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Library, Utensils, Settings } from 'lucide-react-native'
 import { Link, Tabs } from 'expo-router';
-
+import SettingsModal from '../../components/settingsModal';
 import { Pressable, useColorScheme } from 'react-native';
 
 import Colors from '../../constants/Colors';
@@ -81,7 +81,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Library color={color} size={28} style={{ marginBottom: -5 }} />,
         }}
       />
-
+    <SettingsModal visible={modalVisible}/>
     </Tabs>
   );
 }
