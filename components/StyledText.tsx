@@ -7,6 +7,11 @@ export function MonoText(props: TextProps) {
 }
 
 export function AlataMedium(props: TextProps) {
-  return <Text {...props} style={[props.style, { fontFamily: 'Alata', color: Colors.dark.text }]} />;
+  return <Text {...props} style={[props.style, { fontFamily: 'Alata', fontSize: 12, color: Colors.dark.text }]} />;
 }
+
+export function AlataLarge(props: TextProps) {
+  return <Text {...props} style={[props.style, { fontFamily: 'Alata', fontSize: 18, color: Colors.dark.text }]} />;
+}
+
 

@@ -21,12 +21,33 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'dark'].tint,
+        tabBarActiveTintColor: Colors.dark.text,
+        tabBarInactiveTintColor: Colors.dark.background,
+        
+        tabBarStyle: {
+          backgroundColor: Colors.dark.mainColorLight, 
+          height: 60,
+          borderRadius: 10,
+          borderEndEndRadius: 10,
+        },
+        headerTintColor: Colors.dark.text,
+        headerStyle: {
+          
+          backgroundColor: Colors.dark.mainColorDark,
+        },
+        tabBarItemStyle: {
+          backgroundColor: Colors.dark.mainColorDark,
+          padding: 4,
+          
+        }
       }}>
       <Tabs.Screen
         name="index"
         options={{
           title: 'Selection',
+          tabBarLabelStyle: {
+            fontFamily: 'Alata'
+          },
           tabBarIcon: ({ color }) => <TabBarIcon name="silverware-fork-knife" color={color} />,
           headerRight: () => (
             <Link href="/modal" asChild>
@@ -35,7 +56,7 @@ export default function TabLayout() {
                   <FontAwesome
                     name="info-circle"
                     size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
+                    color= {Colors.dark.text}
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                   />
                 )}
@@ -48,6 +69,9 @@ export default function TabLayout() {
         name="two"
         options={{
           title: 'Cookbook',
+          tabBarLabelStyle: {
+            fontFamily: 'Alata'
+          },
           tabBarIcon: ({ color }) => <TabBarIcon name="bookshelf" color={color} />,
         }}
       />

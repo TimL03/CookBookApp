@@ -1,49 +1,71 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import Colors from '../constants/Colors';
 import { DarkTheme } from '@react-navigation/native';
 import {View} from './Themed';
-import { AlataMedium } from './StyledText';
+import { AlataLarge, AlataMedium } from './StyledText';
 
-export default function Recipe(){
+type RecipeProps = {
+    item: {
+        name: string;
+        cookTime: string;
+    };
+};
+
+export default function Recipe({ item }: RecipeProps) {
+
     return (
-        <TouchableOpacity style={styles.item}>  
+        <TouchableOpacity style={styles.outerBox} activeOpacity={0.2}>  
             <Image
                 style={styles.logoSmall}
                 source={require('../assets/images/ramenImage.png')}
             />
-            <View style={styles.test}>
-                <AlataMedium>Gericht 1</AlataMedium>
+            <View style={styles.innerBox}>
+                <AlataLarge>{item.name}</AlataLarge>
+                <AlataMedium>{item.cookTime}</AlataMedium>
             </View>
+            <View style={styles.icons}>
+                    <MaterialCommunityIcons name="food-steak-off" size={20} style={{ marginBottom: 5 }} color={Colors.dark.text}/>
+                    <MaterialCommunityIcons name="food-apple-outline" size={20} style={{ marginBottom: 5 }} color={Colors.dark.text}/>
+            </View>
+            
+
+            
         </TouchableOpacity>
     )
 }
 
 const styles = StyleSheet.create({
-    item: {
+    outerBox: {
         backgroundColor: Colors.dark.mainColorDark,
         borderRadius: 10,
         height: 96,
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        
+        justifyContent: 'flex-start',
+        gap: 5,
+        marginVertical: 8,
+    },
+    innerBox: {
+        backgroundColor: Colors.dark.mainColorDark,
+        margin: 8,
+        gap: 0
     },
     logoSmall: {
+        alignContent: 'flex-start',
         width: 96,
         height: 96,
-        borderRadius: 10,
+        borderRadius: 10,        
     },
-    test: {
+    icons: {
         backgroundColor: Colors.dark.mainColorDark,
-        borderBottomRightRadius: 10,
-        borderTopRightRadius: 10,
-        height: 96,
-        width: 216,    
-        opacity: 100, 
-    },
-    title: {
-        paddingLeft: 12,
-        paddingTop: 6,
+        flex: 2,
+        margin: 8,
+        justifyContent: 'flex-end',
+        flexDirection: 'row',
+        alignItems: 'flex-end',
+        flexWrap: 'wrap-reverse',
+        borderRadius: 10,
     }
 });

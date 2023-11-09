@@ -4,11 +4,9 @@ import React from 'react';
 import Recipe from '../../components/RecipeElement'
 import Colors from '../../constants/Colors';
 
-
 export default function TabTwoScreen() {
   return (
     <View style={styles.container}>
-      <Recipe/>
     </View>
   )
 }
