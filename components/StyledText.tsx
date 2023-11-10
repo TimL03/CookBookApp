@@ -1,5 +1,6 @@
 import { Text, TextProps } from './Themed';
 import Colors from '../constants/Colors';
+import React from 'react';
 
 
 export function MonoText(props: TextProps) {
@@ -11,7 +12,11 @@ export function AlataMedium(props: TextProps) {
 }
 
 export function AlataLarge(props: TextProps) {
-  return <Text {...props} style={[props.style, { fontFamily: 'Alata', fontSize: 18, color: Colors.dark.text }]} />;
+  return <Text {...props} style={[props.style, { fontFamily: 'Alata', fontSize: 20, color: Colors.dark.text }]} />;
+}
+
+export function AlataLargeMiddle(props: TextProps) {
+  return <Text {...props} style={[props.style, { fontFamily: 'Alata', fontSize: 24, color: Colors.dark.text, textAlign: 'center'}]} />;
 }
 
 

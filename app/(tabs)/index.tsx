@@ -1,6 +1,5 @@
 import { StyleSheet, Text, View, SafeAreaView, SectionList} from 'react-native';
 import React from 'react';
-
 import Recipe from '../../components/RecipeElement'
 import {AlataLarge, AlataMedium} from '../../components/StyledText'
 import Colors from '../../constants/Colors';
@@ -43,17 +42,8 @@ const DATA = [
 export default function TabOneScreen() {
   return (
     <SafeAreaView style={styles.container}>
-    <SectionList
-      sections={DATA}
-      keyExtractor={(item, index) => item.name + index}
-      renderItem={({item}) => (
-        <Recipe item={item}/>
-      )}
-      renderSectionHeader={({section: {title}}) => (
-        <AlataLarge style={styles.header}>{title}</AlataLarge>
-      )}
-    />
-  </SafeAreaView>
+    
+    </SafeAreaView>
   )
 }
 

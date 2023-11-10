@@ -1,9 +1,9 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Library, Utensils, Settings } from 'lucide-react-native'
+import { Library, Utensils, Menu } from 'lucide-react-native'
 import { Link, Tabs } from 'expo-router';
 import SettingsModal from '../../components/settingsModal';
-import { Pressable, useColorScheme } from 'react-native';
+import { Pressable, useColorScheme, View } from 'react-native';
 
 import Colors from '../../constants/Colors';
 import React, { useState } from 'react';
@@ -26,18 +26,24 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
   const [modalVisible, setModalVisible] = useState(false);
 
-  const settingsModal = () => {
+  const openSettingsModal = () => {
     setModalVisible(true);
-  }
+  };
+
+  const closeSettingsModal = () => {
+    setModalVisible(false);
+  };
 
   return (
+    <View style={{ flex: 1 }}>
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors.dark.text,
         tabBarInactiveTintColor: Colors.dark.background,
         
         tabBarStyle: {
-          backgroundColor: Colors.dark.mainColorLight, 
+          backgroundColor: Colors.dark.mainColorLight,
+          borderTopWidth: 0,
           height: 60,
           borderRadius: 10,
           borderEndEndRadius: 10,
@@ -45,6 +51,7 @@ export default function TabLayout() {
         headerTintColor: Colors.dark.text,
         headerStyle: {
           backgroundColor: Colors.dark.mainColorDark,
+          borderWidth: 0,
         },
         tabBarItemStyle: {
           backgroundColor: Colors.dark.mainColorDark,
@@ -64,10 +71,9 @@ export default function TabLayout() {
           },
           tabBarIcon: ({ color }) => <Utensils color={color} size={28} style={{ marginBottom: -5 }} />,
           headerRight: () => (
-            <Pressable onPress={settingsModal}>
-                  <Settings color={Colors.dark.text} size={28} style={{ marginRight: 15 }} />
-            </Pressable>
-                    
+            <Pressable onPress={openSettingsModal}>
+                  <Menu color={Colors.dark.text} size={28} style={{ marginRight: 15 }} />
+            </Pressable>                    
           ),
         }}
       />
@@ -79,9 +85,16 @@ export default function TabLayout() {
             fontFamily: 'Alata'
           },
           tabBarIcon: ({ color }) => <Library color={color} size={28} style={{ marginBottom: -5 }} />,
+          headerRight: () => (
+            <Pressable onPress={openSettingsModal}>
+                  <Menu color={Colors.dark.text} size={28} style={{ marginRight: 15 }} />
+            </Pressable>
+          ),
         }}
       />
-    <SettingsModal visible={modalVisible}/>
+    
     </Tabs>
+    <SettingsModal visible={modalVisible} onClose={closeSettingsModal} />
+    </View>
   );
 }

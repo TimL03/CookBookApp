@@ -32,10 +32,7 @@ export default function Recipe({ item }: RecipeProps) {
             <View style={styles.icons}>
                     <Soup color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />
                     <Carrot color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />
-            </View>
-            
-
-            
+            </View>            
         </TouchableOpacity>
     )
 }
