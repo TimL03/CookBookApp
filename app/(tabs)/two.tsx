@@ -59,8 +59,6 @@ export default function TabTwoScreen() {
         <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{alignSelf: 'center'}} />
       </Pressable>
       </View>
-    
-    
   </SafeAreaView>
   )
 }

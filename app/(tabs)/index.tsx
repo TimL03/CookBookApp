@@ -1,8 +1,9 @@
-import { StyleSheet, Text, View, SafeAreaView, SectionList} from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, SectionList, Pressable} from 'react-native';
 import React from 'react';
 import Recipe from '../../components/RecipeElement'
 import {AlataLarge, AlataMedium} from '../../components/StyledText'
 import Colors from '../../constants/Colors';
+import { Plus } from 'lucide-react-native';
 
 const DATA = [
   {
@@ -42,7 +43,11 @@ const DATA = [
 export default function TabOneScreen() {
   return (
     <SafeAreaView style={styles.container}>
-    
+      <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+      <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+        <AlataLarge style={{marginBottom: 5, textAlign: 'center'}}>Get a Recipe</AlataLarge>
+      </Pressable>
+      </View>
     </SafeAreaView>
   )
 }
@@ -63,4 +68,12 @@ const styles = StyleSheet.create({
     fontSize: 32,
     backgroundColor: Colors.dark.background,
   },
+  button: {
+    backgroundColor: Colors.dark.mainColorDark,
+    borderRadius: 10, 
+    width: 200,
+    padding: 12,
+    justifyContent: 'center',
+  }
 });
+
