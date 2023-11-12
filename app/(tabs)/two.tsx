@@ -9,7 +9,7 @@ const DATA = [
   {
     title: 'Asian',
     data: [
-      { name: 'ChowMein', cookTime: '30 minutes'},
+      { name: 'ChowMein', cookTime: '30 minutes' },
       { name: 'Ramen', cookTime: '20 minutes' },
       { name: 'Chicken Wings', cookTime: '40 minutes' }
     ],

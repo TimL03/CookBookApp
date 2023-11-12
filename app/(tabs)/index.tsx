@@ -1,53 +1,47 @@
-import { StyleSheet, Text, View, SafeAreaView, SectionList, Pressable} from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, SectionList, Pressable, ScrollView} from 'react-native';
 import React from 'react';
-import Recipe from '../../components/RecipeElement'
+import ItemSelectorSwitch from '../../components/ItemSelectorSwitch'
 import {AlataLarge, AlataMedium} from '../../components/StyledText'
 import Colors from '../../constants/Colors';
 import { Plus } from 'lucide-react-native';
+import { FlatList } from 'react-native-gesture-handler';
 
 const DATA = [
-  {
-    title: 'Asian',
-    data: [
-      { name: 'ChowMein', cookTime: '30 minutes' },
-      { name: 'Ramen', cookTime: '20 minutes' },
-      { name: 'Chicken Wings', cookTime: '40 minutes' }
-    ],
-  },
-  {
-    title: 'Breakfast',
-    data: [
-      { name: 'Breakfast 1', cookTime: '30 minutes' },
-      { name: 'Breakfast 2', cookTime: '20 minutes' },
-      { name: 'Breakfast 3', cookTime: '40 minutes' }
-    ],
-  },
-  {
-    title: 'Drinks',
-    data: [
-      { name: 'Drink 1', cookTime: '2 minutes' },
-      { name: 'Drink 2', cookTime: '3 minutes' },
-      { name: 'Drink 3', cookTime: '1 minutes' }
-    ],
-  },
-  {
-    title: 'Desserts',
-    data: [
-      { name: 'Desserts 1', cookTime: '2 minutes' },
-      { name: 'Desserts 2', cookTime: '3 minutes' },
-      { name: 'Desserts 3', cookTime: '1 minutes' }
-    ],
-  },
+  
+    { name: 'Salmon'},
+      { name: 'Rice'},
+      { name: 'Soy Sauce'},
+      { name: 'Sesame Seeds'},
+      { name: 'Green Onions'},
+      { name: 'Avocado'},
+      { name: 'Cucumber'},
+      { name: 'Carrots'},
+      { name: 'Nori'},
+  
 ];
 
 export default function TabOneScreen() {
   return (
     <SafeAreaView style={styles.container}>
-      <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+      <View>
+        <AlataLarge>Ingredients</AlataLarge>
+        <FlatList 
+          data={DATA}
+          renderItem={({item}) => (
+            <ItemSelectorSwitch item={item}/>
+          )}
+          horizontal={true}
+          wrap={true}
+          numRows={3}
+          HorizontalScrollbar
+          showsHorizontalScrollIndicator={false}/>
+        
+      </View>
+        
       <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
         <AlataLarge style={{marginBottom: 5, textAlign: 'center'}}>Get a Recipe</AlataLarge>
       </Pressable>
-      </View>
+
     </SafeAreaView>
   )
 }
@@ -56,12 +50,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.dark.background,
+    flexDirection: 'column',
     padding: 36,
     alignContent: 'center',
+    marginTop: 40,
   },
   item: {
-    backgroundColor: Colors.dark.background,
+    backgroundColor: Colors.dark.mainColorLight,
     padding: 20,
+    flexDirection: 'row',
     marginVertical: 8,
   },
   header: {
@@ -74,6 +71,11 @@ const styles = StyleSheet.create({
     width: 200,
     padding: 12,
     justifyContent: 'center',
+  },
+  list: {
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+    width: '100%',
   }
 });
 

@@ -63,7 +63,7 @@ export default function TabLayout() {
         ),
         headerBackground: () => (
           <View style={{backgroundColor: Colors.dark.background, height: 110}}>
-            <View style={{backgroundColor: Colors.dark.mainColorDark, height: 115, borderBottomLeftRadius: 20, borderBottomRightRadius: 20,}}>
+            <View style={{backgroundColor: Colors.dark.mainColorDark, height: 110, borderBottomLeftRadius: 20, borderBottomRightRadius: 20,}}>
             </View>
           </View>
         ),
