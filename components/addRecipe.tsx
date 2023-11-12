@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { TextInput, Button, StyleSheet, ScrollView } from 'react-native';
-import { db } from '../../FirebaseConfig'
+import { db } from '../FirebaseConfig'
 import { collection, addDoc } from 'firebase/firestore';
 
-export default function AddRecipeScreen({  }) {
+interface AddRecipeScreenProps {
+  closeModal: () => void;
+}
+
+export default function AddRecipeScreen({ closeModal }: AddRecipeScreenProps) {
   const [name, setName] = useState('');
   const [cookTime, setCookTime] = useState('');
   const [category, setCategory] = useState('');
@@ -68,6 +72,7 @@ export default function AddRecipeScreen({  }) {
       ))}
       <Button title="Schritt hinzufügen" onPress={addStep} />
       <Button title="Rezept speichern" onPress={handleSave} />
+      <Button title="Schließen" onPress={closeModal} />
     </ScrollView>
   );
 }

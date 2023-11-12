@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, SectionList, Button, Pressable } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, SectionList, Button, Pressable, Modal } from 'react-native';
 import React from 'react';
 import { Plus } from 'lucide-react-native';
 import Recipe from '../../components/RecipeElement'
@@ -7,6 +7,8 @@ import Colors from '../../constants/Colors';
 import { db } from '../../FirebaseConfig'
 import { useState, useEffect } from "react"
 import { collection, onSnapshot, query } from 'firebase/firestore';
+import AddRecipeScreen from '../../components/addRecipe'; // Pfad zu Ihrer addRecipe.tsx
+
 
 interface RecipeData {
   id: string; 
@@ -22,6 +24,12 @@ interface GroupedByCategory {
   [key: string]: RecipeData[];
 }
 export default function TabTwoScreen() {
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
   const [data, setData] = useState<Array<{ title: string, data: RecipeData[] }>>([]);
 
   useEffect(() => {
@@ -65,9 +73,17 @@ export default function TabTwoScreen() {
         )}
       />
       <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-        <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+        <Pressable onPress={toggleModal} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
           <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
         </Pressable>
+        <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={toggleModal}
+      >
+        <AddRecipeScreen closeModal={toggleModal} />
+      </Modal>
       </View>
     </SafeAreaView>
   )
