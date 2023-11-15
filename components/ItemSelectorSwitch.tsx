@@ -12,8 +12,12 @@ type SelectionProps = {
 };
 
 export default function Switch({ item }: SelectionProps) {
+    const [isSelected, setSelected] = React.useState(false);
+    const switchPressed = () => {
+        setSelected(!isSelected);
+    }
     return (
-        <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.tint : Colors.dark.mainColorDark }]}>
+        <Pressable onPress={switchPressed} style={() => [styles.button, { backgroundColor: isSelected ? Colors.dark.tint : Colors.dark.mainColorDark }]}>
             <AlataMedium style={{marginBottom: 5, textAlign: 'center'}}>{item.name}</AlataMedium>
         </Pressable>
     )
@@ -21,7 +25,7 @@ export default function Switch({ item }: SelectionProps) {
 
 const styles = StyleSheet.create({
     button: {
-        borderRadius: 20,
+        borderRadius: 15,
         padding: 10,
         elevation: 2,
         margin: 5,

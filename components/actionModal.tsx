@@ -22,7 +22,7 @@ const ActionsModal = ({ visible, onClose}: ActionsModalProps) => {
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    backdropFilter: visible ? 'blur(4px)' : 'none',
+    backdropFilter: visible ? 'blur(px)' : 'none',
   };
 
   const handleSettingsPress = () => {
@@ -75,13 +75,15 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0)',
-    blurRadius: 10,
+    backdropFilter: 'blur(5px)',
   },
   modalContent: {
     backgroundColor: Colors.dark.mainColorDark,
     padding: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
     width: '100%',
   },
   button: {

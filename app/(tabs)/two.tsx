@@ -60,7 +60,7 @@ export default function TabTwoScreen() {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <SectionList
         showsVerticalScrollIndicator={false}
         sections={data}
@@ -85,7 +85,7 @@ export default function TabTwoScreen() {
         <AddRecipeScreen closeModal={toggleModal} />
       </Modal>
       </View>
-    </SafeAreaView>
+    </View>
   )
 }
 

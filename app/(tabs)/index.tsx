@@ -5,12 +5,14 @@ import {AlataLarge, AlataMedium} from '../../components/StyledText'
 import Colors from '../../constants/Colors';
 import { Plus } from 'lucide-react-native';
 import { FlatList } from 'react-native-gesture-handler';
+import SearchBar from '../../components/searchBar';
 
 const DATA = [
   
     { name: 'Salmon'},
       { name: 'Rice'},
       { name: 'Soy Sauce'},
+      { name: 'Chocolate Cake'},
       { name: 'Sesame Seeds'},
       { name: 'Green Onions'},
       { name: 'Avocado'},
@@ -22,19 +24,27 @@ const DATA = [
 
 export default function TabOneScreen() {
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View>
-        <AlataLarge>Ingredients</AlataLarge>
-        <FlatList 
-          data={DATA}
-          renderItem={({item}) => (
-            <ItemSelectorSwitch item={item}/>
-          )}
-          horizontal={true}
-          wrap={true}
-          numRows={3}
-          HorizontalScrollbar
-          showsHorizontalScrollIndicator={false}/>
+        <AlataLarge>Select Ingredients:</AlataLarge>
+        <SearchBar/>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          directionalLockEnabled={true}
+          alwaysBounceVertical={false}
+        >
+          <FlatList
+            contentContainerStyle={{alignSelf: 'flex-start'}}
+            numColumns={Math.ceil(DATA.length / 3)}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            data={DATA}
+            renderItem={({item}) => (
+              <ItemSelectorSwitch item={item}/>
+            )}
+          />
+      </ScrollView>
         
       </View>
         
@@ -42,7 +52,7 @@ export default function TabOneScreen() {
         <AlataLarge style={{marginBottom: 5, textAlign: 'center'}}>Get a Recipe</AlataLarge>
       </Pressable>
 
-    </SafeAreaView>
+    </View>
   )
 }
 
@@ -51,9 +61,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.dark.background,
     flexDirection: 'column',
-    padding: 36,
+    padding: 30,
     alignContent: 'center',
-    marginTop: 40,
+    justifyContent : 'space-between',
   },
   item: {
     backgroundColor: Colors.dark.mainColorLight,
@@ -71,6 +81,7 @@ const styles = StyleSheet.create({
     width: 200,
     padding: 12,
     justifyContent: 'center',
+    alignSelf: 'center',
   },
   list: {
     flexWrap: 'wrap',

@@ -1,13 +1,29 @@
 import { StatusBar } from 'expo-status-bar';
-import { Platform, StyleSheet } from 'react-native';
+import { Modal, Platform, StyleSheet } from 'react-native';
 
+import { BlurView } from 'react-native-blur';
 import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
 import React from 'react';
 
-export default function SettingsModal() {
+interface props {
+    onClose: () => void;
+};
+
+
+export default function SettingsModal({ onClose }: props) {
+
+    onClose = () => {
+        onClose();
+    } 
+    
     return (
-        <View style={styles.container}>
+      <Modal
+      animationType="slide"
+      transparent={true}
+      onRequestClose={() => onClose()}
+    >
+      <View style={styles.container}>
           <Text style={styles.title}>Settings Page</Text>
           <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
           <EditScreenInfo path="app/settingsModal.tsx" />
@@ -15,6 +31,8 @@ export default function SettingsModal() {
           {/* Use a light status bar on iOS to account for the black space above the modal */}
           <StatusBar style={Platform.OS === 'ios' ? 'dark' : 'auto'} />
         </View>
+    </Modal>
+        
       );
 }
 
