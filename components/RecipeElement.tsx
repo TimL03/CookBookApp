@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     innerBox: {
         backgroundColor: Colors.dark.mainColorDark,
         margin: 8,
-        gap: 0
+        gap: 0,
     },
     logoSmall: {
         alignContent: 'flex-start',

@@ -7,7 +7,7 @@ import Colors from '../../constants/Colors';
 import { db } from '../../FirebaseConfig'
 import { useState, useEffect } from "react"
 import { collection, onSnapshot, query } from 'firebase/firestore';
-import AddRecipeScreen from '../../components/addRecipe'; // Pfad zu Ihrer addRecipe.tsx
+import AddRecipeScreen from '../modals/addRecipeModal'; 
 
 
 interface RecipeData {

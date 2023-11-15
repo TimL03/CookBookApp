@@ -19,6 +19,7 @@
       "supportsTablet": true
     },
     "android": {
+      "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -29,11 +30,11 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "experiments": {
-      "typedRoutes": true
-    },
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
   }
 }

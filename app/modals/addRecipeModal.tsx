@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { TextInput, Button, StyleSheet, ScrollView, View, Pressable, Text } from 'react-native';
-import Colors from '../constants/Colors';
-import { db } from '../FirebaseConfig'
+import Colors from '../../constants/Colors';
+import { db } from '../../FirebaseConfig'
 import { collection, addDoc } from 'firebase/firestore';
-import { AlataLarge, AlataMedium } from './StyledText';
+import { AlataLarge, AlataMedium } from '../../components/StyledText';
 import { X, PlusCircle, Plus, Save } from 'lucide-react-native';
 
 interface AddRecipeScreenProps {

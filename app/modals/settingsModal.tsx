@@ -2,8 +2,8 @@ import { StatusBar } from 'expo-status-bar';
 import { Modal, Platform, StyleSheet } from 'react-native';
 
 import { BlurView } from 'react-native-blur';
-import EditScreenInfo from '../components/EditScreenInfo';
-import { Text, View } from '../components/Themed';
+import EditScreenInfo from '../../components/EditScreenInfo';
+import { Text, View } from '../../components/Themed';
 import React from 'react';
 
 interface props {

@@ -44,8 +44,29 @@ export default function TabOneScreen() {
               <ItemSelectorSwitch item={item}/>
             )}
           />
-      </ScrollView>
-        
+        </ScrollView>
+      </View>
+
+      <View>
+        <AlataLarge>Select Kategories:</AlataLarge>
+        <SearchBar/>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          directionalLockEnabled={true}
+          alwaysBounceVertical={false}
+        >
+          <FlatList
+            contentContainerStyle={{alignSelf: 'flex-start'}}
+            numColumns={Math.ceil(DATA.length / 3)}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            data={DATA}
+            renderItem={({item}) => (
+              <ItemSelectorSwitch item={item}/>
+            )}
+          />
+        </ScrollView>
       </View>
         
       <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>

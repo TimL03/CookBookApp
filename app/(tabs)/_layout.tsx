@@ -2,8 +2,8 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Library, Utensils, Menu } from 'lucide-react-native'
 import { Link, Tabs } from 'expo-router';
-import ActionsModal from '../../components/actionModal';
-import { Pressable, useColorScheme, View } from 'react-native';
+import ActionsModal from '../modals/actionModal';
+import { Pressable, useColorScheme, View, Platform } from 'react-native';
 
 import Colors from '../../constants/Colors';
 import React, { useState } from 'react';
@@ -16,10 +16,6 @@ function TabBarIcon(props: {
   color: string;
 }) {
   return <MaterialCommunityIcons size={28} style={{ marginBottom: 5 }} {...props} />;
-}
-
-function settingsModal() {
-  console.log("settings modal");
 }
 
 export default function TabLayout() {
@@ -48,7 +44,7 @@ export default function TabLayout() {
         ),
         tabBarStyle: {
           borderTopWidth: 0,
-          height: 60,
+          height: 100,
           borderRadius: 20,
           borderEndEndRadius: 10,
         },
@@ -83,7 +79,7 @@ export default function TabLayout() {
           tabBarLabelStyle: {
             fontFamily: 'Alata'
           },
-          tabBarIcon: ({ color }) => <Utensils color={color} size={28} style={{ marginBottom: -5 }} />,
+          tabBarIcon: ({ color }) => <Utensils color={color} size={28} style={{ marginBottom: -10 }} />,
         }}
       />
       <Tabs.Screen
@@ -93,7 +89,7 @@ export default function TabLayout() {
           tabBarLabelStyle: {
             fontFamily: 'Alata'
           },
-          tabBarIcon: ({ color }) => <Library color={color} size={28} style={{ marginBottom: -5 }} />,
+          tabBarIcon: ({ color }) => <Library color={color} size={28} style={{ marginBottom: -10 }} />,
         }}
       />
     

@@ -3,11 +3,11 @@ import React from 'react';
 import { Modal, View, Text, StyleSheet, Pressable, Button, } from 'react-native';
 import { Settings, User2, Info } from 'lucide-react-native';
 import { BlurView, VibrancyView } from 'react-native-blur';
-import Colors from '../constants/Colors';
+import Colors from '../../constants/Colors';
 import { Link } from 'expo-router';
-import { AlataLarge, AlataMedium, AlataLargeMiddle } from './StyledText';
+import { AlataLarge, AlataMedium, AlataLargeMiddle } from '../../components/StyledText';
 import { AlignCenter } from 'lucide-react-native';
-import SettingsModal from '../app/settingsModal';
+import SettingsModal from './settingsModal';
 
 
 interface ActionsModalProps {
