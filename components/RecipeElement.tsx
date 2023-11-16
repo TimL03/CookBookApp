@@ -2,9 +2,6 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, Image, Modal } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Carrot, Soup } from 'lucide-react-native';
-
-
-
 import Colors from '../constants/Colors';
 import { DarkTheme } from '@react-navigation/native';
 import {View} from './Themed';
@@ -14,7 +11,9 @@ import ViewRecipeScreen from '../app/modals/viewRecipeModal';
 type RecipeProps = {
     item: {
         name: string;
-        cookTime: string;
+        cookHTime: string;
+        cookMinTime: string;
+        imageUrl: string;
     };
 };
 
@@ -28,11 +27,11 @@ export default function Recipe({ item }: RecipeProps) {
         <TouchableOpacity onPress={toggleModal} style={styles.outerBox} activeOpacity={0.2}>  
             <Image
                 style={styles.logoSmall}
-                source={require('../assets/images/ramenImage.png')}
+                source={{ uri: item.imageUrl }}
             />
             <View style={styles.innerBox}>
                 <AlataLarge>{item.name}</AlataLarge>
-                <AlataMedium>{item.cookTime}</AlataMedium>
+                <AlataMedium>{item.cookHTime} h {item.cookMinTime} min</AlataMedium>
             </View>
             <View style={styles.icons}>
                     <Soup color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />
