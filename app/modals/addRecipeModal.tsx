@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { TextInput, Button, StyleSheet, ScrollView, View, Pressable, Text } from 'react-native';
+import { TextInput, StyleSheet, ScrollView, View, Pressable, Text } from 'react-native';
 import Colors from '../../constants/Colors';
 import { db } from '../../FirebaseConfig'
 import { collection, addDoc } from 'firebase/firestore';
-import { AlataLarge, AlataMedium } from '../../components/StyledText';
+import { AlataLarge } from '../../components/StyledText';
 import { X, PlusCircle, Plus, Save } from 'lucide-react-native';
+import TopModalBar from '../../components/topModalBar';
 
 interface AddRecipeScreenProps {
   closeModal: () => void;
@@ -56,17 +57,12 @@ export default function AddRecipeScreen({ closeModal }: AddRecipeScreenProps) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.barTop}>
-        <AlataLarge>Add Recipe</AlataLarge>
-        <Pressable onPress={closeModal} style={{paddingTop: 5}}>
-          <X color={Colors.dark.text} size={24} strokeWidth='2.5' style={{ alignSelf: 'center', marginBottom: 10}} />
-        </Pressable>
-      </View>
+      <TopModalBar title="Add Recipe" onClose={closeModal} />
       <ScrollView style={styles.scrollView}>
         <Pressable onPress={addImage} style={({ pressed }) => [styles.addImage, { backgroundColor: pressed ? Colors.dark.background : Colors.dark.mainColorLight },]}>
           <PlusCircle color={Colors.dark.text} size={24} style={{alignSelf: 'center'}} />
           <AlataLarge>Add Image</AlataLarge>
-      </Pressable>
+        </Pressable>
         <View style={{padding: 30}}>
         <AlataLarge>Name:</AlataLarge>
         <TextInput placeholder="Name" value={name} onChangeText={setName} style={styles.input}/>
@@ -135,6 +131,7 @@ export default function AddRecipeScreen({ closeModal }: AddRecipeScreenProps) {
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1, 
@@ -170,14 +167,6 @@ const styles = StyleSheet.create({
     marginTop: 5, 
     width: 100,
     fontFamily: 'Alata',
-  },
-  barTop: {
-    height: 80,
-    backgroundColor: Colors.dark.mainColorDark,
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    padding: 20,
-    paddingHorizontal: 30,
   },
   scrollView: {
     flex: 1,

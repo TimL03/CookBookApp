@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, Image, Modal } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Carrot, Soup } from 'lucide-react-native';
 
@@ -9,6 +9,7 @@ import Colors from '../constants/Colors';
 import { DarkTheme } from '@react-navigation/native';
 import {View} from './Themed';
 import { AlataLarge, AlataMedium } from './StyledText';
+import ViewRecipeScreen from '../app/modals/viewRecipeModal';
 
 type RecipeProps = {
     item: {
@@ -18,9 +19,13 @@ type RecipeProps = {
 };
 
 export default function Recipe({ item }: RecipeProps) {
+    const [isModalVisible, setModalVisible] = useState(false);
 
+    const toggleModal = () => {
+        setModalVisible(!isModalVisible);
+    };
     return (
-        <TouchableOpacity style={styles.outerBox} activeOpacity={0.2}>  
+        <TouchableOpacity onPress={toggleModal} style={styles.outerBox} activeOpacity={0.2}>  
             <Image
                 style={styles.logoSmall}
                 source={require('../assets/images/ramenImage.png')}
@@ -32,7 +37,15 @@ export default function Recipe({ item }: RecipeProps) {
             <View style={styles.icons}>
                     <Soup color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />
                     <Carrot color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />
-            </View>            
+            </View>        
+            <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={toggleModal}
+        >
+        <ViewRecipeScreen closeModal={toggleModal} />
+      </Modal>    
         </TouchableOpacity>
     )
 }

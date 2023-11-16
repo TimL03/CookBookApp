@@ -45,7 +45,7 @@ const ActionsModal = ({ visible, onClose}: ActionsModalProps) => {
       <Pressable style={styles.modalContainer} onPress={onClose}>
         <View style={styles.modalContent}>
           <AlataLargeMiddle>Aktionen</AlataLargeMiddle>        
-            <Link href="/settingsModal" asChild>
+            <Link href="/modals/settingsModal" asChild>
               <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.background }]}>
                 <View style={styles.button}>
                   <Settings color={Colors.dark.text} size={22} style={{alignSelf: 'center'}} />

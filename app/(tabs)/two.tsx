@@ -81,7 +81,7 @@ export default function TabTwoScreen() {
         transparent={true}
         visible={isModalVisible}
         onRequestClose={toggleModal}
-      >
+        >
         <AddRecipeScreen closeModal={toggleModal} />
       </Modal>
       </View>
