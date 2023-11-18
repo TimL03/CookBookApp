@@ -3,6 +3,8 @@ import { TextInput, StyleSheet, ScrollView, View, Pressable, Text } from 'react-
 import Colors from '../../constants/Colors';
 import { db } from '../../FirebaseConfig'
 import { collection, addDoc } from 'firebase/firestore';
+import * as ImagePicker from 'expo-image-picker';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { AlataLarge } from '../../components/StyledText';
 import { X, PlusCircle, Plus, Save } from 'lucide-react-native';
 import TopModalBar from '../../components/topModalBar';
@@ -13,19 +15,61 @@ interface AddRecipeScreenProps {
 
 export default function AddRecipeScreen({ closeModal }: AddRecipeScreenProps) {
   const [name, setName] = useState('');
-  const [cookTime, setCookTime] = useState('');
+  const [cookHTime, setCookHTime] = useState('');
+  const [cookMinTime, setCookMinTime] = useState('');
   const [category, setCategory] = useState('');
   const [ingredients, setIngredients] = useState(['']);
   const [steps, setSteps] = useState(['']);
+  const [imageUri, setImageUri] = useState<string | null>(null);
+
+
+  const addImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Sorry, we need camera roll permissions to make this work!');
+      return;
+    }
+
+  let result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    allowsEditing: true,
+    aspect: [4, 3],
+    quality: 1,
+  });
+
+  if (result && !result.canceled && result.assets) {
+    const uri = result.assets[0].uri;
+    setImageUri(uri); 
+  }
+};
+
+const uploadImage = async (uri: string, recipeName: string) => {
+  const response = await fetch(uri);
+  const blob = await response.blob();
+
+  const storage = getStorage();
+  const imagePath = `images/${recipeName}/${Date.now()}.jpg`; 
+  const storageRef = ref(storage, imagePath);
+
+  const snapshot = await uploadBytes(storageRef, blob);
+  return await getDownloadURL(snapshot.ref); 
+};
 
   const handleSave = async () => {
-    try {
+      try {
+        let imageUrl = '';
+        if (imageUri) {
+          imageUrl = await uploadImage(imageUri, name);
+        }
+  
       const docRef = await addDoc(collection(db, 'recipes'), {
         name,
-        cookTime,
+        cookHTime,
+        cookMinTime,
         category,
         ingredients,
         steps,
+        imageUrl, 
       });
       console.log('Dokument geschrieben mit ID: ', docRef.id);
       closeModal();
@@ -33,26 +77,24 @@ export default function AddRecipeScreen({ closeModal }: AddRecipeScreenProps) {
       console.error('Fehler beim Hinzufügen des Dokuments: ', e);
     }
   };
+  
 
   const addIngredient = () => {
     setIngredients([...ingredients, '']);
   };
 
-  const removeIngredient = () => {
-    
+  const removeIngredient = (indexToRemove: number) => {
+    setIngredients(ingredients.filter((_, index) => index !== indexToRemove));
   };
 
   const addStep = () => {
     setSteps([...steps, '']);
   };
 
-  const removeStep = () => {
-    
+  const removeStep = (indexToRemove: number) => {
+    setSteps(steps.filter((_, index) => index !== indexToRemove));
   };
 
-  const addImage = () => {
-    console.log('Add Image');
-  }
 
 
   return (
@@ -70,9 +112,9 @@ export default function AddRecipeScreen({ closeModal }: AddRecipeScreenProps) {
         <TextInput placeholder="Kategory" value={category} onChangeText={setCategory} style={styles.input}/>
         <AlataLarge>Preperation Time:</AlataLarge>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookTime} onChangeText={setCookTime} style={styles.inputNumber}/>
+          <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookHTime} onChangeText={setCookHTime} style={styles.inputNumber}/>
           <Text style={{paddingVertical: 15, textAlign: 'center', fontSize: 16, fontFamily: 'Alata', color: Colors.dark.text}}>hours</Text>
-          <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookTime} onChangeText={setCookTime} style={styles.inputNumber}/>
+          <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookMinTime} onChangeText={setCookMinTime} style={styles.inputNumber}/>
           <Text style={{paddingVertical: 15, alignContent: 'center', textAlign: 'center', fontSize: 16, fontFamily: 'Alata', color: Colors.dark.text}}>minutes</Text>
         </View>
         <AlataLarge>Ingredients:</AlataLarge>
@@ -89,7 +131,7 @@ export default function AddRecipeScreen({ closeModal }: AddRecipeScreenProps) {
             }}
             style={styles.inputDelete}
           />
-          <Pressable onPress={removeIngredient} style={styles.deleteButton}>
+          <Pressable onPress={() => removeIngredient(index)} style={styles.deleteButton}>
           <X color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
           </Pressable>
           </View>
@@ -113,7 +155,7 @@ export default function AddRecipeScreen({ closeModal }: AddRecipeScreenProps) {
             }}
             style={styles.inputDelete}
           />
-          <Pressable onPress={removeStep} style={styles.deleteButton}>
+          <Pressable onPress={() => removeIngredient(index)} style={styles.deleteButton}>
           <X color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
           </Pressable>
           </View>

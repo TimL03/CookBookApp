@@ -14,10 +14,12 @@ interface RecipeData {
   id: string; 
   name: string;
   category: string;
-  cookTime: string;
+  cookHTime: string;
+  cookMinTime: string;
   description: string;
   ingredients: string[];
   steps: string[];
+  imageUrl: string;
 }
 
 interface GroupedByCategory {
