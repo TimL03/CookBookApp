@@ -13,6 +13,7 @@ import ViewRecipeScreen from '../app/modals/viewRecipeModal';
 
 type RecipeProps = {
     item: {
+        key: Int16Array;
         name: string;
         cookTime: string;
     };

@@ -20,9 +20,13 @@ export default function SettingsModal({ onClose }: props) {
         <Stack.Screen options={{ 
           title: 'Settings',
           animation: 'slide_from_bottom',
+          headerStyle: {
+            backgroundColor: Colors.dark.mainColorDark,
+          },
+          headerTitleAlign: 'center',
           headerLeft: () => 
           <Link href="/"> 
-            <ChevronLeft color={Colors.dark.text} size={28} style={{ marginRight: 15 }} />
+            <ChevronLeft color={Colors.dark.text} size={28}/>
           </Link>
         }} 
         />

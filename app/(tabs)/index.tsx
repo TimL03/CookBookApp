@@ -1,73 +1,54 @@
-import { StyleSheet, Text, View, SafeAreaView, SectionList, Pressable, ScrollView} from 'react-native';
-import React from 'react';
+import { StyleSheet, Text, View, Pressable, ScrollView} from 'react-native';
+import React, { useState } from 'react';
 import ItemSelectorSwitch from '../../components/ItemSelectorSwitch'
-import {AlataLarge, AlataMedium} from '../../components/StyledText'
+import {AlataLarge} from '../../components/StyledText'
 import Colors from '../../constants/Colors';
-import { Plus } from 'lucide-react-native';
-import { FlatList } from 'react-native-gesture-handler';
 import SearchBar from '../../components/searchBar';
 
-const DATA = [
-  
-    { name: 'Salmon'},
-      { name: 'Rice'},
-      { name: 'Soy Sauce'},
-      { name: 'Chocolate Cake'},
-      { name: 'Sesame Seeds'},
-      { name: 'Green Onions'},
-      { name: 'Avocado'},
-      { name: 'Cucumber'},
-      { name: 'Carrots'},
-      { name: 'Nori'},
+const data = [
+  {key:'1', value:'Tomato', selected: false},
+  {key:'2', value:'Spagetti', selected: false},
+  {key:'3', value:'Carrot', selected: true},
+  {key:'7', value:'Milk', selected: false},
+  {key:'4', value:'Soy Sauce', selected: false},
+  {key:'5', value:'Salad', selected: false},
+  {key:'6', value:'Toast Bread', selected: false},
   
 ];
 
-export default function TabOneScreen() {
+export default function TabOneScreen() {  
   return (
     <View style={styles.container}>
+      <ScrollView showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false}>
       <View>
         <AlataLarge>Select Ingredients:</AlataLarge>
-        <SearchBar/>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          directionalLockEnabled={true}
-          alwaysBounceVertical={false}
-        >
-          <FlatList
-            contentContainerStyle={{alignSelf: 'flex-start'}}
-            numColumns={Math.ceil(DATA.length / 3)}
-            showsVerticalScrollIndicator={false}
-            showsHorizontalScrollIndicator={false}
-            data={DATA}
-            renderItem={({item}) => (
-              <ItemSelectorSwitch item={item}/>
-            )}
-          />
-        </ScrollView>
+        <SearchBar item={data}/>
+        <View style={{ flexDirection:'row',marginBottom:20,flexWrap:'wrap'}}>
+        {
+          data?.map((item,index) => {
+          return (
+            <ItemSelectorSwitch item={item}/>
+          )
+          })
+        }
+      </View>                                  
+      
       </View>
 
       <View>
-        <AlataLarge>Select Kategories:</AlataLarge>
-        <SearchBar/>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          directionalLockEnabled={true}
-          alwaysBounceVertical={false}
-        >
-          <FlatList
-            contentContainerStyle={{alignSelf: 'flex-start'}}
-            numColumns={Math.ceil(DATA.length / 3)}
-            showsVerticalScrollIndicator={false}
-            showsHorizontalScrollIndicator={false}
-            data={DATA}
-            renderItem={({item}) => (
-              <ItemSelectorSwitch item={item}/>
-            )}
-          />
-        </ScrollView>
+        <AlataLarge>Select Categories:</AlataLarge>
+        <SearchBar item={data}/>
+        <View style={{ flexDirection:'row',marginBottom:20,flexWrap:'wrap'}}>
+        {
+          data?.map((item,index) => {
+          return (
+            <ItemSelectorSwitch item={item}/>
+          )
+          })
+        }
       </View>
+      </View>
+      </ScrollView>
         
       <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
         <AlataLarge style={{marginBottom: 5, textAlign: 'center'}}>Get a Recipe</AlataLarge>
@@ -84,7 +65,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     padding: 30,
     alignContent: 'center',
-    justifyContent : 'space-between',
+    justifyContent : 'space-around',
   },
   item: {
     backgroundColor: Colors.dark.mainColorLight,
@@ -100,7 +81,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.dark.mainColorDark,
     borderRadius: 10, 
     width: 200,
-    padding: 12,
+    padding: 10,
     justifyContent: 'center',
     alignSelf: 'center',
   },
