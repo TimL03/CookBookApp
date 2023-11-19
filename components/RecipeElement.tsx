@@ -44,7 +44,7 @@ export default function Recipe({ item }: RecipeProps) {
         visible={isModalVisible}
         onRequestClose={toggleModal}
         >
-        <ViewRecipeScreen closeModal={toggleModal} />
+        <ViewRecipeScreen closeModal={toggleModal} recipe= {item}/>
       </Modal>    
         </TouchableOpacity>
     )

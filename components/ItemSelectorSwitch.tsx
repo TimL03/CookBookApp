@@ -11,12 +11,16 @@ type SelectionProps = {
         value: string;
         selected: boolean;
     };
+    onToggle?: () => void;
 };
 
-export default function ItemSelectorSwitch({ item }: SelectionProps) {
+export default function ItemSelectorSwitch({ item, onToggle }: SelectionProps) {
     const [isSelected, setSelected] = React.useState(item.selected);
     const switchPressed = () => {
         setSelected(!isSelected);
+        if (onToggle) {
+            onToggle();
+          }
     }
     return (
         <Pressable onPress={switchPressed} style={() => [styles.button, { backgroundColor: isSelected ? Colors.dark.tint : Colors.dark.mainColorDark }]}>

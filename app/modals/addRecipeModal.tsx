@@ -11,6 +11,7 @@ import TopModalBar from '../../components/topModalBar';
 
 interface AddRecipeScreenProps {
   closeModal: () => void;
+  
 }
 
 export default function AddRecipeScreen({ closeModal }: AddRecipeScreenProps) {
@@ -155,7 +156,7 @@ const uploadImage = async (uri: string, recipeName: string) => {
             }}
             style={styles.inputDelete}
           />
-          <Pressable onPress={() => removeIngredient(index)} style={styles.deleteButton}>
+          <Pressable onPress={() => removeStep (index)} style={styles.deleteButton}>
           <X color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
           </Pressable>
           </View>
