@@ -9,11 +9,12 @@ import ViewRandomRecipeScreen from '../modals/viewRandomRecipeModal';
 const data = [
   {key:'1', value:'Tomato', selected: false},
   {key:'2', value:'Spagetti', selected: false},
-  {key:'3', value:'Carrot', selected: true},
-  {key:'7', value:'Milk', selected: false},
-  {key:'4', value:'Soy Sauce', selected: false},
-  {key:'5', value:'Salad', selected: false},
-  {key:'6', value:'Toast Bread', selected: false},
+  {key:'3', value:'Garlic', selected: true},
+  {key:'4', value:'Milk', selected: false},
+  {key:'5', value:'Soy Sauce', selected: false},
+  {key:'6', value:'Salad', selected: false},
+  {key:'7', value:'Butter', selected: false},
+  {key:'8', value:'Onion', selected: false},
 ];
 
 export default function TabOneScreen() {  
@@ -22,18 +23,22 @@ export default function TabOneScreen() {
   const [selectedMeal, setSelectedMeal] = useState(null);
 
   const getSelectedIngredients = () => {
-    return ingredients.filter(item => item.selected).map(item => item.value).join(',');
-  };
+    return ingredients
+    .filter(item => item.selected)
+    .map(item => item.value.toLowerCase()) 
+    .join(',');
+};
 
   const getMeal = async () => {
     console.log("getMeal aufgerufen");
     const selectedIngredients = getSelectedIngredients();
     try {
-      const response = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${selectedIngredients}`);
+      const response = await fetch(`https://www.themealdb.com/api/json/v2/9973533/filter.php?i=${selectedIngredients}`);
+      console.log("URL für den API-Aufruf: ", response);
       const data = await response.json();
       if (data.meals) {
         const randomMealId = data.meals[Math.floor(Math.random() * data.meals.length)].idMeal;
-        const detailedResponse = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${randomMealId}`);
+        const detailedResponse = await fetch(`https://www.themealdb.com/api/json/v2/9973533/lookup.php?i=${randomMealId}`);
         const detailedData = await detailedResponse.json();
         if (detailedData.meals) {
           const detailedMeal = detailedData.meals[0];

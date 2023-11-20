@@ -83,15 +83,15 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
           source={{ uri: recipe.strMealThumb }}
         />
         <View style={{ padding: 30 }}>
+        <AlataLarge>
+            {recipe.strMeal}
+          </AlataLarge>
         <View>
           <AlataLarge>Ingredients:</AlataLarge>
             {ingredients.map((item, index) => (
               <AlataLarge key={index}>{item.name} - {item.measure}</AlataLarge>
             ))}
           </View>
-          <AlataLarge>
-            {recipe.strMeal}
-          </AlataLarge>
           <AlataLarge>{recipe.strInstructions}</AlataLarge>
         </View>
         <Pressable onPress={onFindNewRecipe} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
