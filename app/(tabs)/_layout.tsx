@@ -2,7 +2,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Library, Utensils, Menu } from 'lucide-react-native'
 import { Link, Tabs } from 'expo-router';
-import ActionsModal from '../modals/actionModal';
+import LoginModal from '../modals/logInModal';
 import { Pressable, useColorScheme, View, Platform } from 'react-native';
 
 import Colors from '../../constants/Colors';
@@ -94,7 +94,7 @@ export default function TabLayout() {
       />
     
     </Tabs>
-    <ActionsModal visible={modalVisible} onClose={closeSettingsModal} />
+    <LoginModal visible={modalVisible} onClose={closeSettingsModal} />
     </View>
   );
 }

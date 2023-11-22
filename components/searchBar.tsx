@@ -41,7 +41,7 @@ export default function SearchBar({ item }: SelectionProps) {
             <View style={{flexDirection:'row', gap: -1}}>
               <TextInput
               onPressIn={searchActive}
-              
+              onEndEditing={searchInactive}
               placeholder={`search...`}
               placeholderTextColor={Colors.dark.text}
               style={styles.inputDelete}
