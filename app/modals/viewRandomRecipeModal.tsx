@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Text, View, StyleSheet, Image, Pressable } from "react-native";
 import TopModalBar from "../../components/topModalBar";
 import Colors from '../../constants/Colors';
-import { Share2, PenSquare, Trash2 } from 'lucide-react-native';
+import { Share2, PenSquare, Trash2, Save, ArrowDownToLine } from 'lucide-react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { AlataLarge, AlataMedium } from '../../components/StyledText';
+import { AlataLarge, AlataMedium, AlataText } from '../../components/StyledText';
 
 interface ViewRandomRecipeScreenProps {
   closeModal: () => void;
@@ -82,21 +82,49 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
           style={styles.image}
           source={{ uri: recipe.strMealThumb }}
         />
-        <View style={{ padding: 30 }}>
-        <AlataLarge>
-            {recipe.strMeal}
-          </AlataLarge>
-        <View>
-          <AlataLarge>Ingredients:</AlataLarge>
-            {ingredients.map((item, index) => (
-              <AlataLarge key={index}>{item.name} - {item.measure}</AlataLarge>
-            ))}
+        <View style={{ padding: 30, marginTop: -20, backgroundColor: Colors.dark.mainColorDark, borderRadius: 15, flex: 1 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Text style={{ fontFamily: 'Alata', fontSize: 24, color: Colors.dark.text }}>{recipe.strMeal}</Text>
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <Pressable style={{ alignSelf: 'center' }}>
+                <Share2 color={Colors.dark.text} size={24} style={{ marginBottom: -5 }} />
+              </Pressable>
+              <Pressable style={{ alignSelf: 'center' }}>
+                <ArrowDownToLine color={Colors.dark.text} size={24} style={{ marginBottom: -5 }} />
+              </Pressable>
+            </View>
           </View>
-          <AlataLarge>{recipe.strInstructions}</AlataLarge>
+
+          <View style={{ justifyContent: 'flex-start', flexDirection:'row', paddingTop: 20, marginBottom:20,flexWrap:'wrap'}}>
+            
+          </View>
+
+        <View style={styles.contentBox}>
+            <AlataText style={{fontSize: 20}}>Ingredients:</AlataText>
+            <View style={{ flexDirection: 'column', flexWrap: 'wrap', paddingHorizontal: 10, paddingTop: 5}}>
+              {ingredients.map((item, index) => (
+                <View key={index} style={{paddingVertical: 2, justifyContent: 'space-between', flexDirection: 'row'}}>
+                  <AlataText style={{flex: 1, fontSize: 16}}>{index + 1}. {item.name}</AlataText>
+                  <AlataText style={{fontSize: 16}}>{item.measure}</AlataText>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.contentBox}>
+            <AlataText style={{fontSize: 20}}>Instructions:</AlataText>
+            <View style={{ flexDirection: 'column', flexWrap: 'wrap', paddingLeft: 10, paddingTop: 5 }}>
+              <View style={{paddingVertical: 10, justifyContent: 'space-between'}}>
+                <AlataText style={{fontSize: 16}}>{recipe.strInstructions}</AlataText>
+              </View>
+            </View>
+          </View>
         </View>
+
         <Pressable onPress={onFindNewRecipe} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
         <AlataLarge style={{marginBottom: 5, textAlign: 'center'}}>Get new recipe!</AlataLarge>
       </Pressable>
+
       </ScrollView>
     </View>
   );
@@ -110,21 +138,29 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
     borderRadius: 20,
-    backgroundColor: Colors.dark.background,
+    backgroundColor: Colors.dark.mainColorDark,
     flexDirection: 'column',
     gap: 20,
   },
   image: {
     width: '100%',
-    height: 150,
+    height: 200,
     resizeMode: 'cover',
     borderRadius: 20,
+  },
+  contentBox: {
+    backgroundColor: Colors.dark.background,
+    borderRadius: 20,
+    padding: 20,
+    marginTop: 15,
+    marginBottom: 15,
   },
   button: {
     backgroundColor: Colors.dark.mainColorDark,
     borderRadius: 10, 
     width: 200,
     padding: 10,
+    marginBottom: 40,
     justifyContent: 'center',
     alignSelf: 'center',
   },

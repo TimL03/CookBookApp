@@ -67,7 +67,7 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
           
           <View style={styles.contentBox}>
             <AlataText style={{fontSize: 20}}>Ingredients:</AlataText>
-            <View style={{ flexDirection: 'column', flexWrap: 'wrap', paddingLeft: 10, paddingTop: 5}}>
+            <View style={{ flexDirection: 'column', flexWrap: 'wrap', paddingHorizontal: 10, paddingTop: 5}}>
               {recipe.ingredients.map((ingredient, index) => (
                 <View key={index} style={{paddingVertical: 2, justifyContent: 'space-between', flexDirection: 'row'}}>
                   <AlataText style={{flex: 1, fontSize: 16}}>{index + 1}. {ingredient}</AlataText>
