@@ -41,7 +41,6 @@ export default function SearchBar({ item }: SelectionProps) {
             <View style={{flexDirection:'row', gap: -1}}>
               <TextInput
               onPressIn={searchActive}
-              onEndEditing={searchInactive}
               placeholder={`search...`}
               placeholderTextColor={Colors.dark.text}
               style={styles.inputDelete}
@@ -61,6 +60,7 @@ export default function SearchBar({ item }: SelectionProps) {
             (search) ?
             <View style={styles.searchList}>   
                 <FlatList 
+                  keyboardShouldPersistTaps='handled'
                   data={item} 
                   renderItem={({ item }) => (
                     <Pressable onPress={() => itemSelected(item.key)} style={({ pressed }) => [styles.button, { backgroundColor: (isItemSelected(item.key)) ? Colors.dark.tint : Colors.dark.mainColorDark }]}>

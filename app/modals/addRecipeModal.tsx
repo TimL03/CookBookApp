@@ -5,13 +5,13 @@ import { db } from '../../FirebaseConfig'
 import { collection, addDoc } from 'firebase/firestore';
 import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { AlataLarge } from '../../components/StyledText';
-import { X, PlusCircle, Plus, Save } from 'lucide-react-native';
+import { AlataLarge, AlataMedium, AlataText } from '../../components/StyledText';
+import { X, PlusCircle, Plus, Save, ChevronDown } from 'lucide-react-native';
 import TopModalBar from '../../components/topModalBar';
+import DropDown from '../../components/DropDown';
 
 interface AddRecipeScreenProps {
-  closeModal: () => void;
-  
+  closeModal: () => void;  
 }
 
 export default function AddRecipeScreen({ closeModal }: AddRecipeScreenProps) {
@@ -22,6 +22,17 @@ export default function AddRecipeScreen({ closeModal }: AddRecipeScreenProps) {
   const [ingredients, setIngredients] = useState(['']);
   const [steps, setSteps] = useState(['']);
   const [imageUri, setImageUri] = useState<string | null>(null);
+
+  const units = [
+    { key: '1', value: 'tbsp'},
+    { key: '2', value: 'tsp'},
+    { key: '3', value: 'cup'},
+    { key: '4', value: 'ml'},
+    { key: '5', value: 'l'},
+    { key: '6', value: 'g'},
+    { key: '7', value: 'kg'},
+    { key: '8', value: 'x'},
+  ];
 
 
   const addImage = async () => {
@@ -96,70 +107,87 @@ const uploadImage = async (uri: string, recipeName: string) => {
     setSteps(steps.filter((_, index) => index !== indexToRemove));
   };
 
+  const unitDropDown = () => {
+    
+  }
+
 
 
   return (
     <View style={styles.container}>
       <TopModalBar title="Add Recipe" onClose={closeModal} />
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={styles.scrollView} keyboardShouldPersistTaps='handled'>
+
         <Pressable onPress={addImage} style={({ pressed }) => [styles.addImage, { backgroundColor: pressed ? Colors.dark.background : Colors.dark.mainColorLight },]}>
           <PlusCircle color={Colors.dark.text} size={24} style={{alignSelf: 'center'}} />
           <AlataLarge>Add Image</AlataLarge>
         </Pressable>
+
         <View style={{padding: 30}}>
-        <AlataLarge>Name:</AlataLarge>
-        <TextInput placeholder="Name" value={name} onChangeText={setName} style={styles.input}/>
-        <AlataLarge>Kategory:</AlataLarge>
-        <TextInput placeholder="Kategory" value={category} onChangeText={setCategory} style={styles.input}/>
-        <AlataLarge>Preperation Time:</AlataLarge>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookHTime} onChangeText={setCookHTime} style={styles.inputNumber}/>
-          <Text style={{paddingVertical: 15, textAlign: 'center', fontSize: 16, fontFamily: 'Alata', color: Colors.dark.text}}>hours</Text>
-          <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookMinTime} onChangeText={setCookMinTime} style={styles.inputNumber}/>
-          <Text style={{paddingVertical: 15, alignContent: 'center', textAlign: 'center', fontSize: 16, fontFamily: 'Alata', color: Colors.dark.text}}>minutes</Text>
-        </View>
-        <AlataLarge>Ingredients:</AlataLarge>
-        {ingredients.map((ingredient, index) => (
-          <View style={{flexDirection:'row', gap: -1}}>
-            <TextInput
-            key={index}
-            placeholder={`Ingredient ${index + 1}`}
-            value={ingredient}
-            onChangeText={(text) => {
-              const newIngredients = [...ingredients];
-              newIngredients[index] = text;
-              setIngredients(newIngredients);
-            }}
-            style={styles.inputDelete}
-          />
-          <Pressable onPress={() => removeIngredient(index)} style={styles.deleteButton}>
-          <X color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
-          </Pressable>
+          <AlataLarge>Name:</AlataLarge>
+          <TextInput placeholder="Name" value={name} onChangeText={setName} style={styles.input} placeholderTextColor={Colors.dark.text}/>
+          <AlataLarge>Kategory:</AlataLarge>
+          <TextInput placeholder="Kategory" value={category} onChangeText={setCategory} style={styles.input} placeholderTextColor={Colors.dark.text}/>
+          <AlataLarge>Preperation Time:</AlataLarge>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookHTime} onChangeText={setCookHTime} style={styles.inputNumber} placeholderTextColor={Colors.dark.text}/>
+            <Text style={{paddingVertical: 15, textAlign: 'center', fontSize: 16, fontFamily: 'Alata', color: Colors.dark.text}}>hours</Text>
+            <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookMinTime} onChangeText={setCookMinTime} style={styles.inputNumber} placeholderTextColor={Colors.dark.text}/>
+            <Text style={{paddingVertical: 15, alignContent: 'center', textAlign: 'center', fontSize: 16, fontFamily: 'Alata', color: Colors.dark.text}}>minutes</Text>
           </View>
-        ))}
-        <Pressable onPress={addIngredient} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-          <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
-        </Pressable>
-        <AlataLarge>Instructions:</AlataLarge>
-        {steps.map((step, index) => (
-          <View style={{flexDirection:'row', gap: -1}}>
-            <TextInput
-            multiline
-            numberOfLines={3}
-            key={index}
-            placeholder={`Step ${index + 1}`}
-            value={step}
-            onChangeText={(text) => {
-              const newSteps = [...steps];
-              newSteps[index] = text;
-              setSteps(newSteps);
-            }}
-            style={styles.inputDelete}
-          />
-          <Pressable onPress={() => removeStep (index)} style={styles.deleteButton}>
-          <X color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
+
+          <AlataLarge>Ingredients:</AlataLarge>
+          {ingredients.map((ingredient, index) => (
+            <View style={{flexDirection: 'row', gap: 10, zIndex: 1}}>
+              <View style={styles.input}>
+                <TextInput
+                key={index}
+                placeholder={`Ingredient ${index + 1}`}
+                value={ingredient}
+                placeholderTextColor={Colors.dark.text}
+                onChangeText={(text) => {
+                  const newIngredients = [...ingredients];
+                  newIngredients[index] = text;
+                  setIngredients(newIngredients);
+                }}
+                style={{fontFamily: 'Alata', flex: 1, color: Colors.dark.text}}
+                />
+                <Pressable onPress={() => removeIngredient(index)} style={{alignSelf: 'center'}}>
+                  <X color={Colors.dark.text} size={22} strokeWidth='2.5' />
+                </Pressable>
+              </View>
+              <View style={{flex: 2}}>
+                <DropDown item={units}/>
+              </View>
+            </View>
+            
+          ))}
+          <Pressable onPress={addIngredient} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+            <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
           </Pressable>
-          </View>
+
+
+          <AlataLarge>Instructions:</AlataLarge>
+          {steps.map((step, index) => (
+            <View style={{flexDirection:'row', gap: -1}}>
+              <TextInput
+                multiline
+                numberOfLines={3}
+                key={index}
+                placeholder={`Step ${index + 1}`}
+                value={step}
+                placeholderTextColor={Colors.dark.text}
+                onChangeText={(text) => {
+                  const newSteps = [...steps];
+                  newSteps[index] = text;
+                  setSteps(newSteps);
+                }}
+                style={styles.inputDelete}
+              />
+              <Pressable onPress={() => removeStep (index)} style={styles.deleteButton}>
+              <X color={Colors.dark.text} size={22} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
+              </Pressable>
+            </View>
         ))}
         <Pressable onPress={addStep} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
           <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
@@ -183,12 +211,13 @@ const styles = StyleSheet.create({
   input: {
     color: Colors.dark.text,
     backgroundColor: Colors.dark.mainColorLight,
+    flexDirection: 'row',
     padding: 10, 
     borderRadius: 15,  
     marginBottom: 10, 
     marginTop: 5, 
     fontFamily: 'Alata',
-    flex: 2
+    flex: 3
   },
   inputDelete: {
     color: Colors.dark.text,
@@ -213,7 +242,8 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    borderRadius: 20,
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
     backgroundColor: Colors.dark.background, 
     flexDirection: 'column',
     gap: 20,

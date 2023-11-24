@@ -70,7 +70,7 @@ export default function TabOneScreen() {
   
   return (
     <View style={styles.container}>
-      <ScrollView showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false}>
+      <ScrollView showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled'>
       <View>
         <AlataLarge>Select Ingredients:</AlataLarge>
         <SearchBar item={data}/>

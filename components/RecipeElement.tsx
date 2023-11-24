@@ -10,11 +10,15 @@ import ViewRecipeScreen from '../app/modals/viewRecipeModal';
 
 type RecipeProps = {
     item: {
-        key: Int16Array;
-        name: string;
-        cookHTime: string;
-        cookMinTime: string;
-        imageUrl: string;
+    id: string; 
+    name: string;
+    category: string;
+    cookHTime: string;
+    cookMinTime: string;
+    description: string;
+    ingredients: string[];
+    steps: string[];
+    imageUrl: string;
     };
 };
 
@@ -28,7 +32,7 @@ export default function Recipe({ item }: RecipeProps) {
         <TouchableOpacity onPress={toggleModal} style={styles.outerBox} activeOpacity={0.2}>  
             <Image
                 style={styles.logoSmall}
-                source={{ uri: item.imageUrl }}
+                source={(item.imageUrl == null ? {uri: undefined} : { uri: item.imageUrl })}
             />
             <View style={styles.innerBox}>
                 <AlataLarge>{item.name}</AlataLarge>

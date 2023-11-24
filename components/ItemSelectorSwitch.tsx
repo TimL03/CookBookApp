@@ -17,13 +17,15 @@ type SelectionProps = {
 export default function ItemSelectorSwitch({ item, onToggle }: SelectionProps) {
     const [isSelected, setSelected] = React.useState(item.selected);
     const switchPressed = () => {
-        setSelected(!isSelected);
-        if (onToggle) {
-            onToggle();
-          }
+        if(item.selected !== null) {
+            setSelected(!isSelected);
+            if (onToggle) {
+                onToggle();
+            }
+        }
     }
     return (
-        <Pressable onPress={switchPressed} style={() => [styles.button, { backgroundColor: isSelected ? Colors.dark.tint : Colors.dark.mainColorDark }]}>
+        <Pressable onPress={switchPressed} style={() => [styles.button, { backgroundColor: !isSelected ? Colors.dark.tint : Colors.dark.mainColorDark }]}>
             <AlataMedium style={{marginBottom: 5, textAlign: 'center'}}>{item.value}</AlataMedium>
         </Pressable>
     )
