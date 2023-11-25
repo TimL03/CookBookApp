@@ -80,7 +80,7 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
       <ScrollView style={styles.scrollView}>
         <Image
           style={styles.image}
-          source={{ uri: recipe.strMealThumb }}
+          source={recipe.strMealThumb == null ? {uri: '../../assets/images/no-image.png'} : { uri: recipe.strMealThumb }}
         />
         <View style={{ padding: 30, marginTop: -20, backgroundColor: Colors.dark.mainColorDark, borderRadius: 15, flex: 1 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -121,7 +121,7 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
           </View>
         </View>
 
-        <Pressable onPress={onFindNewRecipe} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+      <Pressable onPress={onFindNewRecipe} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
         <AlataLarge style={{marginBottom: 5, textAlign: 'center'}}>Get new recipe!</AlataLarge>
       </Pressable>
 

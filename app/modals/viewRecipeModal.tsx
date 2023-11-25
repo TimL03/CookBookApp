@@ -34,7 +34,7 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
       <ScrollView style={styles.scrollView}>
         <Image
           style={styles.image}
-          source={{ uri: recipe.imageUrl }}
+          source={recipe.imageUrl == '' ? require("../../assets/images/no-image.png") : { uri: recipe.imageUrl }}
         />
         <View style={{ padding: 30, marginTop: -20, backgroundColor: Colors.dark.mainColorDark, borderRadius: 15, flex: 1 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -51,13 +51,13 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
               </Pressable>
             </View>
           </View>
-          <AlataMedium>{recipe.cookHTime} h {recipe.cookMinTime} min</AlataMedium>
+          <AlataMedium>{(recipe.cookHTime == '0' || recipe.cookHTime == '') ? '' : (recipe.cookHTime == '1') ? (recipe.cookHTime + ' hour ') : (recipe.cookHTime + ' hours ')}{(recipe.cookHTime == '0' || recipe.cookHTime == '' || recipe.cookMinTime == '0' || recipe.cookMinTime == '')  ? '' : 'and '}{(recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : (recipe.cookMinTime == '1') ? (recipe.cookMinTime + ' minute ') : (recipe.cookMinTime + ' minutes ')}</AlataMedium>
 
           <View style={{ justifyContent: 'flex-start', flexDirection:'row', paddingTop: 20, marginBottom:20,flexWrap:'wrap'}}>
             {
               currentCategories?.map((item,index) => {
               return (
-                <View style={{backgroundColor: Colors.dark.tint, padding: 10, borderRadius: 20, marginRight: 5}}>
+                <View key={item.key} style={{backgroundColor: Colors.dark.tint, padding: 10, borderRadius: 20, marginRight: 5}}>
                   <AlataText style={{fontSize: 12}}>{item.value}</AlataText>
                 </View>
               )

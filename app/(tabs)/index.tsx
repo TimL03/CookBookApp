@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Pressable, ScrollView, Modal, TouchableOpacity} from 'react-native';
-import React, { useState } from 'react';
+import React, { useReducer, useRef, useState } from 'react';
 import ItemSelectorSwitch from '../../components/ItemSelectorSwitch'
 import {AlataLarge} from '../../components/StyledText'
 import Colors from '../../constants/Colors';
@@ -9,7 +9,7 @@ import ViewRandomRecipeScreen from '../modals/viewRandomRecipeModal';
 const data = [
   {key:'1', value:'Tomato', selected: false},
   {key:'2', value:'Spagetti', selected: false},
-  {key:'3', value:'Garlic', selected: true},
+  {key:'3', value:'Garlic', selected: false},
   {key:'4', value:'Milk', selected: false},
   {key:'5', value:'Soy Sauce', selected: false},
   {key:'6', value:'Salad', selected: false},
@@ -17,10 +17,19 @@ const data = [
   {key:'8', value:'Onion', selected: false},
 ];
 
-export default function TabOneScreen() {  
+const recomendedList = data.filter((i) => i.key === '1' || i.key === '2' || i.key === '3');
+
+
+export default function TabOneScreen() {
+  const [currentList, setCurrentList] = useState(recomendedList);
   const [ingredients, setIngredients] = useState(data);
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState(null);
+
+
+  const handleCurrentListUpdate = (updatedList: {key: string, value: string, selected: boolean}[]) => {
+    setCurrentList(updatedList);
+  };
 
   const getSelectedIngredients = () => {
     return ingredients
@@ -30,11 +39,10 @@ export default function TabOneScreen() {
 };
 
   const getMeal = async () => {
-    console.log("getMeal aufgerufen");
     const selectedIngredients = getSelectedIngredients();
     try {
       const response = await fetch(`https://www.themealdb.com/api/json/v2/9973533/filter.php?i=${selectedIngredients}`);
-      console.log("URL für den API-Aufruf: ", response);
+      console.log("URL for API call: ", response);
       const data = await response.json();
       if (data.meals) {
         const randomMealId = data.meals[Math.floor(Math.random() * data.meals.length)].idMeal;
@@ -73,10 +81,10 @@ export default function TabOneScreen() {
       <ScrollView showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled'>
       <View>
         <AlataLarge>Select Ingredients:</AlataLarge>
-        <SearchBar item={data}/>
+        <SearchBar item={data} currentList={recomendedList} onCurrentListUpdated={handleCurrentListUpdate}/>
         <View style={{ flexDirection:'row',marginBottom:20,flexWrap:'wrap'}}>
         {
-              ingredients.map((item) => (
+              currentList.map((item) => (
                 <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleIngredientSelected(item.key)} />
               ))
             }
@@ -86,12 +94,12 @@ export default function TabOneScreen() {
 
       <View>
         <AlataLarge>Select Categories:</AlataLarge>
-        <SearchBar item={data}/>
+        <SearchBar item={data} currentList={recomendedList} onCurrentListUpdated={handleCurrentListUpdate}/>
         <View style={{ flexDirection:'row',marginBottom:20,flexWrap:'wrap'}}>
         {
-          data?.map((item,index) => {
+          currentList?.map((item,index) => {
           return (
-            <ItemSelectorSwitch item={item} />
+            <ItemSelectorSwitch key={item.key} item={item} />
           )
           })
         }
@@ -121,7 +129,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     padding: 30,
     alignContent: 'center',
-    justifyContent : 'space-around',
+    justifyContent : 'space-evenly',
+    gap: 15
   },
   item: {
     backgroundColor: Colors.dark.mainColorLight,

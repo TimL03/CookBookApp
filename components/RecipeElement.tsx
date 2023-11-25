@@ -32,11 +32,11 @@ export default function Recipe({ item }: RecipeProps) {
         <TouchableOpacity onPress={toggleModal} style={styles.outerBox} activeOpacity={0.2}>  
             <Image
                 style={styles.logoSmall}
-                source={(item.imageUrl == null ? {uri: undefined} : { uri: item.imageUrl })}
+                source={item.imageUrl == '' ? require("../assets/images/no-image.png") : { uri: item.imageUrl }}
             />
             <View style={styles.innerBox}>
                 <AlataLarge>{item.name}</AlataLarge>
-                <AlataMedium>{item.cookHTime} h {item.cookMinTime} min</AlataMedium>
+                <AlataMedium>{(item.cookHTime == '0' ||  item.cookHTime == '') ? '' : item.cookHTime + ' h '}{(item.cookMinTime == '0' || item.cookMinTime == '') ? '' : (item.cookMinTime + ' min ')}</AlataMedium>
             </View>
             <View style={styles.icons}>
                     <Soup color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />

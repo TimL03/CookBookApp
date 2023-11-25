@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Pressable, TextInput, View, StyleSheet } from 'react-native';
+import { Pressable, TextInput, View, StyleSheet, Keyboard } from 'react-native';
 import { Search, X } from 'lucide-react-native';
 import Colors from '../constants/Colors';
 import { AlataLarge, AlataMedium } from './StyledText';
@@ -11,11 +11,21 @@ type SelectionProps = {
     value: string;
     selected: boolean;
   }[];
+  currentList: { 
+    key: string;
+    value: string;
+    selected: boolean;
+  }[];
+  onCurrentListUpdated: (searchList: { 
+    key: string;
+    value: string;
+    selected: boolean;
+  }[]) => void;
 };
 
-export default function SearchBar({ item }: SelectionProps) {
+export default function SearchBar({ item, currentList, onCurrentListUpdated }: SelectionProps) {
+  const [thiscurrentList, setCurrentList] = React.useState(currentList);
   const [search, setSearch] = React.useState(false);
-  //const [selectedItems, setSelectedItems] = React.useState<{ [key: string]: boolean }>({});
 
   const searchActive = () => {
     setSearch(true);
@@ -23,6 +33,16 @@ export default function SearchBar({ item }: SelectionProps) {
 
   const searchInactive = () => {
     setSearch(false);
+    Keyboard.dismiss();
+  }
+
+  const updateList = (text: string) => {
+    if(text === '') {
+      setCurrentList(item.filter((i) => ( i.selected === true)));
+      return;
+    } else {
+      setCurrentList(item.filter((i) => i.value.toLowerCase().includes(text.toLowerCase())));
+    };
   }
 
   const isItemSelected = (itemKey: string) => {
@@ -34,6 +54,8 @@ export default function SearchBar({ item }: SelectionProps) {
     if (selectedItem) {
       selectedItem.selected = !selectedItem.selected;
     }
+
+    onCurrentListUpdated(thiscurrentList);
   }
 
     return(
@@ -41,7 +63,9 @@ export default function SearchBar({ item }: SelectionProps) {
             <View style={{flexDirection:'row', gap: -1}}>
               <TextInput
               onPressIn={searchActive}
+              onEndEditing={searchInactive}
               placeholder={`search...`}
+              onChangeText={updateList}
               placeholderTextColor={Colors.dark.text}
               style={styles.inputDelete}
             />
@@ -58,18 +82,14 @@ export default function SearchBar({ item }: SelectionProps) {
             </View>
           {
             (search) ?
-            <View style={styles.searchList}>   
-                <FlatList 
-                  keyboardShouldPersistTaps='handled'
-                  data={item} 
-                  renderItem={({ item }) => (
-                    <Pressable onPress={() => itemSelected(item.key)} style={({ pressed }) => [styles.button, { backgroundColor: (isItemSelected(item.key)) ? Colors.dark.tint : Colors.dark.mainColorDark }]}>
-                      <AlataMedium>{item.value}</AlataMedium>
+            <View style={styles.searchList}>  
+              {
+                thiscurrentList.map((i) => (
+                    <Pressable  key={i.key} onPress={() => itemSelected(i.key)} style={({ pressed }) => [styles.button, { backgroundColor: (isItemSelected(i.key)) ? Colors.dark.tint : Colors.dark.mainColorDark }]}>
+                      <AlataMedium>{i.value}</AlataMedium>
                     </Pressable>
-                  )}
-                  keyExtractor={(item, index) => item.key + index}             
-                >
-                </FlatList>
+                ))
+              }
             </View>
            : null
           }
@@ -80,7 +100,6 @@ export default function SearchBar({ item }: SelectionProps) {
 
 const styles = StyleSheet.create({
     inputDelete: {
-      position: 'sticky',
       color: Colors.dark.text,
       backgroundColor: Colors.dark.mainColorLight,
       padding: 10, 

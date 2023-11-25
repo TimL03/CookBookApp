@@ -138,10 +138,9 @@ const uploadImage = async (uri: string, recipeName: string) => {
 
           <AlataLarge>Ingredients:</AlataLarge>
           {ingredients.map((ingredient, index) => (
-            <View style={{flexDirection: 'row', gap: 10, zIndex: 1}}>
+            <View key={index} style={{flexDirection: 'row', gap: 10, zIndex: 1}}>
               <View style={styles.input}>
                 <TextInput
-                key={index}
                 placeholder={`Ingredient ${index + 1}`}
                 value={ingredient}
                 placeholderTextColor={Colors.dark.text}
@@ -169,11 +168,10 @@ const uploadImage = async (uri: string, recipeName: string) => {
 
           <AlataLarge>Instructions:</AlataLarge>
           {steps.map((step, index) => (
-            <View style={{flexDirection:'row', gap: -1}}>
+            <View key={index} style={{flexDirection:'row', gap: -1}}>
               <TextInput
                 multiline
                 numberOfLines={3}
-                key={index}
                 placeholder={`Step ${index + 1}`}
                 value={step}
                 placeholderTextColor={Colors.dark.text}
