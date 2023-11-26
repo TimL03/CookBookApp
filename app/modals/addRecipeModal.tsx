@@ -128,7 +128,7 @@ const uploadImage = async (uri: string, recipeName: string) => {
         <View style={{padding: 30}}>
           <AlataLarge>Name:</AlataLarge>
           <TextInput placeholder="Name" value={name} onChangeText={setName} style={styles.input} placeholderTextColor={Colors.dark.text}/>
-          <AlataLarge>Kategory:</AlataLarge>
+          <AlataLarge>Category:</AlataLarge>
           <TextInput placeholder="Kategory" value={category} onChangeText={setCategory} style={styles.input} placeholderTextColor={Colors.dark.text}/>
           <AlataLarge>Preperation Time:</AlataLarge>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>

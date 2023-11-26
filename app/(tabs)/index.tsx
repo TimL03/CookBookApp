@@ -3,7 +3,6 @@ import React, { useReducer, useRef, useState } from 'react';
 import ItemSelectorSwitch from '../../components/ItemSelectorSwitch'
 import { AlataLarge } from '../../components/StyledText'
 import Colors from '../../constants/Colors';
-import LoginModal from '../modals/logInModal';
 import SearchBar from '../../components/searchBar';
 import SearchBarCategories from '../../components/searchBarCategories';
 import ViewRandomRecipeScreen from '../modals/viewRandomRecipeModal';
@@ -34,7 +33,7 @@ export default function TabOneScreen() {
   const [ingredients, setIngredients] = useState(dataIngredients);
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(''); // Zustandsvariable für die ausgewählte Kategorie
+  const [selectedCategory, setSelectedCategory] = useState(''); 
 
 
   const handleCurrentListIngredientsUpdate = (updatedList: { key: string, value: string, selected: boolean }[]) => {

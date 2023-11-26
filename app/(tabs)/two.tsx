@@ -10,7 +10,7 @@ import { User } from 'firebase/auth';
 import { useState, useEffect } from "react"
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import AddRecipeScreen from '../modals/addRecipeModal';
-
+import ShowSharedRecipeInvitationModalScreen from '../modals/showSharedRecipeInvitation';
 
 interface RecipeData {
   id: string;
@@ -30,9 +30,35 @@ interface GroupedByCategory {
 }
 export default function TabTwoScreen() {
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isInvitationModalVisible, setIsInvitationModalVisible] = useState(false);
+  const [invitationData, setInvitationData] = useState<any>(null); 
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userID, setUserID] = useState<string | null>(null);
+
+  const openInvitationModal = (invitation: string) => {
+    setInvitationData(invitation); 
+    setIsInvitationModalVisible(true);
+  };
+
+  useEffect(() => {
+    if (userID) {
+      const q = query(collection(db, "invitations"), where("receiverId", "==", userID), where("status", "==", "pending"));
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const invitations: any[] = [];
+        querySnapshot.forEach((doc) => {
+          const invitationData = doc.data();
+          invitations.push({ id: doc.id, ...invitationData });
+        });
+
+        invitations.forEach((invitation) => {
+          openInvitationModal(invitation);
+        });
+      });
+
+      return () => unsubscribe();
+    }
+  }, [userID]);
 
   const handleLoginSuccess = (user: User) => {
     setIsAuthenticated(true);
@@ -111,6 +137,14 @@ export default function TabTwoScreen() {
         >
           <LoginModalScreen onClose={() => setIsLoginModalVisible(false)} setUserID={setUserID}
             setIsAuthenticated={setIsAuthenticated} onLoginSuccess={handleLoginSuccess} />
+        </Modal>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isInvitationModalVisible}
+          onRequestClose={() => setIsInvitationModalVisible(false)}
+        >
+          <ShowSharedRecipeInvitationModalScreen onClose={() => setIsInvitationModalVisible(false)} invitationData={invitationData}/>
         </Modal>
       </View>
     </View>
