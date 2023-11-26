@@ -3,15 +3,17 @@ import React from 'react';
 import { Plus } from 'lucide-react-native';
 import Recipe from '../../components/RecipeElement'
 import { AlataLarge, AlataMedium } from '../../components/StyledText'
+import LoginModalScreen from '../modals/logInModal';
 import Colors from '../../constants/Colors';
 import { db } from '../../FirebaseConfig'
+import { User } from 'firebase/auth';
 import { useState, useEffect } from "react"
-import { collection, onSnapshot, query } from 'firebase/firestore';
-import AddRecipeScreen from '../modals/addRecipeModal'; 
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import AddRecipeScreen from '../modals/addRecipeModal';
 
 
 interface RecipeData {
-  id: string; 
+  id: string;
   name: string;
   category: string;
   cookHTime: string;
@@ -20,6 +22,7 @@ interface RecipeData {
   ingredients: string[];
   steps: string[];
   imageUrl: string;
+  userID: string;
 }
 
 interface GroupedByCategory {
@@ -27,39 +30,53 @@ interface GroupedByCategory {
 }
 export default function TabTwoScreen() {
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userID, setUserID] = useState<string | null>(null);
+
+  const handleLoginSuccess = (user: User) => {
+    setIsAuthenticated(true);
+    setUserID(user.uid);
+  };
 
   const toggleModal = () => {
-    setModalVisible(!isModalVisible);
+    if (isAuthenticated) {
+      setModalVisible(!isModalVisible);
+    } else {
+      setIsLoginModalVisible(!isLoginModalVisible);
+    }
   };
 
   const [data, setData] = useState<Array<{ title: string, data: RecipeData[] }>>([]);
 
   useEffect(() => {
-    const q = query(collection(db, "recipes"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const recipes: RecipeData[] = [];
-      querySnapshot.forEach((doc) => {
-        const recipeData = doc.data() as Omit<RecipeData, 'id'>;
-        recipes.push({ id: doc.id, ...recipeData });
+    if (userID) {
+      const q = query(collection(db, "recipes"), where("userID", "==", userID));
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const recipes: RecipeData[] = [];
+        querySnapshot.forEach((doc) => {
+          const recipeData = doc.data() as Omit<RecipeData, 'id'>;
+          recipes.push({ id: doc.id, ...recipeData });
+        });
+
+        const groupedByCategory = recipes.reduce((acc: GroupedByCategory, recipe) => {
+          const { category } = recipe;
+          acc[category] = acc[category] || [];
+          acc[category].push(recipe);
+          return acc;
+        }, {});
+
+        const sections = Object.keys(groupedByCategory).map(key => ({
+          title: key,
+          data: groupedByCategory[key],
+        }));
+
+        setData(sections);
       });
 
-      const groupedByCategory = recipes.reduce((acc: GroupedByCategory, recipe) => {
-        const { category } = recipe;
-        acc[category] = acc[category] || [];
-        acc[category].push(recipe);
-        return acc;
-      }, {});
-
-      const sections = Object.keys(groupedByCategory).map(key => ({
-        title: key,
-        data: groupedByCategory[key],
-      }));
-
-      setData(sections);
-    });
-
-    return () => unsubscribe(); 
-  }, []);
+      return () => unsubscribe();
+    }
+  }, [userID]);
 
   return (
     <View style={styles.container}>
@@ -79,13 +96,22 @@ export default function TabTwoScreen() {
           <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
         </Pressable>
         <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={toggleModal}
+          animationType="slide"
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={toggleModal}
         >
-        <AddRecipeScreen closeModal={toggleModal} />
-      </Modal>
+          <AddRecipeScreen closeModal={toggleModal} userID={userID}/>
+        </Modal>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isLoginModalVisible}
+          onRequestClose={() => setIsLoginModalVisible(false)}
+        >
+          <LoginModalScreen onClose={() => setIsLoginModalVisible(false)} setUserID={setUserID}
+            setIsAuthenticated={setIsAuthenticated} onLoginSuccess={handleLoginSuccess} />
+        </Modal>
       </View>
     </View>
   )

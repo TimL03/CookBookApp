@@ -12,9 +12,10 @@ import DropDown from '../../components/DropDown';
 
 interface AddRecipeScreenProps {
   closeModal: () => void;  
+  userID: string | null;
 }
 
-export default function AddRecipeScreen({ closeModal }: AddRecipeScreenProps) {
+export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenProps) {
   const [name, setName] = useState('');
   const [cookHTime, setCookHTime] = useState('');
   const [cookMinTime, setCookMinTime] = useState('');
@@ -82,6 +83,7 @@ const uploadImage = async (uri: string, recipeName: string) => {
         ingredients,
         steps,
         imageUrl, 
+        userID
       });
       console.log('Dokument geschrieben mit ID: ', docRef.id);
       closeModal();
