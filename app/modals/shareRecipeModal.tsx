@@ -5,6 +5,7 @@ import { db } from '../../FirebaseConfig'
 import { collection, addDoc } from 'firebase/firestore';
 import { AlataLarge, AlataMedium, AlataText } from '../../components/StyledText';
 import TopModalBar from '../../components/topModalBar';
+import { Send } from 'lucide-react-native';
 
 interface ShareRecipeScreenProps {
   closeModal: () => void;
@@ -43,48 +44,79 @@ export default function ShareRecipeScreen({ closeModal, recipe }: ShareRecipeScr
   };
 
   return (
-    <View style={styles.container}>
-      <TopModalBar title="Share Recipe" onClose={closeModal} />
-      <ScrollView style={styles.scrollView} keyboardShouldPersistTaps='handled'>
-        <Image
-          style={styles.image}
-          source={{ uri: recipe.imageUrl }}
-        />
-        <View style={{ padding: 30, marginTop: -20, backgroundColor: Colors.dark.mainColorDark, borderRadius: 15, flex: 1 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <Text style={{ fontFamily: 'Alata', fontSize: 25, color: Colors.dark.text }}>{recipe.name}</Text>
+    <Pressable style={styles.modalContainer} onPress={closeModal}>
+      <View style={styles.modalContent}>
+        <AlataText style={{ textAlign: 'center', fontSize: 24, marginBottom: 15 }}>Share {recipe.name} Recipe</AlataText>
+        <AlataText style={{fontSize: 20, marginBottom: 10 }}>Message:</AlataText>
+        <View style={styles.inputContainer}>
+        <TextInput
+          multiline
+          numberOfLines={3}
+          style={styles.input}
+          placeholder="Optional message"
+          value={message}
+          onChangeText={text => setMessage(text)}
+          placeholderTextColor={Colors.dark.text}
+          />
+        </View>
+
+        <AlataText style={{fontSize: 20, marginBottom: 10 }}>Share with:</AlataText>
+        <View style={{flexDirection:'row', gap: 15}}>
+          <View style={[styles.inputContainer, {flex: 1}]}>
+            <TextInput
+              placeholder="Recipient (UserID or E-Mail)"
+              value={recipient}
+              onChangeText={text => setRecipient(text)}
+              style={styles.input}
+              placeholderTextColor={Colors.dark.text}
+            />
           </View>
-          <AlataMedium>{(recipe.cookHTime == '0' || recipe.cookHTime == '') ? '' : (recipe.cookHTime == '1') ? (recipe.cookHTime + ' hour ') : (recipe.cookHTime + ' hours ')}{(recipe.cookHTime == '0' || recipe.cookHTime == '' || recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : 'and '}{(recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : (recipe.cookMinTime == '1') ? (recipe.cookMinTime + ' minute ') : (recipe.cookMinTime + ' minutes ')}</AlataMedium>
-
-
-          <AlataLarge>Recipient:</AlataLarge>
-          <TextInput
-            placeholder="Recipient (UserID or E-Mail)"
-            value={recipient}
-            onChangeText={text => setRecipient(text)}
-          />
-          <AlataLarge>Message: (optional)</AlataLarge>
-          <TextInput
-            multiline
-            placeholder="Optional message"
-            value={message}
-            onChangeText={text => setMessage(text)}
-            placeholderTextColor={Colors.dark.text}
-          />
-          <Pressable onPress={saveInvitation}>
-            <AlataLarge style={{ marginBottom: 5, textAlign: 'center' }}>Share Recipe</AlataLarge>
+          
+          <Pressable onPress={saveInvitation} style={styles.button}>
+            <Send color={Colors.dark.text} size={24} style={{ alignSelf: 'center', alignItems: 'center' }} />
           </Pressable>
         </View>
-      </ScrollView>
-    </View>
+
+        
+      </View>
+    </Pressable>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  modalContainer: {
     flex: 1,
-    backgroundColor: Colors.dark.mainColorDark,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0)',
+    backdropFilter: 'blur(5px)',
   },
+  modalContent: {
+    backgroundColor: Colors.dark.background,
+    padding: 30,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    width: '100%',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: Colors.dark.mainColorLight,
+    borderRadius: 15,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+  },
+  input: {
+    flex: 1,
+    color: Colors.dark.text,
+    fontFamily: 'Alata',
+    paddingVertical: 10,
+    fontSize: 16,
+    textAlignVertical: 'top',
+  }, 
   scrollView: {
     flex: 1,
     borderRadius: 20,
@@ -92,17 +124,10 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: 20,
   },
-  image: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
-    borderRadius: 20,
-  },
-  contentBox: {
-    backgroundColor: Colors.dark.background,
-    borderRadius: 20,
-    padding: 20,
-    marginTop: 15,
+  button: {
+    borderRadius: 30,
+    backgroundColor: Colors.dark.tint,
+    padding: 15,
     marginBottom: 15,
-  },
+  }
 });
