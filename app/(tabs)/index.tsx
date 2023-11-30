@@ -6,6 +6,7 @@ import Colors from '../../constants/Colors';
 import SearchBar from '../../components/searchBar';
 import SearchBarCategories from '../../components/searchBarCategories';
 import ViewRandomRecipeScreen from '../modals/viewRandomRecipeModal';
+import SearchSwitch from '../../components/SearchSwitch';
 
 const dataIngredients = [
   { key: '1', value: 'Tomato', selected: false },
@@ -33,7 +34,8 @@ export default function TabOneScreen() {
   const [ingredients, setIngredients] = useState(dataIngredients);
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(''); 
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [searchMode, setSearchMode] = useState<'database' | 'cookbook'>('database');
 
 
   const handleCurrentListIngredientsUpdate = (updatedList: { key: string, value: string, selected: boolean }[]) => {
@@ -60,7 +62,7 @@ export default function TabOneScreen() {
 
   const getMeal = async () => {
     const selectedIngredients = getSelectedIngredients();
-    const selectedCategories = getSelectedCategories(); 
+    const selectedCategories = getSelectedCategories();
     try {
       const response = await fetch(`https://www.themealdb.com/api/json/v2/9973533/filter.php?i=${selectedIngredients}`);
       const data = await response.json();
@@ -97,33 +99,41 @@ export default function TabOneScreen() {
 
   return (
     <View style={styles.container}>
+      <SearchSwitch onToggle={(isDatabaseSearch) => setSearchMode(isDatabaseSearch ? 'database' : 'cookbook')} />
       <ScrollView showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled'>
-        <View>
-          <AlataLarge>Select Ingredients:</AlataLarge>
-          <SearchBar item={dataIngredients} currentList={recomendedListIngredients} onCurrentListUpdated={handleCurrentListIngredientsUpdate} />
-          <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
-            {
-              currentListIngredients.map((item) => (
+        {searchMode === 'database' && (
+          <View>
+            <AlataLarge>Select Ingredients:</AlataLarge>
+            <SearchBar item={dataIngredients} currentList={recomendedListIngredients} onCurrentListUpdated={handleCurrentListIngredientsUpdate} />
+            <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
+              {currentListIngredients.map((item) => (
                 <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleIngredientSelected(item.key)} />
-              ))
-            }
+              ))}
+            </View>
           </View>
-
-        </View>
-
-        <View>
-          <AlataLarge>Select Categories:</AlataLarge>
-          <SearchBarCategories item={dataCategories} currentListCategories={recomendedListCategories} onCurrentListCategoriesUpdated={handleCurrentListCategoriesUpdate} />
-          <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
-            {
-              currentListCategories?.map((item, index) => {
-                return (
-                  <ItemSelectorSwitch key={item.key} item={item} />
-                )
-              })
-            }
+        )}
+        {searchMode === 'cookbook' && (
+          <View>
+            <AlataLarge>Select Ingredients:</AlataLarge>
+            <SearchBar item={dataIngredients} currentList={recomendedListIngredients} onCurrentListUpdated={handleCurrentListIngredientsUpdate} />
+            <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
+              {currentListIngredients.map((item) => (
+                <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleIngredientSelected(item.key)} />
+              ))}
+            </View>
+            <AlataLarge>Select Categories:</AlataLarge>
+            <SearchBarCategories item={dataCategories} currentListCategories={recomendedListCategories} onCurrentListCategoriesUpdated={handleCurrentListCategoriesUpdate} />
+            <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
+              {
+                currentListCategories?.map((item, index) => {
+                  return (
+                    <ItemSelectorSwitch key={item.key} item={item} />
+                  )
+                })
+              }
+            </View>
           </View>
-        </View>
+        )}
       </ScrollView>
 
       <Pressable onPress={getMeal} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
@@ -140,6 +150,8 @@ export default function TabOneScreen() {
     </View>
   )
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
