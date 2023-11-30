@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { Modal, View, Text, StyleSheet, Pressable, Button, } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Modal, View, Text, StyleSheet, Pressable, Button, Animated, } from 'react-native';
 import { Settings, User2, Info } from 'lucide-react-native';
 import { BlurView, VibrancyView } from 'react-native-blur';
 import Colors from '../../constants/Colors';
@@ -26,12 +26,8 @@ const ActionsModal = ({ visible, onClose}: ActionsModalProps) => {
   };
 
   const handleSettingsPress = () => {
-    onClose(); // Close the modal before opening the settings
+    onClose();  
     debugger;
-    // Navigate to the SettingsModal or perform an action related to settings
-    // For navigation, you'd typically use a navigation library like react-navigation here
-    // For example:
-    // navigation.navigate('SettingsScreen') if using react-navigation
   };
 
   
@@ -43,10 +39,11 @@ const ActionsModal = ({ visible, onClose}: ActionsModalProps) => {
       onRequestClose={() => onClose()}
     >
       <Pressable style={styles.modalContainer} onPress={onClose}>
+
         <View style={styles.modalContent}>
           <AlataLargeMiddle>Aktionen</AlataLargeMiddle>        
             <Link href="/modals/settingsModal" asChild>
-              <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.background }]}>
+              <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.mainColorLight }]}>
                 <View style={styles.button}>
                   <Settings color={Colors.dark.text} size={22} style={{alignSelf: 'center'}} />
                   <AlataLarge style={{paddingBottom: 4}}>Settings</AlataLarge>
@@ -63,8 +60,8 @@ const ActionsModal = ({ visible, onClose}: ActionsModalProps) => {
               <AlataLarge style={{paddingBottom: 4}}>About the App</AlataLarge>
             </Pressable>
         </View>
-      </Pressable>
         
+      </Pressable>
     </Modal>
   );
 };
@@ -93,6 +90,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-start',
     gap: 15,
+  },
+  fadeIn: {
+    backgroundColor: '#000',
+    flex: 1,
+    flexGrow: 3
   }
 });
 
