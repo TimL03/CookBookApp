@@ -12,6 +12,7 @@ import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import AddRecipeScreen from '../modals/addRecipeModal';
 import ShowSharedRecipeInvitationModalScreen from '../modals/showSharedRecipeInvitation';
 
+
 interface RecipeData {
   id: string;
   name: string;

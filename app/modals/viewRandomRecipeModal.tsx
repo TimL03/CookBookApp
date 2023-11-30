@@ -1,10 +1,19 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet, Image, Pressable } from "react-native";
+import { Text, View, StyleSheet, Image, Pressable, TextInput, Modal } from "react-native";
 import TopModalBar from "../../components/topModalBar";
 import Colors from '../../constants/Colors';
+import { addDoc, collection } from 'firebase/firestore';
+import { db } from '../../FirebaseConfig'
+import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { Share2, PenSquare, Trash2, Save, ArrowDownToLine } from 'lucide-react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { AlataLarge, AlataMedium, AlataText } from '../../components/StyledText';
+import LoginModalScreen from './logInModal';
+
+interface Ingredient {
+  name: string;
+  measure: string;
+}
 
 interface ViewRandomRecipeScreenProps {
   closeModal: () => void;
@@ -57,8 +66,37 @@ interface ViewRandomRecipeScreenProps {
   };
 }
 
+interface Recipe {
+  strMeal: string;
+  strMealThumb: string;
+  strInstructions: string;
+}
+
+
 export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRecipe }: ViewRandomRecipeScreenProps) {
-  const ingredients = [];
+  const [category, setCategory] = useState('');
+  const [cookHTime, setCookHTime] = useState('');
+  const [cookMinTime, setCookMinTime] = useState('');
+  const [showInputs, setShowInputs] = useState(false);
+  const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userID, setUserID] = useState<string | null>(null);
+
+  const handleLoginSuccess = (user: User) => {
+    setIsAuthenticated(true);
+    setUserID(user.uid);
+  };
+
+
+  const auth = getAuth();
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      setUserID(user.uid);
+    }
+  });
+
+  const ingredients: Ingredient[] = [];
 
   for (let i = 1; i <= 20; i++) {
     const ingredientKey = `strIngredient${i}`;
@@ -73,6 +111,40 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
     }
   }
 
+  async function saveRecipeToDatabase(recipe: Recipe) {
+    try {
+      const recipesCollectionRef = collection(db, 'recipes');
+      const newRecipeRef = await addDoc(recipesCollectionRef, {
+        name: recipe.strMeal,
+        imageUrl: recipe.strMealThumb,
+        ingredients: ingredients.map(ingredient => `${ingredient.name} (${ingredient.measure})`),
+        steps: recipe.strInstructions.split('\n'),
+        userID,
+        category,
+        cookHTime,
+        cookMinTime,
+      });
+
+      console.log('Recipe saved to database with ID:', newRecipeRef.id);
+    } catch (error) {
+      console.error('Error saving recipe to database:', error);
+    }
+  }
+
+  const handleSaveButtonClick = () => {
+    if (!userID) {
+      setIsLoginModalVisible(true);
+    } else {
+      setShowInputs(true);
+    }
+  };
+
+  const handleFinalSaveClick = () => {
+    if (recipe) {
+      saveRecipeToDatabase(recipe);
+    }
+  };
+
 
   return (
     <View style={styles.container}>
@@ -80,52 +152,89 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
       <ScrollView style={styles.scrollView}>
         <Image
           style={styles.image}
-          source={recipe.strMealThumb == null ? {uri: '../../assets/images/no-image.png'} : { uri: recipe.strMealThumb }}
+          source={recipe.strMealThumb == null ? { uri: '../../assets/images/no-image.png' } : { uri: recipe.strMealThumb }}
         />
         <View style={{ padding: 30, marginTop: -20, backgroundColor: Colors.dark.mainColorDark, borderRadius: 15, flex: 1 }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             <Text style={{ fontFamily: 'Alata', fontSize: 24, color: Colors.dark.text }}>{recipe.strMeal}</Text>
             <View style={{ flexDirection: 'row', gap: 12 }}>
               <Pressable style={{ alignSelf: 'center' }}>
                 <Share2 color={Colors.dark.text} size={24} style={{ marginBottom: -5 }} />
               </Pressable>
-              <Pressable style={{ alignSelf: 'center' }}>
-                <ArrowDownToLine color={Colors.dark.text} size={24} style={{ marginBottom: -5 }} />
-              </Pressable>
+              {showInputs ? (
+                <Pressable onPress={handleFinalSaveClick} style={{ alignSelf: 'center' }}>
+                  <ArrowDownToLine color={Colors.dark.text} size={24} style={{ marginBottom: -5 }} />
+                </Pressable>
+              ) : (
+                <Pressable onPress={handleSaveButtonClick} style={{ alignSelf: 'center' }}>
+                  <Text style={{ color: Colors.dark.text }}>Save</Text>
+                </Pressable>
+              )}
             </View>
           </View>
 
-          <View style={{ justifyContent: 'flex-start', flexDirection:'row', paddingTop: 20, marginBottom:20,flexWrap:'wrap'}}>
-            
+          {showInputs && (
+            <View style={{ paddingHorizontal: 30 }}>
+              <TextInput
+                placeholder="Category"
+                style={styles.input}
+                value={category}
+                onChangeText={setCategory}
+              />
+              <TextInput
+                placeholder="Cook Time Hours"
+                style={styles.input}
+                value={cookHTime}
+                onChangeText={setCookHTime}
+              />
+              <TextInput
+                placeholder="Cook Time Min"
+                style={styles.input}
+                value={cookMinTime}
+                onChangeText={setCookMinTime}
+              />
+            </View>
+          )}
+
+          <View style={{ justifyContent: 'flex-start', flexDirection: 'row', paddingTop: 20, marginBottom: 20, flexWrap: 'wrap' }}>
+
           </View>
 
-        <View style={styles.contentBox}>
-            <AlataText style={{fontSize: 20}}>Ingredients:</AlataText>
-            <View style={{ flexDirection: 'column', flexWrap: 'wrap', paddingHorizontal: 10, paddingTop: 5}}>
+          <View style={styles.contentBox}>
+            <AlataText style={{ fontSize: 20 }}>Ingredients:</AlataText>
+            <View style={{ flexDirection: 'column', flexWrap: 'wrap', paddingHorizontal: 10, paddingTop: 5 }}>
               {ingredients.map((item, index) => (
-                <View key={index} style={{paddingVertical: 2, justifyContent: 'space-between', flexDirection: 'row'}}>
-                  <AlataText style={{flex: 1, fontSize: 16}}>{index + 1}. {item.name}</AlataText>
-                  <AlataText style={{fontSize: 16}}>{item.measure}</AlataText>
+                <View key={index} style={{ paddingVertical: 2, justifyContent: 'space-between', flexDirection: 'row' }}>
+                  <AlataText style={{ flex: 1, fontSize: 16 }}>{index + 1}. {item.name}</AlataText>
+                  <AlataText style={{ fontSize: 16 }}>{item.measure}</AlataText>
                 </View>
               ))}
             </View>
           </View>
 
           <View style={styles.contentBox}>
-            <AlataText style={{fontSize: 20}}>Instructions:</AlataText>
+            <AlataText style={{ fontSize: 20 }}>Instructions:</AlataText>
             <View style={{ flexDirection: 'column', flexWrap: 'wrap', paddingLeft: 10, paddingTop: 5 }}>
-              <View style={{paddingVertical: 10, justifyContent: 'space-between'}}>
-                <AlataText style={{fontSize: 16}}>{recipe.strInstructions}</AlataText>
+              <View style={{ paddingVertical: 10, justifyContent: 'space-between' }}>
+                <AlataText style={{ fontSize: 16 }}>{recipe.strInstructions}</AlataText>
               </View>
             </View>
           </View>
         </View>
 
-      <Pressable onPress={onFindNewRecipe} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-        <AlataLarge style={{marginBottom: 5, textAlign: 'center'}}>Get new recipe!</AlataLarge>
-      </Pressable>
-
+        <Pressable onPress={onFindNewRecipe} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+          <AlataLarge style={{ marginBottom: 5, textAlign: 'center' }}>Get new recipe!</AlataLarge>
+        </Pressable>
       </ScrollView>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isLoginModalVisible}
+        onRequestClose={() => setIsLoginModalVisible(false)}
+      >
+        <LoginModalScreen onClose={() => setIsLoginModalVisible(false)} setUserID={setUserID}
+          setIsAuthenticated={setIsAuthenticated} onLoginSuccess={handleLoginSuccess} />
+      </Modal>
     </View>
   );
 }
@@ -157,7 +266,7 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: Colors.dark.mainColorDark,
-    borderRadius: 10, 
+    borderRadius: 10,
     width: 200,
     padding: 10,
     marginBottom: 40,
