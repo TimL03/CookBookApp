@@ -9,7 +9,7 @@ import { db } from '../../FirebaseConfig'
 import { User } from 'firebase/auth';
 import { useState, useEffect } from "react"
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import AddRecipeScreen from '../modals/addRecipeModal';
+import AddRecipeScreen from '../screens/addRecipeScreen';
 import ShowSharedRecipeInvitationModalScreen from '../modals/showSharedRecipeInvitation';
 
 interface RecipeData {

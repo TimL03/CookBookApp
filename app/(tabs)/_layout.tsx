@@ -6,7 +6,7 @@ import { Pressable, useColorScheme, View, Platform } from 'react-native';
 
 import Colors from '../../constants/Colors';
 import React, { useState } from 'react';
-import ActionsModal from '../modals/actionModal';
+import ActionsModal from '../(modals)/actionModal';
 
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
@@ -53,9 +53,11 @@ export default function TabLayout() {
           borderWidth: 0,
         },
         headerRight: () => (
-          <Pressable onPress={openSettingsModal}>
-                <Menu color={Colors.dark.text} size={28} style={{ marginRight: 15 }} />
-          </Pressable>                    
+          <Link href="/modals/actionModal" asChild>
+            <Pressable>
+              <Menu color={Colors.dark.text} size={28} style={{ marginRight: 15 }} />
+            </Pressable>
+          </Link>                 
         ),
         headerBackground: () => (
           <View style={{backgroundColor: Colors.dark.background, height: 110}}>
@@ -94,7 +96,6 @@ export default function TabLayout() {
       />
     
     </Tabs>
-    <ActionsModal visible={modalVisible} onClose={closeSettingsModal} />
     </View>
   );
 }

@@ -27,22 +27,26 @@ const ActionsModal = ({ visible, onClose}: ActionsModalProps) => {
   return (
       <Pressable style={styles.modalContainer} onPress={router.back}>
         <View style={styles.modalContent}>
-          <AlataLargeMiddle>Aktionen</AlataLargeMiddle>     
-            <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.background }]} onPress={() => router.replace('/screens/settingsScreen')}>
-                <Settings color={Colors.dark.text} size={22} style={{alignSelf: 'center'}} />
-                <AlataLarge style={{paddingBottom: 4}}>Settings</AlataLarge>
-            </Pressable>
+          <AlataLargeMiddle>Aktionen</AlataLargeMiddle>        
+            <Link href="/settingsModal" asChild>
+              <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.mainColorLight }]}>
+                <View style={styles.button}>
+                  <Settings color={Colors.dark.text} size={22} style={{alignSelf: 'center'}} />
+                  <AlataLarge style={{paddingBottom: 4}}>Settings</AlataLarge>
+                </View>
+              </Pressable>
+            </Link>
             
-            <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.background }]} onPress={() => router.replace('/screens/accountScreen')}>
+            <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.background },]} onPress={onClose}>
               <User2 color={Colors.dark.text} size={22} style={{alignSelf: 'center'}} />
               <AlataLarge style={{paddingBottom: 4}}>Account</AlataLarge>
             </Pressable>
-            
-            <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.background },]} onPress={() => router.replace('/screens/aboutScreen')}>
+            <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.background },]} onPress={onClose}>
               <Info color={Colors.dark.text} size={22} style={{alignSelf: 'center'}} />
               <AlataLarge style={{paddingBottom: 4}}>About the App</AlataLarge>
             </Pressable>
         </View>
+        
       </Pressable>
   );
 };
