@@ -6,25 +6,26 @@ import Colors from '../constants/Colors';
 import { DarkTheme } from '@react-navigation/native';
 import { View } from './Themed';
 import { AlataLarge, AlataMedium } from './StyledText';
-import ViewRecipeScreen from '../app/modals/viewRecipeModal';
+import ViewFeedRecipeScreen from '../app/modals/viewFeedRecipeModal';
 
-type RecipeProps = {
+interface RecipeProps {
     item: {
-        id: string;
-        name: string;
-        category: string;
-        cookHTime: string;
-        cookMinTime: string;
-        description: string;
-        ingredients: string[];
-        steps: string[];
-        imageUrl: string;
+      id: string;
+      name: string;
+      category: string;
+      cookHTime: string;
+      cookMinTime: string;
+      description: string;
+      ingredients: string[];
+      steps: string[];
+      imageUrl: string;
+      userID: string;
     };
     averageRating: {
-        average: number;
-        totalRatings: number;
-    }
-};
+      average: number;
+      totalRatings: number;
+    };
+  }
 
 export default function Recipe({ item, averageRating }: RecipeProps) {
     const [isModalVisible, setModalVisible] = useState(false);
@@ -43,11 +44,11 @@ export default function Recipe({ item, averageRating }: RecipeProps) {
                 <AlataMedium>{(item.cookHTime == '0' || item.cookHTime == '') ? '' : item.cookHTime + ' h '}{(item.cookMinTime == '0' || item.cookMinTime == '') ? '' : (item.cookMinTime + ' min ')}</AlataMedium>
             </View>
             <AlataMedium>
-                    {averageRating.average !== undefined ? `${averageRating.average}/5` : '4.5'}
-                </AlataMedium>
-                <AlataMedium>
-                    {averageRating.totalRatings !== undefined ? `(${averageRating.totalRatings} ratings)` : ''}
-                </AlataMedium>
+                {averageRating.average !== undefined ? `${averageRating.average}/5` : '4.5'}
+            </AlataMedium>
+            <AlataMedium>
+                {averageRating.totalRatings !== undefined ? `(${averageRating.totalRatings} ratings)` : ''}
+            </AlataMedium>
             <View style={styles.icons}>
                 <Soup color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />
                 <Carrot color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />
@@ -58,7 +59,7 @@ export default function Recipe({ item, averageRating }: RecipeProps) {
                 visible={isModalVisible}
                 onRequestClose={toggleModal}
             >
-                <ViewRecipeScreen closeModal={toggleModal} recipe={item} />
+                <ViewFeedRecipeScreen closeModal={toggleModal} recipe={item} />
             </Modal>
         </TouchableOpacity>
     )

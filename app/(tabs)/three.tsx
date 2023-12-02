@@ -7,7 +7,7 @@ import Colors from '../../constants/Colors';
 import { db } from '../../FirebaseConfig'
 import { User } from 'firebase/auth';
 import { useState, useEffect } from "react"
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, getDocs, doc } from 'firebase/firestore';
 import ShowSharedRecipeInvitationModalScreen from '../modals/showSharedRecipeInvitation';
 import LoginModalScreen from '../modals/logInModal';
 
@@ -22,8 +22,6 @@ interface RecipeData {
   steps: string[];
   imageUrl: string;
   userID: string;
-  recommendations: string[];
-  ratings: number[];
 }
 
 interface GroupedByCategory {
@@ -37,11 +35,13 @@ export default function TabThreeScreen() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userID, setUserID] = useState<string | null>(null);
   const [data, setData] = useState<Array<{ title: string, data: RecipeData[] }>>([]);
+  const [averageRatings, setAverageRatings] = useState<Record<string, { average: number; totalRatings: number }>>({});
+
 
 
   useEffect(() => {
     const feedQuery = query(collection(db, "feed"));
-  
+
     const unsubscribe = onSnapshot(feedQuery, (querySnapshot) => {
       const feedRecipes: RecipeData[] = [];
       querySnapshot.forEach((doc) => {
@@ -104,32 +104,63 @@ export default function TabThreeScreen() {
     }
   };
 
-  const calculateAverageRating = (ratings: number[] = []) => {
-    console.log('Ratings:', ratings);
-  
-    if (ratings.length === 0) {
-      return { average: 1, totalRatings: 10 };
+  const calculateAverageRating = async (db: any, recipe: RecipeData) => {
+    try {
+        const ratingsCollectionRef = collection(db, 'feed', recipe.id, 'ratings');
+        const ratingsSnapshot = await getDocs(ratingsCollectionRef);
+
+        console.log('Recipe ID:', recipe.id);
+
+        if (ratingsSnapshot.empty) {
+            return { average: 0, totalRatings: 0 };
+        }
+
+        const ratingsData: number[] = [];
+
+        ratingsSnapshot.forEach((doc) => {
+          const rating = doc.data().rating || 0;
+          console.log('Average Rating:', rating);
+          ratingsData.push(rating);
+      });
+
+      const sum = ratingsData.reduce((acc, rating) => acc + (parseFloat(rating) || 0), 0);
+      const average = sum / ratingsData.length;
+      
+
+        console.log('Average Rating:', average);
+        return { average, totalRatings: ratingsData.length };
+    } catch (error) {
+        return { average: 0, totalRatings: 0 };
     }
-  
-    const sum = ratings.reduce((acc, rating) => acc + rating, 0);
-    const average = sum / ratings.length;
-  
-    console.log('Average Rating:', average);
-    return { average, totalRatings: ratings.length };
+};
+
+useEffect(() => {
+  const calculateAndSetAverageRating = async (recipe: RecipeData) => {
+    const result = await calculateAverageRating(db, recipe);
+    setAverageRatings(prevState => ({
+      ...prevState,
+      [recipe.id]: result,
+    }));
   };
-  
+
+  data.forEach(section => {
+    section.data.forEach(recipe => {
+      calculateAndSetAverageRating(recipe);
+    });
+  });
+}, [data]);
 
   return (
     <View style={styles.container}>
       <SectionList
-        showsVerticalScrollIndicator={false}
         sections={data}
-        keyExtractor={(item, index) => item.category + index}
-        renderItem={({ item }) => {
-          return (
-            <Recipe item={item} averageRating={calculateAverageRating(item.ratings)} />
-          );
-        }}
+        keyExtractor={(item, index) => item.id + index}
+        renderItem={({ item }) => (
+          <Recipe item={item} averageRating={averageRatings[item.id] || { average: 0, totalRatings: 0 }} />
+        )}
+        renderSectionHeader={({ section: { title } }) => (
+          <Text>{title}</Text>
+        )}
       />
       <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
         <Modal

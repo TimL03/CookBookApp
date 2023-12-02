@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Image, Pressable, Modal } from "react-native";
 import TopModalBar from "../../components/topModalBar";
 import Colors from '../../constants/Colors';
-import { Share2, PenSquare, Trash2, ArrowUpToLine } from 'lucide-react-native';
+import { Share2, PenSquare, Trash2, ArrowDownToLine } from 'lucide-react-native';
 import { FlatList, ScrollView } from 'react-native-gesture-handler';
 import { AlataLarge, AlataMedium, AlataText } from '../../components/StyledText';
 import ItemSelectorSwitch from '../../components/ItemSelectorSwitch';
 import ShareRecipeScreen from './shareRecipeModal';
 import { db } from '../../FirebaseConfig'
-import { doc, setDoc, Timestamp } from 'firebase/firestore';
+import { doc, setDoc, Timestamp, collection, addDoc, getDocs } from 'firebase/firestore';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import RatingModal from './RatingModal';
 
-interface AddRecipeScreenProps {
+
+interface FeedRecipeScreenProps {
   closeModal: () => void;
   recipe: {
     id: string;
@@ -21,21 +24,92 @@ interface AddRecipeScreenProps {
     ingredients: string[];
     steps: string[];
     userID: string;
+    ratings: string[];
+    category: string;
   };
 }
 
+const auth = getAuth();
 
-
-export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreenProps) {
+export default function ViewFeedRecipeScreen({ closeModal, recipe }: FeedRecipeScreenProps) {
   const [isShareRecipeModalVisible, setIsShareRecipeModalVisible] = useState(false);
+  const [isRatingModalVisible, setIsRatingModalVisible] = useState(false);
+  const [sortedRatings, setSortedRatings] = useState<Array<{ id: string; userID: string; rating: number; comment: string; timestamp: Timestamp }>>([]);
+
+  const sortRatingsByTimestamp = (ratings: Array<{ id: string, userID: string, rating: number, comment: string, timestamp: Timestamp }>) => {
+    return ratings.sort((a, b) => b.timestamp - a.timestamp);
+  };
+
+  useEffect(() => {
+    const fetchRatings = async () => {
+      try {
+        const recipeRef = doc(db, 'feed', recipe.id);
+        const ratingsCollectionRef = collection(recipeRef, 'ratings');
+
+        const ratingsSnapshot = await getDocs(ratingsCollectionRef);
+        const ratingsData: Array<{ id: string, userID: string, rating: number, comment: string, timestamp: Timestamp }> = [];
+
+        ratingsSnapshot.forEach((ratingDoc) => {
+          ratingsData.push({ id: ratingDoc.id, ...ratingDoc.data() as { userID: string, rating: number, comment: string, timestamp: Timestamp } });
+        });
+
+        const sortedRatings = sortRatingsByTimestamp(ratingsData);
+        setSortedRatings(sortedRatings);
+      } catch (error) {
+        console.error('Fehler beim Abrufen der Bewertungen:', error);
+      }
+    };
+
+    fetchRatings();
+  }, []);
+
+  const handleRatingSubmit = async (ratingData: { rating: number; comment: string }) => {
+    try {
+      const user = auth.currentUser;
+      const userID = user ? user.uid : null;
+
+      if (!userID) {
+        console.error('Benutzer nicht angemeldet.');
+        return;
+      }
+
+      const recipeRef = doc(db, 'feed', recipe.id);
+      const ratingsCollectionRef = collection(recipeRef, 'ratings');
+
+      const ratingsSnapshot = await getDocs(ratingsCollectionRef);
+      const ratingCount = ratingsSnapshot.size;
+
+      const ratingID = `rating${ratingCount + 1}`;
+
+      const ratingDocRef = doc(ratingsCollectionRef, ratingID);
+
+      await setDoc(ratingDocRef, {
+        userID,
+        timestamp: Timestamp.now(),
+        ...ratingData,
+      });
+
+      console.log('Bewertung erfolgreich hinzugefügt!');
+    } catch (error) {
+      console.error('Fehler beim Hinzufügen der Bewertung:', error);
+    }
+  };
 
   const toggleModal = () => {
     setIsShareRecipeModalVisible(!isShareRecipeModalVisible);
   };
 
-  const handleDatabaseSave = async () => {
+  const saveRecipeToDatabase = async () => {
     try {
-      const recipeRef = doc(db, 'feed', recipe.id);
+      const user = auth.currentUser;
+      const userID = user ? user.uid : null;
+
+      if (!userID) {
+        console.error('Benutzer nicht angemeldet.');
+        return;
+      }
+
+      const recipeRef = doc(db, 'recipes', recipe.id);
 
       await setDoc(recipeRef, {
         name: recipe.name,
@@ -44,10 +118,8 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
         imageUrl: recipe.imageUrl,
         ingredients: recipe.ingredients,
         steps: recipe.steps,
-        userID: recipe.userID,
-        timestamp: Timestamp.now(),
-        recommendations: [],
-        ratings: [],
+        userID: userID,
+        category: recipe.category,
       });
 
       console.log('Rezept erfolgreich gespeichert!');
@@ -55,6 +127,7 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
       console.error('Fehler beim Speichern des Rezepts:', error);
     }
   };
+
 
   const currentCategories = [
     { key: '1', value: 'Breakfast', selected: null },
@@ -73,17 +146,11 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             <Text style={{ fontFamily: 'Alata', fontSize: 25, color: Colors.dark.text }}>{recipe.name}</Text>
             <View style={{ flexDirection: 'row', gap: 12 }}>
-              <Pressable onPress={handleDatabaseSave} style={{ alignSelf: 'center' }}>
-                <ArrowUpToLine color={Colors.dark.text} size={24} style={{ marginBottom: -5 }} />
-              </Pressable>
               <Pressable onPress={toggleModal} style={{ alignSelf: 'center' }}>
                 <Share2 color={Colors.dark.text} size={24} style={{ marginBottom: -5 }} />
               </Pressable>
-              <Pressable style={{ alignSelf: 'center' }}>
-                <Trash2 color={Colors.dark.text} size={24} style={{ marginBottom: -5 }} />
-              </Pressable>
-              <Pressable style={{ alignSelf: 'center' }}>
-                <PenSquare color={Colors.dark.text} size={24} style={{ marginBottom: -5 }} />
+              <Pressable onPress={saveRecipeToDatabase} style={{ alignSelf: 'center' }}>
+                <ArrowDownToLine color={Colors.dark.text} size={24} style={{ marginBottom: -5 }} />
               </Pressable>
             </View>
           </View>
@@ -123,7 +190,24 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
               ))}
             </View>
           </View>
-
+          <View>
+            <AlataLarge style={{ color: Colors.dark.text }}>Latest Ratings:</AlataLarge>
+            {sortedRatings.map((rating, index) => (
+              <View key={index}>
+                <AlataText>{`${rating.userID} rated ${rating.rating} stars: ${rating.comment} ${rating.timestamp.toDate().toLocaleString()}`} </AlataText>
+              </View>
+            ))}
+          </View>
+        </View>
+        <View>
+          <Pressable onPress={() => setIsRatingModalVisible(true)}>
+            <AlataLarge style={{ color: Colors.dark.text }}>Your opionion counts!</AlataLarge>
+          </Pressable>
+          <RatingModal
+            isVisible={isRatingModalVisible}
+            onClose={() => setIsRatingModalVisible(false)}
+            onSubmit={handleRatingSubmit}
+          />
         </View>
       </ScrollView>
       <Modal
