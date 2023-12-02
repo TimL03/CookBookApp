@@ -1,12 +1,13 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Pressable, TextInput, View, StyleSheet, Keyboard } from 'react-native';
 import { Search, X } from 'lucide-react-native';
 import Colors from '../constants/Colors';
 import { AlataLarge, AlataMedium } from './StyledText';
 import { FlatList } from 'react-native-gesture-handler';
+import ItemSelectorSwitch from './ItemSelectorSwitch';
 
 type SelectionProps = {
-  item: { 
+  allItems: { 
     key: string;
     value: string;
     selected: boolean;
@@ -23,8 +24,9 @@ type SelectionProps = {
   }[]) => void;
 };
 
-export default function SearchBar({ item, currentList, onCurrentListUpdated }: SelectionProps) {
+export default function SearchBar({ allItems, currentList, onCurrentListUpdated }: SelectionProps) {
   const [thiscurrentList, setCurrentList] = React.useState(currentList);
+  const [thisallItems, setAllItems] = React.useState(allItems);
   const [search, setSearch] = React.useState(false);
 
   const searchActive = () => {
@@ -38,23 +40,20 @@ export default function SearchBar({ item, currentList, onCurrentListUpdated }: S
 
   const updateList = (text: string) => {
     if(text === '') {
-      setCurrentList(item.filter((i) => ( i.selected === true)));
+      setAllItems(allItems);
       return;
     } else {
-      setCurrentList(item.filter((i) => i.value.toLowerCase().includes(text.toLowerCase())));
+      setAllItems(allItems.filter((i) => i.value.toLowerCase().includes(text.toLowerCase())));
     };
-  }
-
-  const isItemSelected = (itemKey: string) => {
-    return item.find((i) => i.key === itemKey)?.selected;
+    onCurrentListUpdated(thisallItems);
   }
 
   const itemSelected = (itemKey: string) => {
-    const selectedItem = item.find((i) => i.key === itemKey);
-    if (selectedItem) {
+    const selectedItem = thisallItems.find((i) => i.key === itemKey);
+    if (selectedItem !== undefined) {
       selectedItem.selected = !selectedItem.selected;
     }
-
+    setCurrentList(thisallItems.filter((i) => i.selected).concat(currentList.filter((i) => !i.selected)));
     onCurrentListUpdated(thiscurrentList);
   }
 
@@ -82,17 +81,34 @@ export default function SearchBar({ item, currentList, onCurrentListUpdated }: S
             </View>
           {
             (search) ?
-            <View style={styles.searchList}>  
-              {
-                thiscurrentList.map((i) => (
-                    <Pressable  key={i.key} onPress={() => itemSelected(i.key)} style={({ pressed }) => [styles.button, { backgroundColor: (isItemSelected(i.key)) ? Colors.dark.tint : Colors.dark.mainColorDark }]}>
-                      <AlataMedium>{i.value}</AlataMedium>
-                    </Pressable>
-                ))
-              }
+            <>
+              <View style={styles.searchList}>  
+                {
+                  thisallItems.map((item) => (
+                      <Pressable  key={item.key} onPress={() => itemSelected(item.key)} style={({ pressed }) => [styles.button, { backgroundColor: item.selected ? Colors.dark.tint : Colors.dark.mainColorDark }]}>
+                        <AlataMedium>{item.value}</AlataMedium>
+                      </Pressable>
+                  ))
+                }
+              </View>
+              <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
+              {thiscurrentList.map((item) => (
+                <Pressable onPress={() => itemSelected(item.key)} style={() => [styles.selectedButton, { backgroundColor: item.selected ? Colors.dark.tint : Colors.dark.mainColorDark }]}>
+                  <AlataMedium style={{marginBottom: 5, textAlign: 'center'}}>{item.value}</AlataMedium>
+                </Pressable>
+              ))}
             </View>
-           : null
+          </>
+           : 
+          <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
+            {thiscurrentList.map((item) => (
+              <Pressable onPress={() => itemSelected(item.key)} style={() => [styles.selectedButton, { backgroundColor: item.selected ? Colors.dark.tint : Colors.dark.mainColorDark }]}>
+                <AlataMedium style={{marginBottom: 5, textAlign: 'center'}}>{item.value}</AlataMedium>
+              </Pressable>
+            ))}
+          </View>
           }
+          
         </>
     )
 }
@@ -128,5 +144,12 @@ const styles = StyleSheet.create({
     },
     button: {
       padding: 10,
+    }, 
+    selectedButton: {
+      borderRadius: 120,
+      padding: 10,
+      paddingHorizontal: 20,
+      elevation: 2,
+      margin: 5,
     }
   });

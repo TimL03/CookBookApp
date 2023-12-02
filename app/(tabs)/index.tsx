@@ -81,9 +81,6 @@ export default function TabOneScreen() {
     const matchingRecipes = await searchRecipesInFirebase(selectedIngredients, selectedCategories);
     console.log('Gefundene Rezepte in Firebase:', matchingRecipes);
   };
-  
-  
-  
 
   const getSelectedIngredients = () => {
     return currentListIngredients
@@ -128,18 +125,13 @@ export default function TabOneScreen() {
         {searchMode === 'database' && (
           <View>
             <AlataLarge>Select Ingredients:</AlataLarge>
-            <SearchBar item={dataIngredients} currentList={recomendedListIngredients} onCurrentListUpdated={handleCurrentListIngredientsUpdate} />
-            <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
-              {currentListIngredients.map((item) => (
-                <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleIngredientSelected(item.key)} />
-              ))}
-            </View>
+            <SearchBar allItems={dataIngredients} currentList={recomendedListIngredients} onCurrentListUpdated={handleCurrentListIngredientsUpdate} />
           </View>
         )}
         {searchMode === 'cookbook' && (
           <View>
             <AlataLarge>Select Ingredients:</AlataLarge>
-            <SearchBar item={dataIngredients} currentList={recomendedListIngredients} onCurrentListUpdated={handleCurrentListIngredientsUpdate} />
+            <SearchBar allItems={dataIngredients} currentList={recomendedListIngredients} onCurrentListUpdated={handleCurrentListIngredientsUpdate} />
             <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
               {currentListIngredients.map((item) => (
                 <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleIngredientSelected(item.key)} />
