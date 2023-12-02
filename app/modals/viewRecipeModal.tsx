@@ -46,16 +46,16 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
         />
         <View style={{ padding: 30, marginTop: -20, backgroundColor: Colors.dark.mainColorDark, borderRadius: 15, flex: 1 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <Text style={{ fontFamily: 'Alata', fontSize: 25, color: Colors.dark.text }}>{recipe.name}</Text>
-            <View style={{ flexDirection: 'row', gap: 12 }}>
-              <Pressable onPress={toggleModal} style={{ alignSelf: 'center' }}>
-                <Share2 color={Colors.dark.text} size={24} style={{ marginBottom: -5 }} />
+            <AlataText style={{ fontSize: 25, color: Colors.dark.text,  wordWrap: 'break-word', flex: 2}}>{recipe.name}</AlataText>
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8, flex: 1 }}>
+              <Pressable onPress={toggleModal} style={({ pressed }) => [{alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
+                <Share2 color={Colors.dark.text} size={24}/>
               </Pressable>
-              <Pressable style={{ alignSelf: 'center' }}>
-                <Trash2 color={Colors.dark.text} size={24} style={{ marginBottom: -5 }} />
+              <Pressable style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
+                <Trash2 color={Colors.dark.text} size={24}/>
               </Pressable>
-              <Pressable style={{ alignSelf: 'center' }}>
-                <PenSquare color={Colors.dark.text} size={24} style={{ marginBottom: -5 }} />
+              <Pressable style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
+                <PenSquare color={Colors.dark.text} size={24}/>
               </Pressable>
             </View>
           </View>

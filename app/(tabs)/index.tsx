@@ -21,7 +21,7 @@ const dataIngredients = [
 ];
 
 const dataCategories = [
-  { key: '1', value: 'Asian', selected: true },
+  { key: '1', value: 'Asia', selected: true },
   { key: '2', value: 'Italian', selected: false },
 ];
 
@@ -134,9 +134,6 @@ export default function TabOneScreen() {
                 <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleIngredientSelected(item.key)} />
               ))}
             </View>
-            <Pressable onPress={getMeal} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-              <AlataLarge style={{ marginBottom: 5, textAlign: 'center' }}>Get a Recipe</AlataLarge>
-            </Pressable>
           </View>
         )}
         {searchMode === 'cookbook' && (
@@ -159,12 +156,13 @@ export default function TabOneScreen() {
                 })
               }
             </View>
-            <Pressable onPress={handleSearchInFirebase} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-              <AlataLarge style={{ marginBottom: 5, textAlign: 'center' }}>Get a Recipe</AlataLarge>
-            </Pressable>
+            
           </View>
         )}
       </ScrollView>
+      <Pressable onPress={ searchMode === 'cookbook' ? handleSearchInFirebase : getMeal} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+              <AlataLarge style={{ marginBottom: 5, textAlign: 'center' }}>Get a Recipe</AlataLarge>
+            </Pressable>
       <Modal
         animationType="slide"
         transparent={true}
@@ -203,6 +201,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.dark.mainColorDark,
     borderRadius: 10,
     width: 200,
+    marginBottom: -10,
     padding: 10,
     justifyContent: 'center',
     alignSelf: 'center',

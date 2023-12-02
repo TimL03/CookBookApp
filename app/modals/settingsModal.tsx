@@ -13,8 +13,6 @@ interface props {
 
 
 export default function SettingsModal({ onClose }: props) {
-
-    
     return (
       <>
         <Stack.Screen options={{ 

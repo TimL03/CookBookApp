@@ -81,6 +81,7 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userID, setUserID] = useState<string | null>(null);
+  const [hasBeenSaved, setHasBeenSaved] = useState(false);
 
   const handleLoginSuccess = (user: User) => {
     setIsAuthenticated(true);
@@ -140,8 +141,9 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
   };
 
   const handleFinalSaveClick = () => {
-    if (recipe) {
+    if (recipe && !hasBeenSaved) {
       saveRecipeToDatabase(recipe);
+      setHasBeenSaved(true);
     }
   };
 
@@ -156,25 +158,25 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
         />
         <View style={{ padding: 30, marginTop: -20, backgroundColor: Colors.dark.mainColorDark, borderRadius: 15, flex: 1 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <Text style={{ fontFamily: 'Alata', fontSize: 24, color: Colors.dark.text }}>{recipe.strMeal}</Text>
-            <View style={{ flexDirection: 'row', gap: 12 }}>
-              <Pressable style={{ alignSelf: 'center' }}>
-                <Share2 color={Colors.dark.text} size={24} style={{ marginBottom: -5 }} />
+            <AlataText style={{ fontSize: 24, color: Colors.dark.text, wordWrap: 'break-word', flex: 2}}>{recipe.strMeal}</AlataText>
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', flex: 1, gap: 12 }}>
+              <Pressable style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
+                <Share2 color={Colors.dark.text} />
               </Pressable>
               {showInputs ? (
-                <Pressable onPress={handleFinalSaveClick} style={{ alignSelf: 'center' }}>
-                  <ArrowDownToLine color={Colors.dark.text} size={24} style={{ marginBottom: -5 }} />
+                <Pressable onPress={handleFinalSaveClick} style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
+                  <Save color={hasBeenSaved ? Colors.dark.tint : Colors.dark.text} size={24}/>
                 </Pressable>
               ) : (
-                <Pressable onPress={handleSaveButtonClick} style={{ alignSelf: 'center' }}>
-                  <Text style={{ color: Colors.dark.text }}>Save</Text>
+                <Pressable onPress={handleSaveButtonClick} style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
+                  <ArrowDownToLine color={Colors.dark.text} size={24}/>
                 </Pressable>
               )}
             </View>
           </View>
 
           {showInputs && (
-            <View style={{ paddingHorizontal: 30 }}>
+            <View style={{  }}>
               <TextInput
                 placeholder="Category"
                 style={styles.input}
@@ -196,9 +198,6 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
             </View>
           )}
 
-          <View style={{ justifyContent: 'flex-start', flexDirection: 'row', paddingTop: 20, marginBottom: 20, flexWrap: 'wrap' }}>
-
-          </View>
 
           <View style={styles.contentBox}>
             <AlataText style={{ fontSize: 20 }}>Ingredients:</AlataText>
@@ -256,6 +255,15 @@ const styles = StyleSheet.create({
     height: 200,
     resizeMode: 'cover',
     borderRadius: 20,
+  },
+  input: {
+    color: Colors.dark.text,
+    backgroundColor: Colors.dark.mainColorLight,
+    flexDirection: 'row',
+    padding: 10, 
+    borderRadius: 15,
+    marginTop: 10, 
+    fontFamily: 'Alata',
   },
   contentBox: {
     backgroundColor: Colors.dark.background,
