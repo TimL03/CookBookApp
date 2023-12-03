@@ -37,6 +37,7 @@ export default function TabTwoScreen() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userID, setUserID] = useState<string | null>(null);
 
+  
   const openInvitationModal = (invitation: string) => {
     setInvitationData(invitation); 
     setIsInvitationModalVisible(true);

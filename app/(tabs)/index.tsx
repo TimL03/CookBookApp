@@ -3,100 +3,141 @@ import React, { useReducer, useRef, useState } from 'react';
 import ItemSelectorSwitch from '../../components/ItemSelectorSwitch'
 import { AlataLarge } from '../../components/StyledText'
 import Colors from '../../constants/Colors';
-import SearchBar from '../../components/searchBar';
-import SearchBarCategories from '../../components/searchBarCategories';
+import SearchBarAPI from '../../components/searchBarAPI';
+import SearchBarCookBookIngredients from '../../components/searchBarCookBookIngredients';
+import SearchBarCookBookCategories from '../../components/searchBarCookBookCategories';
 import ViewRandomRecipeScreen from '../modals/viewRandomRecipeModal';
 import SearchSwitch from '../../components/SearchSwitch';
 import { searchRecipesInFirebase } from '../../components/searchRecipesInFirebase';
 
 const dataIngredients = [
-  { key: '1', value: 'Tomato', selected: true },
-  { key: '2', value: 'Spaghetti', selected: true },
+  { key: '1', value: 'Tomato', selected: false },
+  { key: '2', value: 'Cucumber', selected: false },
   { key: '3', value: 'Garlic', selected: false },
-  { key: '4', value: 'Milk', selected: false },
-  { key: '5', value: 'Soy Sauce', selected: false },
-  { key: '6', value: 'Salad', selected: false },
-  { key: '7', value: 'Butter', selected: false },
-  { key: '8', value: 'Onion', selected: false },
+];
+
+const dataIngredientsCookBook = [
+  { key: '1', value: 'Tomato', selected: false },
+  { key: '2', value: 'Cucumber', selected: false },
+  { key: '3', value: 'Garlic', selected: false },
 ];
 
 const dataCategories = [
-  { key: '1', value: 'Asian', selected: true },
-  { key: '2', value: 'Italian', selected: false },
+  { key: '1', value: 'Breakfast', selected: false },
+  { key: '2', value: 'Snacks', selected: false },
 ];
 
-const recomendedListIngredients = dataIngredients.filter((i) => i.key === '1' || i.key === '2' || i.key === '3');
-const recomendedListCategories = dataCategories.filter((i) => i.key === '1' || i.key === '2');
+const recomendedAPIListIngredients = dataIngredients.filter((i) => i.key === '1' || i.key === '2' || i.key === '3');
+const recomendedCookBookListIngredients = dataIngredientsCookBook.filter((i) => i.key === '1' || i.key === '2' || i.key === '3');
+const recomendedCookBookListCategories = dataCategories.filter((i) => i.key === '1' || i.key === '2');
 
 
 export default function TabOneScreen() {
-  const [currentListIngredients, setCurrentListIngredients] = useState(recomendedListIngredients);
-  const [currentListCategories, setCurrentListCategories] = useState(recomendedListCategories);
-  const [ingredients, setIngredients] = useState(dataIngredients);
+  const [currentListCookBookIngredients, setCurrentListCookBookIngredients] = useState(recomendedCookBookListIngredients);
+  const [currentListCookBookCategories, setCurrentListCookBookCategories] = useState(recomendedCookBookListCategories);
+  const [currentListAPIIngredients, setCurrentListAPIIngredients] = useState(recomendedAPIListIngredients);
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [searchMode, setSearchMode] = useState<'database' | 'cookbook'>('database');
-  
-  const toggleIngredientSelected = (key: string) => {
-    setIngredients(ingredients =>
+
+  const getDisplayedAPIIngredients = () => {
+    const displayedAPIIngredients = currentListAPIIngredients.filter(
+      (item) => item.selected || item.key === '1' || item.key === '2' || item.key === '3'
+    );
+    return displayedAPIIngredients;
+  };
+
+  const handleIngredientAPISelection = (ingredientKey: string) => {
+    const selectedIngredient = recomendedAPIListIngredients.find((ingredient) => ingredient.key === ingredientKey);
+    if (selectedIngredient) {
+      setCurrentListAPIIngredients((prevList) => [...prevList, { ...selectedIngredient }]);
+    }
+  };
+
+  const toggleIngredientSelectedAPI = (key: string) => {
+    setCurrentListAPIIngredients(ingredients =>
       ingredients.map(ingredient =>
         ingredient.key === key ? { ...ingredient, selected: !ingredient.selected } : ingredient
       )
     );
-  
-    setIngredients((updatedIngredients) => {
-      console.log('Ingredients after toggle:', updatedIngredients);
+
+    setCurrentListAPIIngredients((updatedIngredients) => {
       return updatedIngredients;
     });
   };
 
-  const handleCurrentListIngredientsUpdate = (updatedList: { key: string, value: string, selected: boolean }[]) => {
-    setCurrentListIngredients(updatedList);
+  const handleCurrentListAPIIngredientsUpdate = (updatedList: { key: string, value: string, selected: boolean }[]) => {
+    setCurrentListAPIIngredients(updatedList);
   };
 
-  const handleCurrentListCategoriesUpdate = (updatedList: { key: string, value: string, selected: boolean }[]) => {
-    setCurrentListCategories(updatedList);
-  };
-
-  const getCurrentSelectedIngredients = () => {
-    return currentListIngredients
-    .filter(item => item.selected)
-    .map(item => item.value);
-};
-
-  const getCurrentSelectedCategories = () => {
-    return currentListCategories
-      .filter(item => item.selected)
-      .map(item => item.value);
-  };
-
-
-  const handleSearchInFirebase = async () => {
-    const selectedIngredients = getCurrentSelectedIngredients();
-    const selectedCategories = getCurrentSelectedCategories().join(',');
-  
-    console.log('Selected Ingredients for Firebase Search:', selectedIngredients);
-    console.log('Selected Category for Firebase Search:', selectedCategories);
-  
-    const matchingRecipes = await searchRecipesInFirebase(selectedIngredients, selectedCategories);
-    console.log('Gefundene Rezepte in Firebase:', matchingRecipes);
-  };
-  
-  
-  
-
-  const getSelectedIngredients = () => {
-    return currentListIngredients
+  const getSelectedAPIIngredients = () => {
+    return currentListAPIIngredients
       .filter(item => item.selected)
       .map(item => item.value.toLowerCase())
       .join(',');
   };
 
+  const getCurrentSelectedCookBookIngredients = () => {
+    return currentListCookBookIngredients
+      .filter(item => item.selected)
+      .map(item => item.value);
+  };
+
+  const getDisplayedCookBookIngredients = () => {
+    const displayedCookBookIngredients = currentListCookBookIngredients.filter(
+      (item) => item.selected || item.key === '1' || item.key === '2' || item.key === '3'
+    );
+    return displayedCookBookIngredients;
+  };
+  
+  const handleIngredientCookBookSelection = (ingredientKey: string) => {
+    setCurrentListCookBookIngredients(prevList => {
+      // Prüfen, ob die Zutat bereits in der Liste ist
+      const ingredientIndex = prevList.findIndex(ingredient => ingredient.key === ingredientKey);
+      
+      if (ingredientIndex > -1) {
+        // Die Zutat ist bereits in der Liste und ausgewählt, nichts weiter tun
+        return prevList;
+      } else {
+        // Zutat ist nicht in der Liste, also hinzufügen und als ausgewählt markieren
+        const selectedIngredientCookBook = recomendedCookBookListIngredients.find(ingredient => ingredient.key === ingredientKey);
+        return selectedIngredientCookBook ? [...prevList, { ...selectedIngredientCookBook, selected: true }] : prevList;
+      }
+    });
+  };
+
+  const toggleIngredientSelectedCookBook = (key: string) => {
+    setCurrentListCookBookIngredients(ingredients =>
+      ingredients.map(ingredient =>
+        ingredient.key === key ? { ...ingredient, selected: !ingredient.selected } : ingredient
+      )
+    );
+
+    setCurrentListCookBookIngredients((updatedIngredients) => {
+      return updatedIngredients;
+    });
+  };
+  3
+  const handleCurrentListCookBookIngredientsUpdate = (updatedListCookBook: { key: string, value: string, selected: boolean }[]) => {
+    setCurrentListCookBookIngredients(updatedListCookBook);
+  };
+
+  const handleSearchInFirebase = async () => {
+    const selectedCookBookIngredients = getCurrentSelectedCookBookIngredients();
+    const selectedCookBookCategories = getCurrentSelectedCookBookCategories().join(',');
+
+    console.log('Selected Ingredients for Firebase Search:', selectedCookBookIngredients);
+    console.log('Selected Category for Firebase Search:', selectedCookBookCategories);
+
+    const matchingRecipes = await searchRecipesInFirebase(selectedCookBookIngredients, selectedCookBookCategories);
+    console.log('Gefundene Rezepte in Firebase:', matchingRecipes);
+  };
+
   const getMeal = async () => {
-    const selectedIngredients = getSelectedIngredients();
-    console.log('Selected Ingredients:', selectedIngredients);
+    const selectedAPIIngredients = getSelectedAPIIngredients();
+    console.log('Selected Ingredients:', selectedAPIIngredients);
     try {
-      const response = await fetch(`https://www.themealdb.com/api/json/v2/9973533/filter.php?i=${selectedIngredients}`);
+      const response = await fetch(`https://www.themealdb.com/api/json/v2/9973533/filter.php?i=${selectedAPIIngredients}`);
       const data = await response.json();
       if (data.meals) {
         const randomMealId = data.meals[Math.floor(Math.random() * data.meals.length)].idMeal;
@@ -121,6 +162,16 @@ export default function TabOneScreen() {
     getMeal();
   };
 
+  const handleCurrentListCookBookCategoriesUpdate = (updatedList: { key: string, value: string, selected: boolean }[]) => {
+    setCurrentListCookBookCategories(updatedList);
+  };
+
+  const getCurrentSelectedCookBookCategories = () => {
+    return currentListCookBookCategories
+      .filter(item => item.selected)
+      .map(item => item.value);
+  };
+
   return (
     <View style={styles.container}>
       <SearchSwitch onToggle={(isDatabaseSearch) => setSearchMode(isDatabaseSearch ? 'database' : 'cookbook')} />
@@ -128,10 +179,15 @@ export default function TabOneScreen() {
         {searchMode === 'database' && (
           <View>
             <AlataLarge>Select Ingredients:</AlataLarge>
-            <SearchBar item={dataIngredients} currentList={recomendedListIngredients} onCurrentListUpdated={handleCurrentListIngredientsUpdate} />
+            <SearchBarAPI
+              item={getDisplayedAPIIngredients()}
+              currentListAPI={recomendedAPIListIngredients}
+              onCurrentListAPIUpdated={handleCurrentListAPIIngredientsUpdate}
+              onIngredientSelectedAPI={handleIngredientAPISelection}
+            />
             <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
-              {currentListIngredients.map((item) => (
-                <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleIngredientSelected(item.key)} />
+              {getDisplayedAPIIngredients().map((item) => (
+                <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleIngredientSelectedAPI(item.key)} />
               ))}
             </View>
             <Pressable onPress={getMeal} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
@@ -142,22 +198,23 @@ export default function TabOneScreen() {
         {searchMode === 'cookbook' && (
           <View>
             <AlataLarge>Select Ingredients:</AlataLarge>
-            <SearchBar item={dataIngredients} currentList={recomendedListIngredients} onCurrentListUpdated={handleCurrentListIngredientsUpdate} />
+            <SearchBarCookBookIngredients
+              item={getDisplayedCookBookIngredients()}
+              currentListCookBook={recomendedCookBookListIngredients}
+              onCurrentListCookBookUpdated={handleCurrentListCookBookIngredientsUpdate}
+              onIngredientSelectedCookBook={handleIngredientCookBookSelection}
+            />
             <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
-              {currentListIngredients.map((item) => (
-                <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleIngredientSelected(item.key)} />
+              {getDisplayedCookBookIngredients().map((item) => (
+                <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleIngredientSelectedCookBook(item.key)} />
               ))}
             </View>
             <AlataLarge>Select Categories:</AlataLarge>
-            <SearchBarCategories item={dataCategories} currentListCategories={recomendedListCategories} onCurrentListCategoriesUpdated={handleCurrentListCategoriesUpdate} />
+            <SearchBarCookBookCategories item={dataCategories} currentListCategories={recomendedCookBookListCategories} onCurrentListCategoriesUpdated={handleCurrentListCookBookCategoriesUpdate} />
             <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
-              {
-                currentListCategories?.map((item, index) => {
-                  return (
-                    <ItemSelectorSwitch key={item.key} item={item} />
-                  )
-                })
-              }
+              {recomendedCookBookListCategories.map((item) => (
+                <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleCategoriesSelectedCookBook(item.key)} />
+              ))}
             </View>
             <Pressable onPress={handleSearchInFirebase} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
               <AlataLarge style={{ marginBottom: 5, textAlign: 'center' }}>Get a Recipe</AlataLarge>

@@ -28,7 +28,6 @@ interface RatingModalProps {
     };
 
     await onSubmit(ratingData);
-    console.log('Modal closed');
     onClose();
     
   };

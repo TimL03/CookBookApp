@@ -14,6 +14,7 @@ interface AddRecipeScreenProps {
   closeModal: () => void;
   recipe: {
     id: string;
+    category: string;
     name: string;
     cookHTime: string;
     cookMinTime: string;
@@ -39,6 +40,7 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
 
       await setDoc(recipeRef, {
         name: recipe.name,
+        category: recipe.category,
         cookHTime: recipe.cookHTime,
         cookMinTime: recipe.cookMinTime,
         imageUrl: recipe.imageUrl,
