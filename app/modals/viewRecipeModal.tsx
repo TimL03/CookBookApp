@@ -10,17 +10,22 @@ import ShareRecipeScreen from './shareRecipeModal';
 import { db } from '../../FirebaseConfig'
 import { doc, setDoc, Timestamp } from 'firebase/firestore';
 
+interface Ingredient {
+  name: string;
+  amount: string;
+  unit: string;
+}
+
 interface AddRecipeScreenProps {
   closeModal: () => void;
   recipe: {
     id: string;
     category: string;
     name: string;
-    category: string;
     cookHTime: string;
     cookMinTime: string;
     description: string;
-    ingredients: string[];
+    ingredients: Ingredient[];
     steps: string[];
     imageUrl: string;
     userID: string;
@@ -48,8 +53,6 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
         steps: recipe.steps,
         userID: recipe.userID,
         timestamp: Timestamp.now(),
-        recommendations: [],
-        ratings: [],
       });
 
       console.log('Rezept erfolgreich gespeichert!');
@@ -87,6 +90,11 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
               <Pressable onPress={toggleModal} style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
                 <Share2 color={Colors.dark.text} size={24} />
               </Pressable>
+             
+              {/* Push to discover button */}
+              <Pressable onPress={handleDatabaseSave} style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                <ArrowUpToLine color={Colors.dark.text} size={24} />
+              </Pressable>
 
               {/* Delete button */}
               <Pressable style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
@@ -118,8 +126,8 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
             <View style={{ flexDirection: 'column', flexWrap: 'wrap', paddingHorizontal: 10, paddingTop: 5 }}>
               {recipe.ingredients.map((ingredient, index) => (
                 <View key={index} style={{ paddingVertical: 2, justifyContent: 'space-between', flexDirection: 'row' }}>
-                  <AlataText style={{ flex: 1, fontSize: 16 }}>{index + 1}. {ingredient}</AlataText>
-                  <AlataText style={{ fontSize: 16 }}>1x</AlataText>
+                  <AlataText style={{ flex: 1, fontSize: 16 }}>{index + 1}. {ingredient.name}</AlataText>
+                  <AlataText style={{ fontSize: 16 }}>{ingredient.amount} {ingredient.unit}</AlataText>
                 </View>
               ))}
             </View>

@@ -12,7 +12,8 @@ import LoginModalScreen from './logInModal';
 
 interface Ingredient {
   name: string;
-  measure: string;
+  amount: string;
+  unit: string;
 }
 
 interface ViewRandomRecipeScreenProps {
@@ -99,18 +100,36 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
 
   const ingredients: Ingredient[] = [];
 
-  for (let i = 1; i <= 20; i++) {
-    const ingredientKey = `strIngredient${i}`;
-    const measureKey = `strMeasure${i}`;
+for (let i = 1; i <= 20; i++) {
+  const ingredientKey = `strIngredient${i}`;
+  const measureKey = `strMeasure${i}`;
 
-    const recipeAny: any = recipe;
-    const ingredient = recipeAny[ingredientKey];
-    const measure = recipeAny[measureKey];
+  const recipeAny: any = recipe;
+  const ingredient = recipeAny[ingredientKey];
+  const measure = recipeAny[measureKey];
 
-    if (ingredient) {
-      ingredients.push({ name: ingredient, measure: measure || '' });
+  if (ingredient && measure) {
+    const hasNumbers = /\d/.test(measure);
+
+    let amount, unit;
+
+    if (hasNumbers) {
+      const match = measure.match(/(\d+)([^\d]+)/);
+      if (match) {
+        amount = match[1];
+        unit = match[2].trim();
+      } else {
+        amount = measure;
+        unit = ''; 
+      }
+    } else {
+      amount = '1'; 
+      unit = 'x';
     }
+
+    ingredients.push({ name: ingredient, amount, unit });
   }
+}
 
   async function saveRecipeToDatabase(recipe: Recipe) {
     try {
@@ -118,7 +137,7 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
       const newRecipeRef = await addDoc(recipesCollectionRef, {
         name: recipe.strMeal,
         imageUrl: recipe.strMealThumb,
-        ingredients: ingredients.map(ingredient => `${ingredient.name} (${ingredient.measure})`),
+        ingredients, 
         steps: recipe.strInstructions.split('\n'),
         userID,
         category,

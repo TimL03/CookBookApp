@@ -10,6 +10,7 @@ import ViewRandomRecipeScreen from '../modals/viewRandomRecipeModal';
 import SearchSwitch from '../../components/SearchSwitch';
 import { searchRecipesInFirebase } from '../../components/searchRecipesInFirebase';
 
+
 const dataIngredients = [
   { key: '1', value: 'Tomato', selected: false },
   { key: '2', value: 'Cucumber', selected: false },
@@ -40,6 +41,8 @@ export default function TabOneScreen() {
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [searchMode, setSearchMode] = useState<'database' | 'cookbook'>('database');
 
+
+  // API Ingredients
   const getDisplayedAPIIngredients = () => {
     const displayedAPIIngredients = currentListAPIIngredients.filter(
       (item) => item.selected || item.key === '1' || item.key === '2' || item.key === '3'
@@ -77,6 +80,8 @@ export default function TabOneScreen() {
       .join(',');
   };
 
+
+  // CookBookIngredients
   const getCurrentSelectedCookBookIngredients = () => {
     return currentListCookBookIngredients
       .filter(item => item.selected)
@@ -119,6 +124,7 @@ export default function TabOneScreen() {
     setCurrentListCookBookIngredients(updatedListCookBook);
   };
 
+  // CookBookSearch
   const handleSearchInFirebase = async () => {
     const selectedCookBookIngredients = getCurrentSelectedCookBookIngredients();
     const selectedCookBookCategories = getCurrentSelectedCookBookCategories().join(',');
@@ -130,6 +136,7 @@ export default function TabOneScreen() {
     console.log('Gefundene Rezepte in Firebase:', matchingRecipes);
   };
 
+  // Firebase Search
   const getMeal = async () => {
     const selectedAPIIngredients = getSelectedAPIIngredients();
     console.log('Selected Ingredients:', selectedAPIIngredients);
@@ -159,14 +166,49 @@ export default function TabOneScreen() {
     getMeal();
   };
 
-  const handleCurrentListCookBookCategoriesUpdate = (updatedList: { key: string, value: string, selected: boolean }[]) => {
-    setCurrentListCookBookCategories(updatedList);
-  };
-
+  // CookBookCategories 
   const getCurrentSelectedCookBookCategories = () => {
     return currentListCookBookCategories
       .filter(item => item.selected)
       .map(item => item.value);
+  };
+
+
+  const getDisplayedCookBookCategories = () => {
+    return currentListCookBookCategories.filter(category => 
+      category.selected || category.key === '0' 
+    );
+  };  
+  
+  
+  const handleCategoryCookBookSelection = (categoryKey: string) => {
+    setCurrentListCookBookCategories(prevList => {
+      const categoryIndex = prevList.findIndex(category => category.key === categoryKey);
+      
+      if (categoryIndex > -1) {
+        return prevList;
+      } else {
+        const selectedCategoryCookBook = recomendedCookBookListCategories.find(category => category.key === categoryKey);
+        return selectedCategoryCookBook ? [...prevList, { ...selectedCategoryCookBook, selected: true }] : prevList;
+      }
+    });
+  };
+
+  const toggleCategorySelectedCookBook = (key: string) => {
+    setCurrentListCookBookCategories(categories =>
+      categories.map(category => {
+        if (category.key === key) {
+          return { ...category, selected: !category.selected };
+        } else {
+          return { ...category, selected: false };
+        }
+      })
+    );
+  };
+  
+  
+  const handleCurrentListCookBookCategoriesUpdate = (updatedListCookBookCategories: { key: string, value: string, selected: boolean }[]) => {
+    setCurrentListCookBookCategories(updatedListCookBookCategories);
   };
 
   return (
@@ -206,11 +248,16 @@ export default function TabOneScreen() {
                 <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleIngredientSelectedCookBook(item.key)} />
               ))}
             </View>
-            <AlataLarge>Select Categories:</AlataLarge>
-            <SearchBarCookBookCategories item={dataCategories} currentListCategories={recomendedCookBookListCategories} onCurrentListCategoriesUpdated={handleCurrentListCookBookCategoriesUpdate} />
+            <AlataLarge>Select Category:</AlataLarge>
+            <SearchBarCookBookCategories 
+            item={getDisplayedCookBookCategories()} 
+            currentListCategories={recomendedCookBookListCategories} 
+            onCurrentListCategoriesUpdated={handleCurrentListCookBookCategoriesUpdate} 
+            onCategorySelectedCookBook={handleCategoryCookBookSelection}
+            />
             <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
-              {recomendedCookBookListCategories.map((item) => (
-                <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleCategoriesSelectedCookBook(item.key)} />
+              {getDisplayedCookBookCategories().map((item) => (
+                <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleCategorySelectedCookBook(item.key)} />
               ))}
             </View>
             <Pressable onPress={handleSearchInFirebase} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>

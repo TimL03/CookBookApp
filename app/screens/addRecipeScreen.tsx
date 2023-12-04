@@ -11,7 +11,7 @@ import TopModalBar from '../../components/topModalBar';
 import DropDown from '../../components/DropDown';
 
 interface AddRecipeScreenProps {
-  closeModal: () => void;  
+  closeModal: () => void;
   userID: string | null;
 }
 
@@ -20,19 +20,19 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
   const [cookHTime, setCookHTime] = useState('');
   const [cookMinTime, setCookMinTime] = useState('');
   const [category, setCategory] = useState('');
-  const [ingredients, setIngredients] = useState(['']);
+  const [ingredients, setIngredients] = useState([{ name: '', unit: 'x', amount: '' },]);
   const [steps, setSteps] = useState(['']);
   const [imageUri, setImageUri] = useState<string | null>(null);
 
   const units = [
-    { key: '1', value: 'tbsp'},
-    { key: '2', value: 'tsp'},
-    { key: '3', value: 'cup'},
-    { key: '4', value: 'ml'},
-    { key: '5', value: 'l'},
-    { key: '6', value: 'g'},
-    { key: '7', value: 'kg'},
-    { key: '8', value: 'x'},
+    { key: '1', value: 'tbsp' },
+    { key: '2', value: 'tsp' },
+    { key: '3', value: 'cup' },
+    { key: '4', value: 'ml' },
+    { key: '5', value: 'l' },
+    { key: '6', value: 'g' },
+    { key: '7', value: 'kg' },
+    { key: '8', value: 'x' },
   ];
 
 
@@ -43,38 +43,38 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
       return;
     }
 
-  let result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    allowsEditing: true,
-    aspect: [4, 3],
-    quality: 1,
-  });
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
 
-  if (result && !result.canceled && result.assets) {
-    const uri = result.assets[0].uri;
-    setImageUri(uri); 
-  }
-};
+    if (result && !result.canceled && result.assets) {
+      const uri = result.assets[0].uri;
+      setImageUri(uri);
+    }
+  };
 
-const uploadImage = async (uri: string, recipeName: string) => {
-  const response = await fetch(uri);
-  const blob = await response.blob();
+  const uploadImage = async (uri: string, recipeName: string) => {
+    const response = await fetch(uri);
+    const blob = await response.blob();
 
-  const storage = getStorage();
-  const imagePath = `images/${recipeName}/${Date.now()}.jpg`; 
-  const storageRef = ref(storage, imagePath);
+    const storage = getStorage();
+    const imagePath = `images/${recipeName}/${Date.now()}.jpg`;
+    const storageRef = ref(storage, imagePath);
 
-  const snapshot = await uploadBytes(storageRef, blob);
-  return await getDownloadURL(snapshot.ref); 
-};
+    const snapshot = await uploadBytes(storageRef, blob);
+    return await getDownloadURL(snapshot.ref);
+  };
 
   const handleSave = async () => {
-      try {
-        let imageUrl = '';
-        if (imageUri) {
-          imageUrl = await uploadImage(imageUri, name);
-        }
-  
+    try {
+      let imageUrl = '';
+      if (imageUri) {
+        imageUrl = await uploadImage(imageUri, name);
+      }
+
       const docRef = await addDoc(collection(db, 'recipes'), {
         name,
         cookHTime,
@@ -82,7 +82,7 @@ const uploadImage = async (uri: string, recipeName: string) => {
         category,
         ingredients,
         steps,
-        imageUrl, 
+        imageUrl,
         userID
       });
       console.log('Dokument geschrieben mit ID: ', docRef.id);
@@ -91,10 +91,10 @@ const uploadImage = async (uri: string, recipeName: string) => {
       console.error('Fehler beim Hinzufügen des Dokuments: ', e);
     }
   };
-  
+
 
   const addIngredient = () => {
-    setIngredients([...ingredients, '']);
+    setIngredients([...ingredients, { name: '', amount: '', unit: '' }]);
   };
 
   const removeIngredient = (indexToRemove: number) => {
@@ -115,66 +115,74 @@ const uploadImage = async (uri: string, recipeName: string) => {
     <View style={styles.container}>
       {/* Top bar with close button */}
       <TopModalBar title="Add Recipe" onClose={closeModal} />
-      
+
       {/* Main content */}
       <ScrollView style={styles.scrollView} keyboardShouldPersistTaps='handled'>
 
         {/* Recipe image selection */}
-        { imageUri != null ? 
-            <Image
-              style={styles.image}
-              source={{uri: imageUri}}
-            />
+        {imageUri != null ?
+          <Image
+            style={styles.image}
+            source={{ uri: imageUri }}
+          />
           :
           <Pressable onPress={addImage} style={({ pressed }) => [styles.addImage, { backgroundColor: pressed ? Colors.dark.background : Colors.dark.mainColorLight },]}>
-            <PlusCircle color={Colors.dark.text} size={24} style={{alignSelf: 'center'}} />
+            <PlusCircle color={Colors.dark.text} size={24} style={{ alignSelf: 'center' }} />
             <AlataLarge>Add Image</AlataLarge>
           </Pressable>
         }
 
-        
-        <View style={{padding: 30}}>
+
+        <View style={{ padding: 30 }}>
           {/* adding Recipe name */}
           <AlataLarge>Name:</AlataLarge>
-          <TextInput placeholder="Name" value={name} onChangeText={setName} style={styles.input} placeholderTextColor={Colors.dark.text}/>
+          <TextInput placeholder="Name" value={name} onChangeText={setName} style={styles.input} placeholderTextColor={Colors.dark.text} />
           {/* adding Recipe category */}
           <AlataLarge>Category:</AlataLarge>
-          <TextInput placeholder="Kategory" value={category} onChangeText={setCategory} style={styles.input} placeholderTextColor={Colors.dark.text}/>
+          <TextInput placeholder="Kategory" value={category} onChangeText={setCategory} style={styles.input} placeholderTextColor={Colors.dark.text} />
           {/* adding Recipe preparation time */}
           <AlataLarge>Preperation Time:</AlataLarge>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookHTime} onChangeText={setCookHTime} style={styles.inputNumber} placeholderTextColor={Colors.dark.text}/>
-            <Text style={{paddingVertical: 15, textAlign: 'center', fontSize: 16, fontFamily: 'Alata', color: Colors.dark.text}}>hours</Text>
-            <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookMinTime} onChangeText={setCookMinTime} style={styles.inputNumber} placeholderTextColor={Colors.dark.text}/>
-            <Text style={{paddingVertical: 15, alignContent: 'center', textAlign: 'center', fontSize: 16, fontFamily: 'Alata', color: Colors.dark.text}}>minutes</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookHTime} onChangeText={setCookHTime} style={styles.inputNumber} placeholderTextColor={Colors.dark.text} />
+            <Text style={{ paddingVertical: 15, textAlign: 'center', fontSize: 16, fontFamily: 'Alata', color: Colors.dark.text }}>hours</Text>
+            <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookMinTime} onChangeText={setCookMinTime} style={styles.inputNumber} placeholderTextColor={Colors.dark.text} />
+            <Text style={{ paddingVertical: 15, alignContent: 'center', textAlign: 'center', fontSize: 16, fontFamily: 'Alata', color: Colors.dark.text }}>minutes</Text>
           </View>
 
           {/* adding Recipe ingredients */}
           <AlataLarge>Ingredients:</AlataLarge>
           {ingredients.map((ingredient, index) => (
-            <View key={index} style={{flexDirection: 'row', gap: 10, zIndex: 1}}>
+            <View key={index} style={{ flexDirection: 'row', gap: 10, zIndex: 1 }}>
               <View style={styles.input}>
                 <TextInput
-                placeholder={`Ingredient ${index + 1}`}
-                value={ingredient}
-                placeholderTextColor={Colors.dark.text}
-                onChangeText={(text) => {
-                  const newIngredients = [...ingredients];
-                  newIngredients[index] = text;
-                  setIngredients(newIngredients);
-                }}
-                style={{fontFamily: 'Alata', flex: 1, color: Colors.dark.text}}
+                  placeholder={`Ingredient ${index + 1}`}
+                  value={ingredient.name}
+                  onChangeText={(text) => {
+                    const newIngredients = [...ingredients];
+                    newIngredients[index].name = text;
+                    setIngredients(newIngredients);
+                  }}
+                  style={{ fontFamily: 'Alata', flex: 1, color: Colors.dark.text }}
                 />
-                <Pressable onPress={() => removeIngredient(index)} style={{alignSelf: 'center'}}>
+                <Pressable onPress={() => removeIngredient(index)} style={{ alignSelf: 'center' }}>
                   <X color={Colors.dark.text} size={22} strokeWidth='2.5' />
                 </Pressable>
               </View>
-              <View style={{flex: 2}}>
-                <DropDown item={units}/>
+              <View style={{ flex: 2 }}>
+                <DropDown
+                  item={units}
+                  selectedUnit={ingredient.unit}
+                  selectedAmount={ingredient.amount}
+                  onSelect={(unit, amount) => {
+                    const newIngredients = [...ingredients];
+                    newIngredients[index] = { ...newIngredients[index], unit, amount };
+                    setIngredients(newIngredients);
+                  }}
+                />
               </View>
             </View>
-            
           ))}
+
           <Pressable onPress={addIngredient} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
             <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
           </Pressable>
@@ -182,7 +190,7 @@ const uploadImage = async (uri: string, recipeName: string) => {
           {/* adding Recipe steps */}
           <AlataLarge>Instructions:</AlataLarge>
           {steps.map((step, index) => (
-            <View key={index} style={{flexDirection:'row', gap: -1}}>
+            <View key={index} style={{ flexDirection: 'row', gap: -1 }}>
               <TextInput
                 multiline
                 numberOfLines={3}
@@ -196,20 +204,20 @@ const uploadImage = async (uri: string, recipeName: string) => {
                 }}
                 style={styles.inputDelete}
               />
-              <Pressable onPress={() => removeStep (index)} style={styles.deleteButton}>
-              <X color={Colors.dark.text} size={22} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
+              <Pressable onPress={() => removeStep(index)} style={styles.deleteButton}>
+                <X color={Colors.dark.text} size={22} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
               </Pressable>
             </View>
-        ))}
-        <Pressable onPress={addStep} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-          <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
-        </Pressable>
-          
-        {/* Save button */}
-        <Pressable onPress={handleSave} style={({ pressed }) => [styles.saveButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-          <Save color={Colors.dark.text} size={28} style={{ alignSelf: 'center' }} />
-          <AlataLarge style={{marginBottom: 5, textAlign: 'center'}}>Save Recipe</AlataLarge>
-        </Pressable>
+          ))}
+          <Pressable onPress={addStep} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+            <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
+          </Pressable>
+
+          {/* Save button */}
+          <Pressable onPress={handleSave} style={({ pressed }) => [styles.saveButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+            <Save color={Colors.dark.text} size={28} style={{ alignSelf: 'center' }} />
+            <AlataLarge style={{ marginBottom: 5, textAlign: 'center' }}>Save Recipe</AlataLarge>
+          </Pressable>
         </View>
       </ScrollView>
     </View>
@@ -219,28 +227,28 @@ const uploadImage = async (uri: string, recipeName: string) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, 
-    backgroundColor: Colors.dark.mainColorDark, 
+    flex: 1,
+    backgroundColor: Colors.dark.mainColorDark,
   },
   input: {
     color: Colors.dark.text,
     backgroundColor: Colors.dark.mainColorLight,
     flexDirection: 'row',
-    padding: 10, 
-    borderRadius: 15,  
-    marginBottom: 10, 
-    marginTop: 5, 
+    padding: 10,
+    borderRadius: 15,
+    marginBottom: 10,
+    marginTop: 5,
     fontFamily: 'Alata',
     flex: 3
   },
   inputDelete: {
     color: Colors.dark.text,
     backgroundColor: Colors.dark.mainColorLight,
-    padding: 10, 
+    padding: 10,
     borderTopLeftRadius: 15,
     borderBottomLeftRadius: 15,
-    marginBottom: 10, 
-    marginTop: 5, 
+    marginBottom: 10,
+    marginTop: 5,
     fontFamily: 'Alata',
     textAlignVertical: 'top',
     flex: 2
@@ -248,10 +256,10 @@ const styles = StyleSheet.create({
   inputNumber: {
     color: Colors.dark.text,
     backgroundColor: Colors.dark.mainColorLight,
-    padding: 10, 
-    borderRadius: 15,  
-    marginBottom: 10, 
-    marginTop: 5, 
+    padding: 10,
+    borderRadius: 15,
+    marginBottom: 10,
+    marginTop: 5,
     width: 100,
     fontFamily: 'Alata',
   },
@@ -259,7 +267,7 @@ const styles = StyleSheet.create({
     flex: 1,
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
-    backgroundColor: Colors.dark.background, 
+    backgroundColor: Colors.dark.background,
     flexDirection: 'column',
     gap: 20,
   },
@@ -270,7 +278,7 @@ const styles = StyleSheet.create({
     height: 100,
     backgroundColor: Colors.dark.mainColorLight,
     borderRadius: 20,
-  }, 
+  },
   button: {
     backgroundColor: Colors.dark.mainColorDark,
     borderRadius: 15,
@@ -279,14 +287,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginTop: 5,
   },
-  saveButton: { 
+  saveButton: {
     backgroundColor: Colors.dark.mainColorDark,
     borderRadius: 15,
     padding: 10,
     justifyContent: 'center',
     marginBottom: 10,
     marginTop: 30,
-    flexDirection: 'row', 
+    flexDirection: 'row',
     gap: 10,
   },
   deleteButton: {

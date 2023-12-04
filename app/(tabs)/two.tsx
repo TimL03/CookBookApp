@@ -13,18 +13,24 @@ import AddRecipeScreen from '../screens/addRecipeScreen';
 import ShowSharedRecipeInvitationModalScreen from '../modals/showSharedRecipeInvitation';
 
 
-interface RecipeData {
-  id: string;
+interface Ingredient {
   name: string;
-  category: string;
-  cookHTime: string;
-  cookMinTime: string;
-  description: string;
-  ingredients: string[];
-  steps: string[];
-  imageUrl: string;
-  userID: string;
+  amount: string;
+  unit: string;
 }
+interface RecipeData {
+    id: string;
+    category: string;
+    name: string;
+    cookHTime: string;
+    cookMinTime: string;
+    description: string;
+    ingredients: Ingredient[];
+    steps: string[];
+    imageUrl: string;
+    userID: string;
+  };
+
 
 interface GroupedByCategory {
   [key: string]: RecipeData[];
@@ -84,6 +90,7 @@ export default function TabTwoScreen() {
         const recipes: RecipeData[] = [];
         querySnapshot.forEach((doc) => {
           const recipeData = doc.data() as Omit<RecipeData, 'id'>;
+          console.log("Fetched recipe data:", recipeData); // Fügen Sie dies hinzu
           recipes.push({ id: doc.id, ...recipeData });
         });
 

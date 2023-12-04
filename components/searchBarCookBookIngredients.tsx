@@ -2,8 +2,8 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Pressable, TextInput, View, StyleSheet, Keyboard, Modal } from 'react-native';
 import { Search, X } from 'lucide-react-native';
 import Colors from '../constants/Colors';
-import { AlataLarge, AlataMedium } from './StyledText';
-import { db, auth } from '../FirebaseConfig'
+import {  AlataMedium } from './StyledText';
+import { db } from '../FirebaseConfig'
 import { User, getAuth, onAuthStateChanged } from 'firebase/auth';
 import { collection, onSnapshot, query, where, getDocs } from 'firebase/firestore';
 import LoginModalScreen from '../app/modals/logInModal';
@@ -33,6 +33,7 @@ export default function SearchBarCookBookIngredients({ item, currentListCookBook
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userID, setUserID] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const auth = getAuth();
 
@@ -55,6 +56,7 @@ export default function SearchBarCookBookIngredients({ item, currentListCookBook
   };
 
   const fetchIngredientsFromFirebase = async () => {
+    setIsLoading(true); 
     try {
       const user = auth.currentUser;
 
@@ -68,37 +70,40 @@ export default function SearchBarCookBookIngredients({ item, currentListCookBook
       const recipes = recipesSnapshot.docs.map((doc) => doc.data());
 
       const newIngredients: { key: string; value: string; selected: boolean }[] = [];
-    let keyIndex = 1;
+      let keyIndex = 1;
 
-    recipes.forEach((recipe) => {
-      const recipeIngredients = recipe.ingredients || [];
+      recipes.forEach((recipe) => {
+        const recipeIngredients = recipe.ingredients || [];
 
-      recipeIngredients.forEach((ingredient: any) => {
-        while (newIngredients.some((item) => item.key === keyIndex.toString())) {
+        recipeIngredients.forEach((ingredient: any) => {
+          while (newIngredients.some((item) => item.key === keyIndex.toString())) {
+            keyIndex++;
+          }
+
+          newIngredients.push({
+            key: keyIndex.toString(),
+            value: ingredient.name, 
+            selected: false,
+          });
+
           keyIndex++;
-        }
-
-        newIngredients.push({
-          key: keyIndex.toString(),
-          value: ingredient,
-          selected: false,
         });
-
-        keyIndex++;
       });
-    });
 
-    // Übernehmen des selected-Status von den aktuellen Zutaten
-    const updatedIngredients = newIngredients.map(newIngredient => {
-      const existingIngredient = thiscurrentList.find(ingredient => ingredient.key === newIngredient.key);
-      return existingIngredient ? { ...newIngredient, selected: existingIngredient.selected } : newIngredient;
-    });
+      console.log("Extrahierte Zutaten für Dropdown:", newIngredients); // Ausgabe der extrahierten Zutaten für das Dropdown
 
-    setCurrentList(updatedIngredients);
-  } catch (error) {
-    console.error('Error fetching user recipes:', error);
-    throw error;
-  }
+
+      const updatedIngredients = newIngredients.map(newIngredient => {
+        const existingIngredient = thiscurrentList.find(ingredient => ingredient.key === newIngredient.key);
+        return existingIngredient ? { ...newIngredient, selected: existingIngredient.selected } : newIngredient;
+      });
+
+      setCurrentList(updatedIngredients);
+    } catch (error) {
+      console.error('Error fetching user recipes:', error);
+      throw error;
+    }
+    setIsLoading(false);
 };
 
 
@@ -159,7 +164,7 @@ export default function SearchBarCookBookIngredients({ item, currentListCookBook
         }
       </View>
       {
-        (search) ?
+        (search && !isLoading) ?
           <View style={styles.searchList}>
             {thiscurrentList && thiscurrentList.map((i) => (
               <Pressable

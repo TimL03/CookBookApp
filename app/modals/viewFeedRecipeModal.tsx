@@ -12,6 +12,11 @@ import { doc, setDoc, Timestamp, collection, addDoc, getDocs } from 'firebase/fi
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import RatingModal from './RatingModal';
 
+interface Ingredient {
+  name: string;
+  amount: string;
+  unit: string;
+}
 
 interface FeedRecipeScreenProps {
   closeModal: () => void;
@@ -21,7 +26,7 @@ interface FeedRecipeScreenProps {
     cookHTime: string;
     cookMinTime: string;
     imageUrl: string;
-    ingredients: string[];
+    ingredients: Ingredient[];
     steps: string[];
     userID: string;
     ratings: string[];
@@ -173,8 +178,8 @@ export default function ViewFeedRecipeScreen({ closeModal, recipe }: FeedRecipeS
             <View style={{ flexDirection: 'column', flexWrap: 'wrap', paddingHorizontal: 10, paddingTop: 5 }}>
               {recipe.ingredients.map((ingredient, index) => (
                 <View key={index} style={{ paddingVertical: 2, justifyContent: 'space-between', flexDirection: 'row' }}>
-                  <AlataText style={{ flex: 1, fontSize: 16 }}>{index + 1}. {ingredient}</AlataText>
-                  <AlataText style={{ fontSize: 16 }}>1x</AlataText>
+                  <AlataText style={{ flex: 1, fontSize: 16 }}>{index + 1}. {ingredient.name}</AlataText>
+                  <AlataText style={{ fontSize: 16 }}>{ingredient.amount} {ingredient.unit}</AlataText>
                 </View>
               ))}
             </View>

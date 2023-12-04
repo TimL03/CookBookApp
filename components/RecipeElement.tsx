@@ -8,20 +8,25 @@ import { View } from './Themed';
 import { AlataLarge, AlataMedium } from './StyledText';
 import ViewRecipeScreen from '../app/modals/viewRecipeModal';
 
-type RecipeProps = {
-    item: {
-        id: string;
-        name: string;
-        category: string;
-        cookHTime: string;
-        cookMinTime: string;
-        description: string;
-        ingredients: string[];
-        steps: string[];
-        imageUrl: string;
-        userID: string;
-    };
-};
+interface Ingredient {
+  name: string;
+  amount: string;
+  unit: string;
+}
+interface RecipeProps {
+  item: {
+    id: string;
+    category: string;
+    name: string;
+    cookHTime: string;
+    cookMinTime: string;
+    description: string;
+    ingredients: Ingredient[];
+    steps: string[];
+    imageUrl: string;
+    userID: string;
+  };
+}
 
 export default function Recipe({ item }: RecipeProps) {
     const [isModalVisible, setModalVisible] = useState(false);
