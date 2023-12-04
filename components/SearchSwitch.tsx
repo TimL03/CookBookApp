@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { View, Switch, Text, StyleSheet } from 'react-native';
+import Colors from '../constants/Colors';
+import { AlataText } from './StyledText';
 
 const SearchSwitch = ({ onToggle }: { onToggle: (isDatabaseSearch: boolean) => void }) => {
     const [isDatabaseSearch, setIsDatabaseSearch] = useState(true);
@@ -11,10 +13,10 @@ const SearchSwitch = ({ onToggle }: { onToggle: (isDatabaseSearch: boolean) => v
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{isDatabaseSearch ? 'Database' : 'CookBook'}</Text>
+      <AlataText style={{fontSize: 14}}>{isDatabaseSearch ? ' Currently selecting Recipes from others' : 'Currently selecting from your CookBook'}</AlataText>
       <Switch
-        trackColor={{ false: '#767577', true: '#81b0ff' }}
-        thumbColor={isDatabaseSearch ? '#f5dd4b' : '#f4f3f4'}
+        trackColor={{ false: Colors.dark.mainColorDark, true: Colors.dark.mainColorLight }}
+        thumbColor={isDatabaseSearch ? Colors.dark.text : Colors.dark.mainColorLight}
         ios_backgroundColor="#3e3e3e"
         onValueChange={handleToggle}
         value={isDatabaseSearch}
@@ -26,11 +28,9 @@ const SearchSwitch = ({ onToggle }: { onToggle: (isDatabaseSearch: boolean) => v
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  label: {
-    marginRight: 10,
-  },
+  }
 });
 
 export default SearchSwitch;

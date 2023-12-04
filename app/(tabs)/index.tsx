@@ -92,14 +92,11 @@ export default function TabOneScreen() {
   
   const handleIngredientCookBookSelection = (ingredientKey: string) => {
     setCurrentListCookBookIngredients(prevList => {
-      // Prüfen, ob die Zutat bereits in der Liste ist
       const ingredientIndex = prevList.findIndex(ingredient => ingredient.key === ingredientKey);
       
       if (ingredientIndex > -1) {
-        // Die Zutat ist bereits in der Liste und ausgewählt, nichts weiter tun
         return prevList;
       } else {
-        // Zutat ist nicht in der Liste, also hinzufügen und als ausgewählt markieren
         const selectedIngredientCookBook = recomendedCookBookListIngredients.find(ingredient => ingredient.key === ingredientKey);
         return selectedIngredientCookBook ? [...prevList, { ...selectedIngredientCookBook, selected: true }] : prevList;
       }
@@ -117,7 +114,7 @@ export default function TabOneScreen() {
       return updatedIngredients;
     });
   };
-  3
+  
   const handleCurrentListCookBookIngredientsUpdate = (updatedListCookBook: { key: string, value: string, selected: boolean }[]) => {
     setCurrentListCookBookIngredients(updatedListCookBook);
   };

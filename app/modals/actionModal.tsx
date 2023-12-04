@@ -4,10 +4,10 @@ import { Modal, View, Text, StyleSheet, Pressable, Button, Animated, } from 'rea
 import { Settings, User2, Info } from 'lucide-react-native';
 import { BlurView, VibrancyView } from 'react-native-blur';
 import Colors from '../../constants/Colors';
-import { Link } from 'expo-router';
+import { Link, router, Stack } from 'expo-router';
 import { AlataLarge, AlataMedium, AlataLargeMiddle } from '../../components/StyledText';
 import { AlignCenter } from 'lucide-react-native';
-import SettingsModal from './settingsModal';
+import SettingsModal from '../screens/settingsScreen';
 
 
 interface ActionsModalProps {
@@ -17,13 +17,6 @@ interface ActionsModalProps {
 
 const ActionsModal = ({ visible, onClose}: ActionsModalProps) => {
 
-  const modalStyle = {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    backdropFilter: visible ? 'blur(px)' : 'none',
-  };
 
   const handleSettingsPress = () => {
     onClose();  
@@ -32,37 +25,25 @@ const ActionsModal = ({ visible, onClose}: ActionsModalProps) => {
 
   
   return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={visible}
-      onRequestClose={() => onClose()}
-    >
-      <Pressable style={styles.modalContainer} onPress={onClose}>
-
+      <Pressable style={styles.modalContainer} onPress={router.back}>
         <View style={styles.modalContent}>
-          <AlataLargeMiddle>Aktionen</AlataLargeMiddle>        
-            <Link href="/modals/settingsModal" asChild>
-              <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.mainColorLight }]}>
-                <View style={styles.button}>
-                  <Settings color={Colors.dark.text} size={22} style={{alignSelf: 'center'}} />
-                  <AlataLarge style={{paddingBottom: 4}}>Settings</AlataLarge>
-                </View>
-              </Pressable>
-            </Link>    
+          <AlataLargeMiddle>Aktionen</AlataLargeMiddle>     
+            <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.background }]} onPress={() => router.replace('/screens/settingsScreen')}>
+                <Settings color={Colors.dark.text} size={22} style={{alignSelf: 'center'}} />
+                <AlataLarge style={{paddingBottom: 4}}>Settings</AlataLarge>
+            </Pressable>
             
-            <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.background },]} onPress={onClose}>
+            <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.background }]} onPress={() => router.replace('/screens/accountScreen')}>
               <User2 color={Colors.dark.text} size={22} style={{alignSelf: 'center'}} />
               <AlataLarge style={{paddingBottom: 4}}>Account</AlataLarge>
             </Pressable>
-            <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.background },]} onPress={onClose}>
+            
+            <Pressable style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.background },]} onPress={() => router.replace('/screens/aboutScreen')}>
               <Info color={Colors.dark.text} size={22} style={{alignSelf: 'center'}} />
               <AlataLarge style={{paddingBottom: 4}}>About the App</AlataLarge>
             </Pressable>
         </View>
-        
       </Pressable>
-    </Modal>
   );
 };
 
@@ -71,8 +52,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0)',
-    backdropFilter: 'blur(5px)',
+    backgroundColor: '#0000'
   },
   modalContent: {
     backgroundColor: Colors.dark.mainColorDark,

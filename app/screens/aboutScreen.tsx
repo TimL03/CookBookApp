@@ -7,19 +7,12 @@ import { Link, Stack } from 'expo-router';
 import { ChevronLeft} from 'lucide-react-native'
 import Colors from '../../constants/Colors';
 
-interface props {
-    onClose: () => void;
-};
 
-
-export default function SettingsModal({ onClose }: props) {
-
-    
+export default function aboutScreen() {    
     return (
       <>
         <Stack.Screen options={{ 
-          title: 'Settings',
-          animation: 'slide_from_bottom',
+          title: 'About the App',
           headerStyle: {
             backgroundColor: Colors.dark.mainColorDark,
           },
@@ -31,7 +24,7 @@ export default function SettingsModal({ onClose }: props) {
         }} 
         />
         <View style={styles.container}>
-          <Text style={styles.title}>SettingsScreen</Text>
+          <Text style={styles.title}>About Screen</Text>
           <Link href="/">
             <Text style={styles.linkText}>Go to home screen!</Text>
           </Link>

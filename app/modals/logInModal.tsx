@@ -9,7 +9,7 @@ import { auth } from '../../FirebaseConfig';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { AlataLarge, AlataMedium, AlataLargeMiddle } from '../../components/StyledText';
 import { AlignCenter } from 'lucide-react-native';
-import SettingsModal from './settingsModal';
+import SettingsModal from '../screens/settingsScreen';
 import { TextInput } from 'react-native-gesture-handler';
 
 

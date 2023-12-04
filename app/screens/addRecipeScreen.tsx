@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextInput, StyleSheet, ScrollView, View, Pressable, Text } from 'react-native';
+import { TextInput, StyleSheet, ScrollView, View, Pressable, Text, Image } from 'react-native';
 import Colors from '../../constants/Colors';
 import { db } from '../../FirebaseConfig'
 import { collection, addDoc } from 'firebase/firestore';
@@ -109,27 +109,38 @@ const uploadImage = async (uri: string, recipeName: string) => {
     setSteps(steps.filter((_, index) => index !== indexToRemove));
   };
 
-  const unitDropDown = () => {
-    
-  }
-
 
 
   return (
     <View style={styles.container}>
+      {/* Top bar with close button */}
       <TopModalBar title="Add Recipe" onClose={closeModal} />
+      
+      {/* Main content */}
       <ScrollView style={styles.scrollView} keyboardShouldPersistTaps='handled'>
 
-        <Pressable onPress={addImage} style={({ pressed }) => [styles.addImage, { backgroundColor: pressed ? Colors.dark.background : Colors.dark.mainColorLight },]}>
-          <PlusCircle color={Colors.dark.text} size={24} style={{alignSelf: 'center'}} />
-          <AlataLarge>Add Image</AlataLarge>
-        </Pressable>
+        {/* Recipe image selection */}
+        { imageUri != null ? 
+            <Image
+              style={styles.image}
+              source={{uri: imageUri}}
+            />
+          :
+          <Pressable onPress={addImage} style={({ pressed }) => [styles.addImage, { backgroundColor: pressed ? Colors.dark.background : Colors.dark.mainColorLight },]}>
+            <PlusCircle color={Colors.dark.text} size={24} style={{alignSelf: 'center'}} />
+            <AlataLarge>Add Image</AlataLarge>
+          </Pressable>
+        }
 
+        
         <View style={{padding: 30}}>
+          {/* adding Recipe name */}
           <AlataLarge>Name:</AlataLarge>
           <TextInput placeholder="Name" value={name} onChangeText={setName} style={styles.input} placeholderTextColor={Colors.dark.text}/>
+          {/* adding Recipe category */}
           <AlataLarge>Category:</AlataLarge>
           <TextInput placeholder="Kategory" value={category} onChangeText={setCategory} style={styles.input} placeholderTextColor={Colors.dark.text}/>
+          {/* adding Recipe preparation time */}
           <AlataLarge>Preperation Time:</AlataLarge>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookHTime} onChangeText={setCookHTime} style={styles.inputNumber} placeholderTextColor={Colors.dark.text}/>
@@ -138,6 +149,7 @@ const uploadImage = async (uri: string, recipeName: string) => {
             <Text style={{paddingVertical: 15, alignContent: 'center', textAlign: 'center', fontSize: 16, fontFamily: 'Alata', color: Colors.dark.text}}>minutes</Text>
           </View>
 
+          {/* adding Recipe ingredients */}
           <AlataLarge>Ingredients:</AlataLarge>
           {ingredients.map((ingredient, index) => (
             <View key={index} style={{flexDirection: 'row', gap: 10, zIndex: 1}}>
@@ -167,7 +179,7 @@ const uploadImage = async (uri: string, recipeName: string) => {
             <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
           </Pressable>
 
-
+          {/* adding Recipe steps */}
           <AlataLarge>Instructions:</AlataLarge>
           {steps.map((step, index) => (
             <View key={index} style={{flexDirection:'row', gap: -1}}>
@@ -192,6 +204,8 @@ const uploadImage = async (uri: string, recipeName: string) => {
         <Pressable onPress={addStep} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
           <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
         </Pressable>
+          
+        {/* Save button */}
         <Pressable onPress={handleSave} style={({ pressed }) => [styles.saveButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
           <Save color={Colors.dark.text} size={28} style={{ alignSelf: 'center' }} />
           <AlataLarge style={{marginBottom: 5, textAlign: 'center'}}>Save Recipe</AlataLarge>
@@ -283,5 +297,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 10,
     marginTop: 5,
+  },
+  image: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'cover',
+    borderRadius: 20,
   },
 });

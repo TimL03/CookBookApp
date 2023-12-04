@@ -53,7 +53,11 @@ function RootLayoutNav() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false, navigationBarColor: Colors.dark.mainColorDark }} />
-        <Stack.Screen name="modals/settingsModal"/>
+        <Stack.Screen name="modals/actionModal" options={{ headerShown: false, presentation: 'transparentModal', animation: 'fade_from_bottom'}}/>
+        <Stack.Screen name="modals/logInModal" options={{ headerShown: false, presentation: 'transparentModal', animation: 'fade_from_bottom'}}/>
+        <Stack.Screen name="screens/settingsScreen" options={{ headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom'}} />
+        <Stack.Screen name="screens/aboutScreen" options={{ headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom'}} />
+        <Stack.Screen name="screens/accountScreen" options={{ headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom'}} />
       </Stack>
     </ThemeProvider>
   );
