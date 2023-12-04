@@ -10,10 +10,14 @@ import { Send } from 'lucide-react-native';
 interface ShareRecipeScreenProps {
   closeModal: () => void;
   recipe: {
-    id: string;
+    id: string; 
     name: string;
+    category: string;
     cookHTime: string;
     cookMinTime: string;
+    description: string;
+    ingredients: string[];
+    steps: string[];
     imageUrl: string;
     userID: string;
   };
@@ -76,7 +80,6 @@ export default function ShareRecipeScreen({ closeModal, recipe }: ShareRecipeScr
             <Send color={Colors.dark.text} size={24} style={{ alignSelf: 'center', alignItems: 'center' }} />
           </Pressable>
         </View>
-
         
       </View>
     </Pressable>

@@ -6,7 +6,7 @@ import Colors from '../constants/Colors';
 import { DarkTheme } from '@react-navigation/native';
 import {View} from './Themed';
 import { AlataLarge, AlataMedium } from './StyledText';
-import ViewRecipeScreen from '../app/(modals)/viewRecipeModal';
+import ViewRecipeScreen from '../app/modals/viewRecipeModal';
 
 type RecipeProps = {
     item: {
@@ -19,6 +19,7 @@ type RecipeProps = {
     ingredients: string[];
     steps: string[];
     imageUrl: string;
+    userID: string;
     };
 };
 

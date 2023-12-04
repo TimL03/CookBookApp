@@ -11,13 +11,15 @@ import ShareRecipeScreen from './shareRecipeModal';
 interface AddRecipeScreenProps {
   closeModal: () => void;
   recipe: {
-    id: string;
+    id: string; 
     name: string;
+    category: string;
     cookHTime: string;
     cookMinTime: string;
-    imageUrl: string;
+    description: string;
     ingredients: string[];
     steps: string[];
+    imageUrl: string;
     userID: string;
   };
 }
