@@ -1,16 +1,13 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Library, Utensils, Menu } from 'lucide-react-native'
-import { Link, Tabs } from 'expo-router';
+import { Library, Utensils, Menu, FileSearch } from 'lucide-react-native'
+import { Link, Tabs, router } from 'expo-router';
 import { Pressable, useColorScheme, View, Platform } from 'react-native';
 
 import Colors from '../../constants/Colors';
 import React, { useState } from 'react';
 import ActionsModal from '../(modals)/actionModal';
 
-/**
- * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
- */
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof MaterialCommunityIcons>['name'];
   color: string;
@@ -53,11 +50,11 @@ export default function TabLayout() {
           borderWidth: 0,
         },
         headerRight: () => (
-          <Link href="/modals/actionModal" asChild>
-            <Pressable>
+          <View style={{paddingHorizontal: 20}}>
+            <Pressable onPress={} style={({ pressed }) => [ {padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
               <Menu color={Colors.dark.text} size={28} style={{ marginRight: 15 }} />
-            </Pressable>
-          </Link>                 
+            </Pressable>    
+          </View>                
         ),
         headerBackground: () => (
           <View style={{backgroundColor: Colors.dark.background, height: 110}}>
@@ -92,6 +89,16 @@ export default function TabLayout() {
             fontFamily: 'Alata'
           },
           tabBarIcon: ({ color }) => <Library color={color} size={28} style={{ marginBottom: -10 }} />,
+        }}
+      />
+      <Tabs.Screen
+        name="three"
+        options={{
+          title: 'Discover',
+          tabBarLabelStyle: {
+            fontFamily: 'Alata'
+          },
+          tabBarIcon: ({ color }) => <FileSearch color={color} size={28} style={{ marginBottom: -10 }} />,
         }}
       />
     

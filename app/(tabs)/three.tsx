@@ -1,17 +1,15 @@
 import { StyleSheet, Text, View, SafeAreaView, SectionList, Button, Pressable, Modal } from 'react-native';
 import React from 'react';
 import { Plus } from 'lucide-react-native';
-import Recipe from '../../components/RecipeElement'
+import Recipe from '../../components/RecipeFeedElement'
 import { AlataLarge, AlataMedium } from '../../components/StyledText'
-import LoginModalScreen from '../modals/logInModal';
 import Colors from '../../constants/Colors';
 import { db } from '../../FirebaseConfig'
 import { User } from 'firebase/auth';
 import { useState, useEffect } from "react"
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import AddRecipeScreen from '../screens/addRecipeScreen';
 import ShowSharedRecipeInvitationModalScreen from '../modals/showSharedRecipeInvitation';
-
+import LoginModalScreen from '../modals/logInModal';
 
 interface RecipeData {
   id: string;
@@ -24,21 +22,53 @@ interface RecipeData {
   steps: string[];
   imageUrl: string;
   userID: string;
+  recommendations: string[];
+  ratings: number[];
 }
 
 interface GroupedByCategory {
   [key: string]: RecipeData[];
 }
-export default function TabTwoScreen() {
+export default function TabThreeScreen() {
   const [isModalVisible, setModalVisible] = useState(false);
   const [isInvitationModalVisible, setIsInvitationModalVisible] = useState(false);
-  const [invitationData, setInvitationData] = useState<any>(null); 
+  const [invitationData, setInvitationData] = useState<any>(null);
   const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userID, setUserID] = useState<string | null>(null);
+  const [data, setData] = useState<Array<{ title: string, data: RecipeData[] }>>([]);
+
+
+  useEffect(() => {
+    const feedQuery = query(collection(db, "feed"));
+  
+    const unsubscribe = onSnapshot(feedQuery, (querySnapshot) => {
+      const feedRecipes: RecipeData[] = [];
+      querySnapshot.forEach((doc) => {
+        const recipeData = doc.data() as Omit<RecipeData, 'id'>;
+        feedRecipes.push({ id: doc.id, ...recipeData });
+      });
+
+      const groupedByCategory = feedRecipes.reduce((acc: GroupedByCategory, recipe) => {
+        const { category } = recipe;
+        acc[category] = acc[category] || [];
+        acc[category].push(recipe);
+        return acc;
+      }, {});
+
+      const sections = Object.keys(groupedByCategory).map(key => ({
+        title: key,
+        data: groupedByCategory[key],
+      }));
+
+      setData(sections);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const openInvitationModal = (invitation: string) => {
-    setInvitationData(invitation); 
+    setInvitationData(invitation);
     setIsInvitationModalVisible(true);
   };
 
@@ -74,36 +104,20 @@ export default function TabTwoScreen() {
     }
   };
 
-  const [data, setData] = useState<Array<{ title: string, data: RecipeData[] }>>([]);
-
-  useEffect(() => {
-    if (userID) {
-      const q = query(collection(db, "recipes"), where("userID", "==", userID));
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const recipes: RecipeData[] = [];
-        querySnapshot.forEach((doc) => {
-          const recipeData = doc.data() as Omit<RecipeData, 'id'>;
-          recipes.push({ id: doc.id, ...recipeData });
-        });
-
-        const groupedByCategory = recipes.reduce((acc: GroupedByCategory, recipe) => {
-          const { category } = recipe;
-          acc[category] = acc[category] || [];
-          acc[category].push(recipe);
-          return acc;
-        }, {});
-
-        const sections = Object.keys(groupedByCategory).map(key => ({
-          title: key,
-          data: groupedByCategory[key],
-        }));
-
-        setData(sections);
-      });
-
-      return () => unsubscribe();
+  const calculateAverageRating = (ratings: number[] = []) => {
+    console.log('Ratings:', ratings);
+  
+    if (ratings.length === 0) {
+      return { average: 1, totalRatings: 10 };
     }
-  }, [userID]);
+  
+    const sum = ratings.reduce((acc, rating) => acc + rating, 0);
+    const average = sum / ratings.length;
+  
+    console.log('Average Rating:', average);
+    return { average, totalRatings: ratings.length };
+  };
+  
 
   return (
     <View style={styles.container}>
@@ -111,25 +125,13 @@ export default function TabTwoScreen() {
         showsVerticalScrollIndicator={false}
         sections={data}
         keyExtractor={(item, index) => item.category + index}
-        renderItem={({ item }) => (
-          <Recipe item={item} />
-        )}
-        renderSectionHeader={({ section: { title } }) => (
-          <AlataLarge style={styles.header}>{title}</AlataLarge>
-        )}
+        renderItem={({ item }) => {
+          return (
+            <Recipe item={item} averageRating={calculateAverageRating(item.ratings)} />
+          );
+        }}
       />
       <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-        <Pressable onPress={toggleModal} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-          <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
-        </Pressable>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={isModalVisible}
-          onRequestClose={toggleModal}
-        >
-          <AddRecipeScreen closeModal={toggleModal} userID={userID}/>
-        </Modal>
         <Modal
           animationType="slide"
           transparent={true}
@@ -145,7 +147,7 @@ export default function TabTwoScreen() {
           visible={isInvitationModalVisible}
           onRequestClose={() => setIsInvitationModalVisible(false)}
         >
-          <ShowSharedRecipeInvitationModalScreen onClose={() => setIsInvitationModalVisible(false)} invitationData={invitationData}/>
+          <ShowSharedRecipeInvitationModalScreen onClose={() => setIsInvitationModalVisible(false)} invitationData={invitationData} />
         </Modal>
       </View>
     </View>

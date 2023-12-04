@@ -6,10 +6,12 @@ import Colors from '../../constants/Colors';
 import SearchBar from '../../components/searchBar';
 import SearchBarCategories from '../../components/searchBarCategories';
 import ViewRandomRecipeScreen from '../modals/viewRandomRecipeModal';
+import SearchSwitch from '../../components/SearchSwitch';
+import { searchRecipesInFirebase } from '../../components/searchRecipesInFirebase';
 
 const dataIngredients = [
-  { key: '1', value: 'Tomato', selected: false },
-  { key: '2', value: 'Spaghetti', selected: false },
+  { key: '1', value: 'Tomato', selected: true },
+  { key: '2', value: 'Spaghetti', selected: true },
   { key: '3', value: 'Garlic', selected: false },
   { key: '4', value: 'Milk', selected: false },
   { key: '5', value: 'Soy Sauce', selected: false },
@@ -19,7 +21,7 @@ const dataIngredients = [
 ];
 
 const dataCategories = [
-  { key: '1', value: 'Asian', selected: false },
+  { key: '1', value: 'Asia', selected: true },
   { key: '2', value: 'Italian', selected: false },
 ];
 
@@ -33,8 +35,20 @@ export default function TabOneScreen() {
   const [ingredients, setIngredients] = useState(dataIngredients);
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(''); 
-
+  const [searchMode, setSearchMode] = useState<'database' | 'cookbook'>('database');
+  
+  const toggleIngredientSelected = (key: string) => {
+    setIngredients(ingredients =>
+      ingredients.map(ingredient =>
+        ingredient.key === key ? { ...ingredient, selected: !ingredient.selected } : ingredient
+      )
+    );
+  
+    setIngredients((updatedIngredients) => {
+      console.log('Ingredients after toggle:', updatedIngredients);
+      return updatedIngredients;
+    });
+  };
 
   const handleCurrentListIngredientsUpdate = (updatedList: { key: string, value: string, selected: boolean }[]) => {
     setCurrentListIngredients(updatedList);
@@ -44,6 +58,33 @@ export default function TabOneScreen() {
     setCurrentListCategories(updatedList);
   };
 
+  const getCurrentSelectedIngredients = () => {
+    return currentListIngredients
+    .filter(item => item.selected)
+    .map(item => item.value);
+};
+
+  const getCurrentSelectedCategories = () => {
+    return currentListCategories
+      .filter(item => item.selected)
+      .map(item => item.value);
+  };
+
+
+  const handleSearchInFirebase = async () => {
+    const selectedIngredients = getCurrentSelectedIngredients();
+    const selectedCategories = getCurrentSelectedCategories().join(',');
+  
+    console.log('Selected Ingredients for Firebase Search:', selectedIngredients);
+    console.log('Selected Category for Firebase Search:', selectedCategories);
+  
+    const matchingRecipes = await searchRecipesInFirebase(selectedIngredients, selectedCategories);
+    console.log('Gefundene Rezepte in Firebase:', matchingRecipes);
+  };
+  
+  
+  
+
   const getSelectedIngredients = () => {
     return currentListIngredients
       .filter(item => item.selected)
@@ -51,16 +92,9 @@ export default function TabOneScreen() {
       .join(',');
   };
 
-  const getSelectedCategories = () => {
-    return currentListCategories
-      .filter(item => item.selected)
-      .map(item => item.value.toLowerCase())
-      .join(',');
-  };
-
   const getMeal = async () => {
     const selectedIngredients = getSelectedIngredients();
-    const selectedCategories = getSelectedCategories(); 
+    console.log('Selected Ingredients:', selectedIngredients);
     try {
       const response = await fetch(`https://www.themealdb.com/api/json/v2/9973533/filter.php?i=${selectedIngredients}`);
       const data = await response.json();
@@ -87,48 +121,48 @@ export default function TabOneScreen() {
     getMeal();
   };
 
-  const toggleIngredientSelected = (key: string) => {
-    setIngredients(ingredients =>
-      ingredients.map(ingredient =>
-        ingredient.key === key ? { ...ingredient, selected: !ingredient.selected } : ingredient
-      )
-    );
-  };
-
   return (
     <View style={styles.container}>
+      <SearchSwitch onToggle={(isDatabaseSearch) => setSearchMode(isDatabaseSearch ? 'database' : 'cookbook')} />
       <ScrollView showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled'>
-        <View>
-          <AlataLarge>Select Ingredients:</AlataLarge>
-          <SearchBar item={dataIngredients} currentList={recomendedListIngredients} onCurrentListUpdated={handleCurrentListIngredientsUpdate} />
-          <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
-            {
-              currentListIngredients.map((item) => (
+        {searchMode === 'database' && (
+          <View>
+            <AlataLarge>Select Ingredients:</AlataLarge>
+            <SearchBar item={dataIngredients} currentList={recomendedListIngredients} onCurrentListUpdated={handleCurrentListIngredientsUpdate} />
+            <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
+              {currentListIngredients.map((item) => (
                 <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleIngredientSelected(item.key)} />
-              ))
-            }
+              ))}
+            </View>
           </View>
-
-        </View>
-
-        <View>
-          <AlataLarge>Select Categories:</AlataLarge>
-          <SearchBarCategories item={dataCategories} currentListCategories={recomendedListCategories} onCurrentListCategoriesUpdated={handleCurrentListCategoriesUpdate} />
-          <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
-            {
-              currentListCategories?.map((item, index) => {
-                return (
-                  <ItemSelectorSwitch key={item.key} item={item} />
-                )
-              })
-            }
+        )}
+        {searchMode === 'cookbook' && (
+          <View>
+            <AlataLarge>Select Ingredients:</AlataLarge>
+            <SearchBar item={dataIngredients} currentList={recomendedListIngredients} onCurrentListUpdated={handleCurrentListIngredientsUpdate} />
+            <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
+              {currentListIngredients.map((item) => (
+                <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleIngredientSelected(item.key)} />
+              ))}
+            </View>
+            <AlataLarge>Select Categories:</AlataLarge>
+            <SearchBarCategories item={dataCategories} currentListCategories={recomendedListCategories} onCurrentListCategoriesUpdated={handleCurrentListCategoriesUpdate} />
+            <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
+              {
+                currentListCategories?.map((item, index) => {
+                  return (
+                    <ItemSelectorSwitch key={item.key} item={item} />
+                  )
+                })
+              }
+            </View>
+            
           </View>
-        </View>
+        )}
       </ScrollView>
-
-      <Pressable onPress={getMeal} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-        <AlataLarge style={{ marginBottom: 5, textAlign: 'center' }}>Get a Recipe</AlataLarge>
-      </Pressable>
+      <Pressable onPress={ searchMode === 'cookbook' ? handleSearchInFirebase : getMeal} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+              <AlataLarge style={{ marginBottom: 5, textAlign: 'center' }}>Get a Recipe</AlataLarge>
+            </Pressable>
       <Modal
         animationType="slide"
         transparent={true}
@@ -140,6 +174,8 @@ export default function TabOneScreen() {
     </View>
   )
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -165,6 +201,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.dark.mainColorDark,
     borderRadius: 10,
     width: 200,
+    marginBottom: -10,
     padding: 10,
     justifyContent: 'center',
     alignSelf: 'center',

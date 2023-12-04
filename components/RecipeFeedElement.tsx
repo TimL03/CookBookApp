@@ -10,20 +10,23 @@ import ViewRecipeScreen from '../app/modals/viewRecipeModal';
 
 type RecipeProps = {
     item: {
-    id: string; 
-    name: string;
-    category: string;
-    cookHTime: string;
-    cookMinTime: string;
-    description: string;
-    ingredients: string[];
-    steps: string[];
-    imageUrl: string;
-    userID: string;
+        id: string;
+        name: string;
+        category: string;
+        cookHTime: string;
+        cookMinTime: string;
+        description: string;
+        ingredients: string[];
+        steps: string[];
+        imageUrl: string;
     };
+    averageRating: {
+        average: number;
+        totalRatings: number;
+    }
 };
 
-export default function Recipe({ item }: RecipeProps) {
+export default function Recipe({ item, averageRating }: RecipeProps) {
     const [isModalVisible, setModalVisible] = useState(false);
 
     const toggleModal = () => {
@@ -39,6 +42,12 @@ export default function Recipe({ item }: RecipeProps) {
                 <AlataLarge>{item.name}</AlataLarge>
                 <AlataMedium>{(item.cookHTime == '0' || item.cookHTime == '') ? '' : item.cookHTime + ' h '}{(item.cookMinTime == '0' || item.cookMinTime == '') ? '' : (item.cookMinTime + ' min ')}</AlataMedium>
             </View>
+            <AlataMedium>
+                    {averageRating.average !== undefined ? `${averageRating.average}/5` : '4.5'}
+                </AlataMedium>
+                <AlataMedium>
+                    {averageRating.totalRatings !== undefined ? `(${averageRating.totalRatings} ratings)` : ''}
+                </AlataMedium>
             <View style={styles.icons}>
                 <Soup color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />
                 <Carrot color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />
