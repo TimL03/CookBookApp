@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, Image, Modal } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Carrot, Soup } from 'lucide-react-native';
+import { Carrot, Soup, Vegan,  } from 'lucide-react-native';
 import Colors from '../constants/Colors';
 import { DarkTheme } from '@react-navigation/native';
 import { View } from './Themed';
@@ -10,22 +10,39 @@ import ViewFeedRecipeScreen from '../app/modals/viewFeedRecipeModal';
 
 interface RecipeProps {
     item: {
-      id: string;
-      name: string;
-      category: string;
-      cookHTime: string;
-      cookMinTime: string;
-      description: string;
-      ingredients: string[];
-      steps: string[];
-      imageUrl: string;
-      userID: string;
+        id: string;
+        name: string;
+        category: string;
+        cookHTime: string;
+        cookMinTime: string;
+        description: string;
+        ingredients: string[];
+        steps: string[];
+        imageUrl: string;
+        userID: string;
     };
     averageRating: {
-      average: number;
-      totalRatings: number;
+        average: number;
+        totalRatings: number;
     };
-  }
+}
+
+interface CategoryIconProps {
+    category: string;
+}
+
+const CategoryIcon: React.FC<CategoryIconProps> = ({ category }) => {
+    switch (category) {
+        case 'Soup':
+            return <Soup color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+        case 'Salad':
+            return <Carrot color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+        case 'Vegan':
+            return <Vegan color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+        default:
+            return null;
+    }
+};
 
 export default function Recipe({ item, averageRating }: RecipeProps) {
     const [isModalVisible, setModalVisible] = useState(false);
@@ -33,6 +50,7 @@ export default function Recipe({ item, averageRating }: RecipeProps) {
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
     };
+
     return (
         <TouchableOpacity onPress={toggleModal} style={styles.outerBox} activeOpacity={0.2}>
             <Image
@@ -50,8 +68,7 @@ export default function Recipe({ item, averageRating }: RecipeProps) {
                 {averageRating.totalRatings !== undefined ? `(${averageRating.totalRatings} ratings)` : ''}
             </AlataMedium>
             <View style={styles.icons}>
-                <Soup color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />
-                <Carrot color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />
+                <CategoryIcon category={item.category} />
             </View>
             <Modal
                 animationType="slide"
