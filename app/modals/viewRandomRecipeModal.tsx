@@ -158,7 +158,7 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
         />
         <View style={{ padding: 30, marginTop: -20, backgroundColor: Colors.dark.mainColorDark, borderRadius: 15, flex: 1 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <AlataText style={{ fontSize: 24, color: Colors.dark.text, wordWrap: 'break-word', flex: 2}}>{recipe.strMeal}</AlataText>
+            <AlataText style={{ fontSize: 24, color: Colors.dark.text,  flex: 2}}>{recipe.strMeal}</AlataText>
             <View style={{ flexDirection: 'row', justifyContent: 'flex-end', flex: 1, gap: 12 }}>
               <Pressable style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
                 <Share2 color={Colors.dark.text} />

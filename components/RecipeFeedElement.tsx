@@ -19,6 +19,7 @@ type RecipeProps = {
         ingredients: string[];
         steps: string[];
         imageUrl: string;
+        userID: string;
     };
     averageRating: {
         average: number;

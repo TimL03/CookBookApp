@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, Image, Modal } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, Image, Modal, Pressable } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Carrot, Soup } from 'lucide-react-native';
 import Colors from '../constants/Colors';
@@ -30,7 +30,7 @@ export default function Recipe({ item }: RecipeProps) {
         setModalVisible(!isModalVisible);
     };
     return (
-        <TouchableOpacity onPress={toggleModal} style={styles.outerBox} activeOpacity={0.2}>
+        <Pressable onPress={toggleModal} style={({ pressed }) => [styles.outerBox, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.mainColorDark }]}>
             <Image
                 style={styles.logoSmall}
                 source={item.imageUrl == '' ? require("../assets/images/no-image.png") : { uri: item.imageUrl }}
@@ -51,7 +51,7 @@ export default function Recipe({ item }: RecipeProps) {
             >
                 <ViewRecipeScreen closeModal={toggleModal} recipe={item} />
             </Modal>
-        </TouchableOpacity>
+        </Pressable>
     )
 }
 
@@ -66,18 +66,19 @@ const styles = StyleSheet.create({
         marginVertical: 8,
     },
     innerBox: {
-        backgroundColor: Colors.dark.mainColorDark,
+        backgroundColor: Colors.dark.seeThrough,
         margin: 8,
         gap: 0,
     },
     logoSmall: {
+        backgroundColor: Colors.dark.seeThrough,
         alignContent: 'flex-start',
         width: 96,
         height: 96,
         borderRadius: 10,
     },
     icons: {
-        backgroundColor: Colors.dark.mainColorDark,
+        backgroundColor: Colors.dark.seeThrough,
         flex: 2,
         margin: 8,
         justifyContent: 'flex-end',

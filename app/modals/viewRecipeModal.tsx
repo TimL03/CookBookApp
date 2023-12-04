@@ -11,7 +11,7 @@ import ShareRecipeScreen from './shareRecipeModal';
 interface AddRecipeScreenProps {
   closeModal: () => void;
   recipe: {
-    id: string; 
+    id: string;
     name: string;
     category: string;
     cookHTime: string;
@@ -24,8 +24,6 @@ interface AddRecipeScreenProps {
   };
 }
 
-
-
 export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreenProps) {
   const [isShareRecipeModalVisible, setIsShareRecipeModalVisible] = useState(false);
 
@@ -37,44 +35,57 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
     { key: '1', value: 'Breakfast', selected: null },
     { key: '2', value: 'Snacks', selected: null },
     { key: '3', value: 'Desert', selected: null },
-  ]
+  ];
+
   return (
     <View style={styles.container}>
+      {/* Top bar with close button */}
       <TopModalBar title="From your Cookbook" onClose={closeModal} />
+
+      {/* Main content */}
       <ScrollView style={styles.scrollView}>
+        {/* Recipe image */}
         <Image
           style={styles.image}
           source={recipe.imageUrl == '' ? require("../../assets/images/no-image.png") : { uri: recipe.imageUrl }}
         />
+
+        {/* Recipe details */}
         <View style={{ padding: 30, marginTop: -20, backgroundColor: Colors.dark.mainColorDark, borderRadius: 15, flex: 1 }}>
+          {/* Recipe name and action buttons */}
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <AlataText style={{ fontSize: 25, color: Colors.dark.text,  wordWrap: 'break-word', flex: 2}}>{recipe.name}</AlataText>
+            <AlataText style={{ fontSize: 25, color: Colors.dark.text, flex: 2 }}>{recipe.name}</AlataText>
             <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8, flex: 1 }}>
-              <Pressable onPress={toggleModal} style={({ pressed }) => [{alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
-                <Share2 color={Colors.dark.text} size={24}/>
+              {/* Share button */}
+              <Pressable onPress={toggleModal} style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                <Share2 color={Colors.dark.text} size={24} />
               </Pressable>
-              <Pressable style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
-                <Trash2 color={Colors.dark.text} size={24}/>
+
+              {/* Delete button */}
+              <Pressable style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                <Trash2 color={Colors.dark.text} size={24} />
               </Pressable>
-              <Pressable style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
-                <PenSquare color={Colors.dark.text} size={24}/>
+
+              {/* Edit button */}
+              <Pressable style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                <PenSquare color={Colors.dark.text} size={24} />
               </Pressable>
             </View>
           </View>
+
+          {/* Cook time */}
           <AlataMedium>{(recipe.cookHTime == '0' || recipe.cookHTime == '') ? '' : (recipe.cookHTime == '1') ? (recipe.cookHTime + ' hour ') : (recipe.cookHTime + ' hours ')}{(recipe.cookHTime == '0' || recipe.cookHTime == '' || recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : 'and '}{(recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : (recipe.cookMinTime == '1') ? (recipe.cookMinTime + ' minute ') : (recipe.cookMinTime + ' minutes ')}</AlataMedium>
 
+          {/* Categories */}
           <View style={{ justifyContent: 'flex-start', flexDirection: 'row', paddingTop: 20, marginBottom: 20, flexWrap: 'wrap' }}>
-            {
-              currentCategories?.map((item, index) => {
-                return (
-                  <View key={item.key} style={{ backgroundColor: Colors.dark.tint, padding: 10, borderRadius: 20, marginRight: 5 }}>
-                    <AlataText style={{ fontSize: 12 }}>{item.value}</AlataText>
-                  </View>
-                )
-              })
-            }
+            {currentCategories?.map((item, index) => (
+              <View key={item.key} style={{ backgroundColor: Colors.dark.tint, padding: 10, borderRadius: 20, marginRight: 5 }}>
+                <AlataText style={{ fontSize: 12 }}>{item.value}</AlataText>
+              </View>
+            ))}
           </View>
 
+          {/* Ingredients */}
           <View style={styles.contentBox}>
             <AlataText style={{ fontSize: 20 }}>Ingredients:</AlataText>
             <View style={{ flexDirection: 'column', flexWrap: 'wrap', paddingHorizontal: 10, paddingTop: 5 }}>
@@ -87,6 +98,7 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
             </View>
           </View>
 
+          {/* Steps */}
           <View style={styles.contentBox}>
             <AlataText style={{ fontSize: 20 }}>Steps:</AlataText>
             <View style={{ flexDirection: 'column', flexWrap: 'wrap', paddingLeft: 10, paddingTop: 5 }}>
@@ -100,17 +112,19 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
 
         </View>
       </ScrollView>
+
+      {/* Share Recipe Modal */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={isShareRecipeModalVisible}
         onRequestClose={() => setIsShareRecipeModalVisible(false)}
       >
-        <ShareRecipeScreen closeModal={() => setIsShareRecipeModalVisible(false)}
-          recipe={recipe} />
+        {/* Pass closeModal and recipe as props to ShareRecipeScreen */}
+        <ShareRecipeScreen closeModal={() => setIsShareRecipeModalVisible(false)} recipe={recipe} />
       </Modal>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({

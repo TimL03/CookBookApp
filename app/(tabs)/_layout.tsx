@@ -1,13 +1,10 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Library, Utensils, Menu, FileSearch } from 'lucide-react-native'
-import { Link, Tabs, router } from 'expo-router';
-import { Pressable, useColorScheme, View, Platform } from 'react-native';
+import { Tabs, router } from 'expo-router';
+import { Pressable, useColorScheme, View } from 'react-native';
 
 import Colors from '../../constants/Colors';
 import React, { useState } from 'react';
-import ActionsModal from '../(modals)/actionModal';
-
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof MaterialCommunityIcons>['name'];
   color: string;
@@ -51,8 +48,8 @@ export default function TabLayout() {
         },
         headerRight: () => (
           <View style={{paddingHorizontal: 20}}>
-            <Pressable onPress={} style={({ pressed }) => [ {padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-              <Menu color={Colors.dark.text} size={28} style={{ marginRight: 15 }} />
+            <Pressable onPress={() => router.push('/modals/actionModal')} style={({ pressed }) => [ {padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+              <Menu color={Colors.dark.text} size={28} />
             </Pressable>    
           </View>                
         ),
