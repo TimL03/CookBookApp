@@ -153,13 +153,14 @@ useEffect(() => {
   return (
     <View style={styles.container}>
       <SectionList
+        showsVerticalScrollIndicator={false}
         sections={data}
         keyExtractor={(item, index) => item.id + index}
         renderItem={({ item }) => (
           <Recipe item={item} averageRating={averageRatings[item.id] || { average: 0, totalRatings: 0 }} />
         )}
         renderSectionHeader={({ section: { title } }) => (
-          <Text>{title}</Text>
+          <AlataLarge style={styles.header}>{title}</AlataLarge>
         )}
       />
       <View style={{ flexDirection: 'row', justifyContent: 'center' }}>

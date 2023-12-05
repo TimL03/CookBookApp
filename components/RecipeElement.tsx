@@ -37,7 +37,7 @@ const CategoryIcon: React.FC<CategoryIconProps> = ({ category }) => {
     switch (category) {
         case 'Soup':
             return <Soup color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
-        case 'Salad':
+        case 'Vegetarian':
             return <Carrot color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
         case 'Vegan':
             return <Vegan color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
@@ -53,18 +53,24 @@ export default function Recipe({ item }: RecipeProps) {
     };
 
     return (
-        <Pressable onPress={toggleModal} style={({ pressed }) => [styles.outerBox, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.mainColorDark }]}>
+        <TouchableOpacity onPress={toggleModal} style={styles.outerBox} activeOpacity={0.2}>
             <Image
                 style={styles.logoSmall}
                 source={item.imageUrl == '' ? require("../assets/images/no-image.png") : { uri: item.imageUrl }}
             />
-            <View style={styles.innerBox}>
-                <AlataLarge>{item.name}</AlataLarge>
+
+            <View style={[styles.innerBox, {flex: 2}]}>
+                <AlataLarge numberOfLines={2}>{item.name}</AlataLarge>
+
                 <AlataMedium>{(item.cookHTime == '0' || item.cookHTime == '') ? '' : item.cookHTime + ' h '}{(item.cookMinTime == '0' || item.cookMinTime == '') ? '' : (item.cookMinTime + ' min ')}</AlataMedium>
             </View>
-            <View style={styles.icons}>
-                <CategoryIcon category={item.category} />
+
+            <View style={[styles.innerBox, {marginRight: 5}]}>
+                <View style={styles.icons}>
+                    <CategoryIcon category={item.category} />
+                </View>
             </View>
+
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -73,7 +79,7 @@ export default function Recipe({ item }: RecipeProps) {
             >
                 <ViewRecipeScreen closeModal={toggleModal} recipe={item} />
             </Modal>
-        </Pressable>
+        </TouchableOpacity>
     )
 }
 
