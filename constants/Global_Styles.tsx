@@ -36,6 +36,15 @@ export default StyleSheet.create({
         gap: 8,
         flex: 1,
     },
+    dropDownContainer: {
+        backgroundColor: Colors.dark.mainColorDark, 
+        borderRadius: 15, 
+        paddingVertical: 15, 
+        marginTop: 50, 
+        width: 125, 
+        position: 'absolute', 
+        zIndex: 1
+    },
     transparentContainer: {
         backgroundColor: Colors.dark.mainColorDark,
     },
@@ -82,6 +91,13 @@ export default StyleSheet.create({
         resizeMode: 'cover',
         borderRadius: 20,
       },
+    imageSmall: {
+        backgroundColor: Colors.dark.seeThrough,
+        alignContent: 'flex-start',
+        width: 96,
+        height: 96,
+        borderRadius: 10,
+    },  
 
     HorizontalLayout: {
         flexDirection: 'row',

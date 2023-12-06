@@ -13,7 +13,7 @@ const SearchSwitch = ({ onToggle }: { onToggle: (isDatabaseSearch: boolean) => v
 
   return (
     <View style={styles.container}>
-      <AlataText style={{fontSize: 14}}>{isDatabaseSearch ? ' Currently selecting Recipes from others' : 'Currently selecting from your CookBook'}</AlataText>
+      <AlataText style={{fontSize: 14}}>{isDatabaseSearch ? ' Currently selecting Recipes from a collection' : 'Currently selecting from your CookBook'}</AlataText>
       <Switch
         trackColor={{ false: Colors.dark.mainColorDark, true: Colors.dark.mainColorLight }}
         thumbColor={isDatabaseSearch ? Colors.dark.text : Colors.dark.mainColorLight}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, Image, Modal } from 'react-native';
 import { Carrot, EggOff, Fish, MilkOff, Soup, Star, Vegan,  } from 'lucide-react-native';
 import Colors from '../constants/Colors';
+import gStyles from '../constants/Global_Styles'
 import { DarkTheme } from '@react-navigation/native';
 import { View } from './Themed';
 import { Alata20, Alata12 } from './StyledText';
@@ -59,7 +60,7 @@ export default function Recipe({ item, averageRating }: RecipeProps) {
     return (
         <TouchableOpacity onPress={toggleModal} style={styles.outerBox} activeOpacity={0.2}>
             <Image
-                style={styles.logoSmall}
+                style={gStyles.imageSmall}
                 source={item.imageUrl == '' ? require("../assets/images/no-image.png") : { uri: item.imageUrl }}
             />
 
@@ -111,12 +112,6 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.dark.seeThrough,
         padding: 8,
         justifyContent: 'space-between',
-    },
-    logoSmall: {
-        alignContent: 'flex-start',
-        width: 96,
-        height: 96,
-        borderRadius: 10,
     },
     icons: {
         backgroundColor: Colors.dark.seeThrough,
