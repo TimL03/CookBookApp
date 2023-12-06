@@ -3,7 +3,7 @@ import { TextInput, StyleSheet, ScrollView, View, Image, Pressable, Text, Modal 
 import Colors from '../../constants/Colors';
 import { db } from '../../FirebaseConfig'
 import { collection, addDoc } from 'firebase/firestore';
-import { AlataLarge, AlataMedium, AlataText } from '../../components/StyledText';
+import { Alata20, Alata12, AlataText } from '../../components/StyledText';
 import TopModalBar from '../../components/topModalBar';
 import { Send } from 'lucide-react-native';
 

@@ -3,7 +3,7 @@ import { View, StyleSheet, Pressable, Image } from 'react-native';
 import Colors from '../../constants/Colors';
 import { db } from '../../FirebaseConfig'
 import { collection, addDoc, updateDoc, getDoc, doc } from 'firebase/firestore';
-import { AlataLarge, AlataMedium, AlataLargeMiddle } from '../../components/StyledText';
+import { Alata20, Alata12, AlataLargeMiddle } from '../../components/StyledText';
 
 
 interface ShowSharedRecipeProps {
@@ -84,15 +84,15 @@ export default function ShowSharedRecipeInvitationModalScreen({ invitationData, 
         {recipeData && (
           <View>
             <Image source={{ uri: recipeData.imageUrl }} style={{ width: 100, height: 100 }} />
-            <AlataLarge>{recipeData.name}</AlataLarge>
+            <Alata20>{recipeData.name}</Alata20>
           </View>
         )}
         <Pressable onPress={handleAccept}>
-          <AlataLarge>Accept</AlataLarge>
+          <Alata20>Accept</Alata20>
         </Pressable>
 
         <Pressable onPress={handleDecline}>
-          <AlataLarge style={{ paddingBottom: 4 }}>Decline</AlataLarge>
+          <Alata20 style={{ paddingBottom: 4 }}>Decline</Alata20>
         </Pressable>
       </View>
     </Pressable>

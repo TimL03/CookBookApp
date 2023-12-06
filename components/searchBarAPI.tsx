@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { Pressable, TextInput, View, StyleSheet, Keyboard } from 'react-native';
 import { Search, X } from 'lucide-react-native';
 import Colors from '../constants/Colors';
-import { AlataLarge, AlataMedium } from './StyledText';
+import { Alata20, Alata12 } from './StyledText';
 
 type SelectionProps = {
   item: {
@@ -116,7 +116,7 @@ export default function SearchBarAPI({ item, currentListAPI, onCurrentListAPIUpd
               onPress={() => itemSelected(i.key)}
               style={({ pressed }) => [styles.button, { backgroundColor: (isItemSelected(i.key)) ? Colors.dark.tint : Colors.dark.mainColorDark }]}
             >
-              <AlataMedium>{i.value}</AlataMedium>
+              <Alata12>{i.value}</Alata12>
             </Pressable>
           ))}
           </View>
