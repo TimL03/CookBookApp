@@ -1,14 +1,16 @@
-import { StyleSheet, Text, View, Pressable, ScrollView, Modal, TouchableOpacity } from 'react-native';
-import React, { useReducer, useRef, useState } from 'react';
+import { View, Pressable, ScrollView, Modal, StyleSheet } from 'react-native';
+import React, {useState } from 'react';
 import ItemSelectorSwitch from '../../components/ItemSelectorSwitch'
-import { AlataLarge } from '../../components/StyledText'
+import { Alata20 } from '../../components/StyledText'
 import Colors from '../../constants/Colors';
+import gStyles from '../../constants/Global_Styles';
 import SearchBarAPI from '../../components/searchBarAPI';
 import SearchBarCookBookIngredients from '../../components/searchBarCookBookIngredients';
 import SearchBarCookBookCategories from '../../components/searchBarCookBookCategories';
 import ViewRandomRecipeScreen from '../modals/viewRandomRecipeModal';
 import SearchSwitch from '../../components/SearchSwitch';
 import { searchRecipesInFirebase } from '../../components/searchRecipesInFirebase';
+import { ScreenContainer } from 'react-native-screens';
 
 
 const dataIngredients = [
@@ -212,60 +214,58 @@ export default function TabOneScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={gStyles.screenContainer}>
       <SearchSwitch onToggle={(isDatabaseSearch) => setSearchMode(isDatabaseSearch ? 'database' : 'cookbook')} />
       <ScrollView showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled'>
         {searchMode === 'database' && (
           <View>
-            <AlataLarge>Select Ingredients:</AlataLarge>
+            <Alata20 style={styles.margin}>Select Ingredients:</Alata20>
             <SearchBarAPI
               item={getDisplayedAPIIngredients()}
               currentListAPI={recomendedAPIListIngredients}
               onCurrentListAPIUpdated={handleCurrentListAPIIngredientsUpdate}
               onIngredientSelectedAPI={handleIngredientAPISelection}
             />
-            <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
+            <View style={[gStyles.mapHorizontal, styles.margin]}>
               {getDisplayedAPIIngredients().map((item) => (
                 <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleIngredientSelectedAPI(item.key)} />
               ))}
             </View>
-            <Pressable onPress={getMeal} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-              <AlataLarge style={{ marginBottom: 5, textAlign: 'center' }}>Get a Recipe</AlataLarge>
-            </Pressable>
           </View>
         )}
         {searchMode === 'cookbook' && (
           <View>
-            <AlataLarge>Select Ingredients:</AlataLarge>
+            <Alata20>Select Ingredients:</Alata20>
             <SearchBarCookBookIngredients
               item={getDisplayedCookBookIngredients()}
               currentListCookBook={recomendedCookBookListIngredients}
               onCurrentListCookBookUpdated={handleCurrentListCookBookIngredientsUpdate}
               onIngredientSelectedCookBook={handleIngredientCookBookSelection}
             />
-            <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
+            <View style={gStyles.mapHorizontal}>
               {getDisplayedCookBookIngredients().map((item) => (
                 <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleIngredientSelectedCookBook(item.key)} />
               ))}
             </View>
-            <AlataLarge>Select Category:</AlataLarge>
+            <Alata20>Select Category:</Alata20>
             <SearchBarCookBookCategories 
             item={getDisplayedCookBookCategories()} 
             currentListCategories={recomendedCookBookListCategories} 
             onCurrentListCategoriesUpdated={handleCurrentListCookBookCategoriesUpdate} 
             onCategorySelectedCookBook={handleCategoryCookBookSelection}
             />
-            <View style={{ flexDirection: 'row', marginBottom: 20, flexWrap: 'wrap' }}>
+            <View style={gStyles.mapHorizontal}>
               {getDisplayedCookBookCategories().map((item) => (
                 <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleCategorySelectedCookBook(item.key)} />
               ))}
             </View>
-            <Pressable onPress={handleSearchInFirebase} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-              <AlataLarge style={{ marginBottom: 5, textAlign: 'center' }}>Get a Recipe</AlataLarge>
-            </Pressable>
+            
           </View>
         )}
       </ScrollView>
+      <Pressable onPress={searchMode === 'cookbook' ? handleSearchInFirebase : getMeal} style={({ pressed }) => [gStyles.squareButtonText, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+        <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Get a Recipe</Alata20>
+      </Pressable>
       <Modal
         animationType="slide"
         transparent={true}
@@ -278,40 +278,9 @@ export default function TabOneScreen() {
   )
 }
 
-
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.dark.background,
-    flexDirection: 'column',
-    padding: 30,
-    alignContent: 'center',
-    justifyContent: 'space-evenly',
-    gap: 15
-  },
-  item: {
-    backgroundColor: Colors.dark.mainColorLight,
-    padding: 20,
-    flexDirection: 'row',
-    marginVertical: 8,
-  },
-  header: {
-    fontSize: 32,
-    backgroundColor: Colors.dark.background,
-  },
-  button: {
-    backgroundColor: Colors.dark.mainColorDark,
-    borderRadius: 10,
-    width: 200,
-    padding: 10,
-    justifyContent: 'center',
-    alignSelf: 'center',
-  },
-  list: {
-    flexWrap: 'wrap',
-    flexDirection: 'row',
-    width: '100%',
+  margin: {
+    marginBottom: 10,
+    marginTop: 10,
   }
 });
-

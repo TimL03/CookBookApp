@@ -1,15 +1,12 @@
 
 import React, { useState } from 'react';
-import { Modal, View, Text, StyleSheet, Pressable, Button, } from 'react-native';
-import { User2, Mail, KeyRound, Eye, EyeOff } from 'lucide-react-native';
-import { BlurView, VibrancyView } from 'react-native-blur';
+import { View, StyleSheet, Pressable} from 'react-native';
+import { User2, Mail, KeyRound, Eye, EyeOff, AlignCenter } from 'lucide-react-native';
 import Colors from '../../constants/Colors';
-import { Link } from 'expo-router';
+import gStyles from '../../constants/Global_Styles';
 import { auth } from '../../FirebaseConfig';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import { AlataLarge, AlataMedium, AlataLargeMiddle } from '../../components/StyledText';
-import { AlignCenter } from 'lucide-react-native';
-import SettingsModal from '../screens/settingsScreen';
+import { Alata20, Alata22 } from '../../components/StyledText';
 import { TextInput } from 'react-native-gesture-handler';
 
 
@@ -69,103 +66,65 @@ export default function LoginModalScreen({ onClose, setIsAuthenticated, setUserI
   };
 
   return (
-    <Pressable style={styles.modalContainer}>
-      <View style={styles.modalContent}>
-        <AlataLargeMiddle>Welcome</AlataLargeMiddle>
+    <Pressable style={gStyles.modalBackgroundContainer}>
+      <View style={gStyles.modalContentContainer}>
+        <Alata22 style={gStyles.alignCenter}>Welcome</Alata22>
         {
           !loginMode ?
-            <View style={styles.input}>
-              <User2 color={Colors.dark.text} size={24} style={{ alignSelf: 'center' }} />
-              <TextInput placeholder="Name" placeholderTextColor={Colors.dark.text} style={{ fontFamily: 'Alata', flex: 1, color: Colors.dark.text }} />
+            <View style={gStyles.cardInput}>
+              <User2 color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
+              <TextInput placeholder="Name" placeholderTextColor={Colors.dark.text} style={gStyles.textInput} />
             </View>
             : null
         }
 
-        <View style={styles.input}>
-          <Mail color={Colors.dark.text} size={24} style={{ alignSelf: 'center' }} />
+        <View style={gStyles.cardInput}>
+          <Mail color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
           <TextInput placeholder="Email" onChangeText={setEmail} value={email}
-            placeholderTextColor={Colors.dark.text} style={{ fontFamily: 'Alata', flex: 1, color: Colors.dark.text }} />
+            placeholderTextColor={Colors.dark.text} style={gStyles.textInput} />
         </View>
 
-        <View style={styles.input}>
-          <KeyRound color={Colors.dark.text} size={24} style={{ alignSelf: 'center' }} />
+        <View style={gStyles.cardInput}>
+          <KeyRound color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
           <TextInput placeholder="Password" onChangeText={setPassword} value={password}
-            placeholderTextColor={Colors.dark.text} style={{ fontFamily: 'Alata', flex: 1, color: Colors.dark.text }} secureTextEntry={hidePassword} />
+            placeholderTextColor={Colors.dark.text} style={gStyles.textInput} secureTextEntry={hidePassword} />
           {hidePassword ?
-            <Pressable onPress={showPassword} style={{ alignSelf: 'center' }}>
-              <Eye color={Colors.dark.text} size={24} style={{ alignSelf: 'center' }} />
+            <Pressable onPress={showPassword} style={gStyles.alignCenter}>
+              <Eye color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
             </Pressable>
             :
-            <Pressable onPress={dontShowPassword} style={{ alignSelf: 'center' }}>
-              <EyeOff color={Colors.dark.text} size={24} style={{ alignSelf: 'center' }} />
+            <Pressable onPress={dontShowPassword} style={gStyles.alignCenter}>
+              <EyeOff color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
             </Pressable>
           }
         </View>
 
         {
           !loginMode ?
-            <View style={styles.input}>
-              <KeyRound color={Colors.dark.text} size={24} style={{ alignSelf: 'center' }} />
-              <TextInput placeholder="Repeat Password" placeholderTextColor={Colors.dark.text} style={{ fontFamily: 'Alata', flex: 1, color: Colors.dark.text }} secureTextEntry={hidePassword} />
+            <View style={gStyles.cardInput}>
+              <KeyRound color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
+              <TextInput placeholder="Repeat Password" placeholderTextColor={Colors.dark.text} style={gStyles.textInput} secureTextEntry={hidePassword} />
               {hidePassword ?
-                <Pressable onPress={showPassword} style={{ alignSelf: 'center' }}>
-                  <Eye color={Colors.dark.text} size={24} style={{ alignSelf: 'center' }} />
+                <Pressable onPress={showPassword} style={gStyles.alignCenter}>
+                  <Eye color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
                 </Pressable>
                 :
-                <Pressable onPress={dontShowPassword} style={{ alignSelf: 'center' }}>
-                  <EyeOff color={Colors.dark.text} size={24} style={{ alignSelf: 'center' }} />
+                <Pressable onPress={dontShowPassword} style={gStyles.alignCenter}>
+                  <EyeOff color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
                 </Pressable>
               }
             </View>
             : null
         }
 
-        <Pressable style={({ pressed }) => [styles.button, { backgroundColor: !loginMode ? Colors.dark.background : pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]} onPress={logIn}>
-          <AlataLarge style={{ paddingBottom: 4, textAlign: 'center' }}>{loginMode ? 'Log in' : 'already have a acount'}</AlataLarge>
+        <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: !loginMode ? Colors.dark.background : pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]} onPress={logIn}>
+          <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>{loginMode ? 'Log in' : 'already have a acount'}</Alata20>
         </Pressable>
 
-        <Pressable style={({ pressed }) => [styles.button, { backgroundColor: loginMode ? Colors.dark.background : pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]} onPress={signUp}>
-          <AlataLarge style={{ paddingBottom: 4 }}>{!loginMode ? 'create Account' : 'Sign up'}</AlataLarge>
+        <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: loginMode ? Colors.dark.background : pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]} onPress={signUp}>
+          <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>{!loginMode ? 'create Account' : 'Sign up'}</Alata20>
         </Pressable>
       </View>
     </Pressable>
   );
 };
-
-const styles = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0)',
-    backdropFilter: 'blur(5px)',
-  },
-  modalContent: {
-    backgroundColor: Colors.dark.mainColorDark,
-    padding: 25,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    gap: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    width: '100%',
-  },
-  button: {
-    borderRadius: 10,
-    padding: 10,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 15,
-  },
-  input: {
-    flexDirection: 'row',
-    color: Colors.dark.text,
-    backgroundColor: Colors.dark.mainColorLight,
-    paddingHorizontal: 10,
-    height: 45,
-    borderRadius: 10,
-    gap: 10,
-  }
-});
-
-

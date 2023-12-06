@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Pressable, TextInput, View, StyleSheet } from 'react-native';
-import { ChevronDown, ChevronUp, Search, X } from 'lucide-react-native';
+import { ChevronDown, ChevronUp } from 'lucide-react-native';
+import gStyles from '../constants/Global_Styles';
 import Colors from '../constants/Colors';
-import { AlataLarge, AlataMedium, AlataText } from './StyledText';
-import { FlatList } from 'react-native-gesture-handler';
+import { Alata12, Alata14 } from './StyledText';
 
 type SelectionProps = {
     item: {
@@ -42,8 +42,8 @@ export default function DropDown({ item, selectedUnit, selectedAmount, onSelect 
       };
 
     return (
-        <View style={{ flex: 2, flexDirection: 'column' }}>
-            <View style={styles.inputSmaller}>
+        <View style={styles.horizontalLayout}>
+            <View style={gStyles.cardInput}>
                 <TextInput
                     placeholder={`00`}
                     inputMode='numeric'
@@ -51,34 +51,34 @@ export default function DropDown({ item, selectedUnit, selectedAmount, onSelect 
                     maxLength={4}
                     placeholderTextColor={Colors.dark.text}
                     onChangeText={handleAmountChange}
-                    style={{ fontFamily: 'Alata', flex: 1, color: Colors.dark.text }}
+                    style={[gStyles.textInput]}
                 />
-                <AlataText style={{ fontSize: 16, color: Colors.dark.text, flex: 1, textAlign: 'center' }}>{unit}</AlataText>
+                <Alata14 style={[gStyles.alignCenter, styles.marginRight]}>{unit}</Alata14>
                 {
                     dropDown ?
-                        <Pressable onPress={deactivateDropDown}>
-                            <ChevronUp color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
+                        <Pressable onPress={deactivateDropDown} style={gStyles.alignCenter}>
+                            <ChevronUp color={Colors.dark.text} size={28} strokeWidth='2.5'  />
                         </Pressable>
                         :
-                        <Pressable onPress={activateDropDown}>
-                            <ChevronDown color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
+                        <Pressable onPress={activateDropDown} style={gStyles.alignCenter}>
+                            <ChevronDown color={Colors.dark.text} size={28} strokeWidth='2.5' style={gStyles.alignCenter} />
                         </Pressable>
                 }
             </View>
 
             {
                 dropDown ?
-                    <View style={{ backgroundColor: Colors.dark.mainColorDark, borderRadius: 15, paddingVertical: 15, marginTop: 54, width: 130, position: 'absolute', zIndex: 1 }}>
+                    <View style={gStyles.dropDownContainer}>
                         {item.map((unitItem) => (
                             <Pressable
                                 key={unitItem.key}
                                 onPress={() => handleSelectUnit(unitItem.value)}
                                 style={({ pressed }) => [
-                                    styles.button,
+                                    styles.dropDownElement,
                                     { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.mainColorDark },
                                 ]}
                             >
-                                <AlataMedium>{unitItem.value}</AlataMedium>
+                                <Alata12>{unitItem.value}</Alata12>
                             </Pressable>
                         ))}
                     </View>
@@ -89,19 +89,15 @@ export default function DropDown({ item, selectedUnit, selectedAmount, onSelect 
 }
 
 const styles = StyleSheet.create({
-    inputSmaller: {
-        color: Colors.dark.text,
-        backgroundColor: Colors.dark.mainColorLight,
-        flexDirection: 'row',
-        padding: 10,
-        borderRadius: 15,
-        marginBottom: 10,
-        marginTop: 5,
-        fontFamily: 'Alata',
-        flex: 2
+    marginRight: {
+        marginRight: -4
     },
-    button: {
+    dropDownElement: {
         padding: 10,
         paddingLeft: 15
+    }, 
+    horizontalLayout: {
+        flex: 2, 
+        flexDirection: 'column'
     }
 })

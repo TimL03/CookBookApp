@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet, Image, Pressable, Modal, TextInput } from "react-native";
+import { View, Image, Pressable, Modal } from "react-native";
 import TopModalBar from "../../components/topModalBar";
 import Colors from '../../constants/Colors';
-import { Share2, PenSquare, Trash2, ArrowUpToLine, Save, X, Plus } from 'lucide-react-native';
-import { ScrollView } from 'react-native-gesture-handler';
-import { AlataMedium, AlataText } from '../../components/StyledText';
+import { Share2, PenSquare, Trash2, ArrowUpToLine } from 'lucide-react-native';
+import { FlatList, ScrollView } from 'react-native-gesture-handler';
+import { AlataLarge, AlataMedium, AlataText } from '../../components/StyledText';
+import ItemSelectorSwitch from '../../components/ItemSelectorSwitch';
 import ShareRecipeScreen from './shareRecipeModal';
 import { db } from '../../FirebaseConfig'
 import { doc, setDoc, Timestamp, deleteDoc } from 'firebase/firestore';
@@ -226,91 +227,57 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
 
 
   return (
-    <View style={styles.container}>
+    <View style={[gStyles.defaultContainer, {backgroundColor: Colors.dark.mainColorDark}]}>
       {/* Top bar with close button */}
       <TopModalBar title="From your Cookbook" onClose={closeModal} />
 
       {/* Main content */}
-      <ScrollView style={styles.scrollView} keyboardShouldPersistTaps='handled'>
+      <ScrollView style={styles.scrollView}>
         {/* Recipe image */}
-        {isEditMode ? (
-          <Pressable onPress={addImage}>
-            <Image style={styles.image} source={{ uri: editedRecipe.imageUrl }} />
-          </Pressable>
-        ) : (
-          <Image style={styles.image} source={{ uri: recipe.imageUrl }} />
-        )}
+        <Image
+          style={styles.image}
+          source={recipe.imageUrl == '' ? require("../../assets/images/no-image.png") : { uri: recipe.imageUrl }}
+        />
 
         {/* Recipe details */}
         <View style={{ padding: 30, marginTop: -20, backgroundColor: Colors.dark.mainColorDark, borderRadius: 15, flex: 1 }}>
           {/* Recipe name and action buttons */}
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            {isEditMode ? (
-              <TextInput
-                style={styles.input}
-                value={editedRecipe.name}
-                onChangeText={handleNameChange}
-              />
-            ) : (
-              <AlataText style={{ fontSize: 25, color: Colors.dark.text, flex: 2 }}>{recipe.name}</AlataText>
-            )}
-
+            <AlataText style={{ fontSize: 25, color: Colors.dark.text, flex: 2 }}>{recipe.name}</AlataText>
             <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8, flex: 1 }}>
               {/* Share button */}
               <Pressable onPress={toggleModal} style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
                 <Share2 color={Colors.dark.text} size={24} />
               </Pressable>
-
+             
               {/* Push to discover button */}
               <Pressable onPress={handleDatabaseSave} style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
                 <ArrowUpToLine color={Colors.dark.text} size={24} />
               </Pressable>
 
               {/* Delete button */}
-              <Pressable onPress={deleteRecipe} style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]} >
+              <Pressable style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
                 <Trash2 color={Colors.dark.text} size={24} />
               </Pressable>
 
               {/* Edit button */}
-              {isEditMode ? (
-                <Pressable onPress={saveChangesToFirebase} style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                  <Save color={Colors.dark.text} size={24} />
-                </Pressable>
-              ) : (
-                <Pressable onPress={toggleEditMode} style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                  <PenSquare color={Colors.dark.text} size={24} />
-                </Pressable>
-              )}
+              <Pressable style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                <PenSquare color={Colors.dark.text} size={24} />
+              </Pressable>
             </View>
+
+            {/* Cook time */}
+            <Alata14>{(recipe.cookHTime == '0' || recipe.cookHTime == '') ? '' : (recipe.cookHTime == '1') ? (recipe.cookHTime + ' hour ') : (recipe.cookHTime + ' hours ')}{(recipe.cookHTime == '0' || recipe.cookHTime == '' || recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : 'and '}{(recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : (recipe.cookMinTime == '1') ? (recipe.cookMinTime + ' minute ') : (recipe.cookMinTime + ' minutes ')}</Alata14>
           </View>
 
           {/* Cook time */}
-          {isEditMode ? (
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <TextInput value={editedRecipe.cookHTime} onChangeText={handleCookHTimeChange} style={styles.input} />
-              <Text style={{ paddingVertical: 15, textAlign: 'center', fontSize: 16, fontFamily: 'Alata', color: Colors.dark.text }}>hours</Text>
-              <TextInput value={editedRecipe.cookMinTime} onChangeText={handleCookMinTimeChange} style={styles.input} />
-              <Text style={{ paddingVertical: 15, alignContent: 'center', textAlign: 'center', fontSize: 16, fontFamily: 'Alata', color: Colors.dark.text }}>minutes</Text>
-            </View>
-          ) : (
-            <AlataMedium>{(recipe.cookHTime == '0' || recipe.cookHTime == '') ? '' : (recipe.cookHTime == '1') ? (recipe.cookHTime + ' hour ') : (recipe.cookHTime + ' hours ')}{(recipe.cookHTime == '0' || recipe.cookHTime == '' || recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : 'and '}{(recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : (recipe.cookMinTime == '1') ? (recipe.cookMinTime + ' minute ') : (recipe.cookMinTime + ' minutes ')}</AlataMedium>
-          )}
+          <AlataMedium>{(recipe.cookHTime == '0' || recipe.cookHTime == '') ? '' : (recipe.cookHTime == '1') ? (recipe.cookHTime + ' hour ') : (recipe.cookHTime + ' hours ')}{(recipe.cookHTime == '0' || recipe.cookHTime == '' || recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : 'and '}{(recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : (recipe.cookMinTime == '1') ? (recipe.cookMinTime + ' minute ') : (recipe.cookMinTime + ' minutes ')}</AlataMedium>
 
           {/* Categories */}
-          {isEditMode ? (
-            editedCategories.map((category, index) => (
-              <View key={index} style={{ flexDirection: 'row', gap: -1 }}>
-                <TextInput
-                  value={category}
-                  onChangeText={(text) => updateCategory(index, text)}
-                  style={styles.inputDelete}
-                />
-                <Pressable onPress={() => removeCategory(index)} style={styles.deleteButton}>
-                  <X color={Colors.dark.text} size={22} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
-                </Pressable>
-                <Pressable onPress={() => addCategory(index)} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]}>
-                  <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
-                </Pressable>
+          <View style={{ justifyContent: 'flex-start', flexDirection: 'row', paddingTop: 20, marginBottom: 20, flexWrap: 'wrap' }}>
+            {currentCategories?.map((item, index) => (
+              <View key={item.key} style={{ backgroundColor: Colors.dark.tint, padding: 10, borderRadius: 20, marginRight: 5 }}>
+                <AlataText style={{ fontSize: 12 }}>{item.value}</AlataText>
               </View>
             ))
           ) : (
@@ -325,38 +292,10 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
           <View style={styles.contentBox}>
             <AlataText style={{ fontSize: 20 }}>Ingredients:</AlataText>
             <View style={{ flexDirection: 'column', flexWrap: 'wrap', paddingHorizontal: 10, paddingTop: 5 }}>
-              {editedRecipe.ingredients.map((ingredient, index) => (
+              {recipe.ingredients.map((ingredient, index) => (
                 <View key={index} style={{ paddingVertical: 2, justifyContent: 'space-between', flexDirection: 'row' }}>
-                  {isEditMode ? (
-                    <>
-                      <View style={styles.input}>
-                        <TextInput
-                          style={{ flex: 1, fontSize: 16 }}
-                          value={editedRecipe.ingredients[index].name}
-                          onChangeText={(text) => handleIngredientChange(index, text, editedRecipe.ingredients[index].unit, editedRecipe.ingredients[index].amount)}
-                        />
-                        <Pressable onPress={() => removeIngredient(index)} style={{ alignSelf: 'center' }}>
-                          <X color={Colors.dark.text} size={22} strokeWidth='2.5' />
-                        </Pressable>
-                        <Pressable onPress={() => addIngredient(index)} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-                          <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
-                        </Pressable>
-                      </View>
-                      <View style={{ flex: 2 }}>
-                        <DropDown
-                          item={units}
-                          selectedUnit={editedRecipe.ingredients[index].unit}
-                          selectedAmount={editedRecipe.ingredients[index].amount}
-                          onSelect={(unit, amount) => handleIngredientChange(index, editedRecipe.ingredients[index].name, unit, amount)}
-                        />
-                      </View>
-                    </>
-                  ) : (
-                    <>
-                      <AlataText style={{ flex: 1, fontSize: 16 }}>{index + 1}. {ingredient.name}</AlataText>
-                      <AlataText style={{ fontSize: 16 }}>{ingredient.amount} {ingredient.unit}</AlataText>
-                    </>
-                  )}
+                  <AlataText style={{ flex: 1, fontSize: 16 }}>{index + 1}. {ingredient.name}</AlataText>
+                  <AlataText style={{ fontSize: 16 }}>{ingredient.amount} {ingredient.unit}</AlataText>
                 </View>
               ))}
             </View>
@@ -366,21 +305,9 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
           <View style={styles.contentBox}>
             <AlataText style={{ fontSize: 20 }}>Steps:</AlataText>
             <View style={{ flexDirection: 'column', flexWrap: 'wrap', paddingLeft: 10, paddingTop: 5 }}>
-              {editedRecipe.steps.map((step, index) => (
-                <View key={index} style={{ flexDirection: 'row', gap: -1 }}>
-                  {isEditMode ? (
-                    <View key={index} style={{ flexDirection: 'row', gap: -1 }}>
-                      <TextInput key={index} value={editedRecipe.steps[index]} onChangeText={(text) => updateStep(index, text)} style={styles.inputDelete} />
-                      <Pressable onPress={() => removeStep(index)} style={styles.deleteButton}>
-                        <X color={Colors.dark.text} size={22} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
-                      </Pressable>
-                      <Pressable onPress={() => addStep(index)} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-                        <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
-                      </Pressable>
-                    </View>
-                  ) : (
-                    <AlataText style={{ fontSize: 16 }}>{index + 1}. {step}</AlataText>
-                  )}
+              {recipe.steps.map((step, index) => (
+                <View key={index} style={{ paddingVertical: 10, justifyContent: 'space-between' }}>
+                  <AlataText style={{ fontSize: 16 }}>{index + 1}. {step}</AlataText>
                 </View>
               ))}
             </View>
@@ -405,46 +332,6 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
 }
 
 const styles = StyleSheet.create({
-  input: {
-    color: Colors.dark.text,
-    backgroundColor: Colors.dark.mainColorLight,
-    flexDirection: 'row',
-    padding: 10,
-    borderRadius: 15,
-    marginBottom: 10,
-    marginTop: 5,
-    fontFamily: 'Alata',
-    flex: 3
-  },
-  inputDelete: {
-    color: Colors.dark.text,
-    backgroundColor: Colors.dark.mainColorLight,
-    padding: 10,
-    borderTopLeftRadius: 15,
-    borderBottomLeftRadius: 15,
-    marginBottom: 10,
-    marginTop: 5,
-    fontFamily: 'Alata',
-    textAlignVertical: 'top',
-    flex: 2
-  },
-  deleteButton: {
-    backgroundColor: Colors.dark.mainColorLight,
-    borderTopRightRadius: 15,
-    borderBottomRightRadius: 15,
-    padding: 10,
-    justifyContent: 'center',
-    marginBottom: 10,
-    marginTop: 5,
-  },
-  button: {
-    backgroundColor: Colors.dark.mainColorDark,
-    borderRadius: 15,
-    padding: 10,
-    justifyContent: 'center',
-    marginBottom: 10,
-    marginTop: 5,
-  },
   container: {
     flex: 1,
     backgroundColor: Colors.dark.mainColorDark,
