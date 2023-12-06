@@ -12,16 +12,15 @@ export function AlataText(props: TextProps) {
   return <Text {...props} style={[props.style, { fontFamily: 'Alata', color: Colors.dark.text }]} />;
 }
 
-export function AlataMedium(props: TextProps) {
+export function Alata12(props: TextProps) {
   return <Text {...props} style={[props.style, { fontFamily: 'Alata', fontSize: 12, color: Colors.dark.text }]} />;
 }
 
-export function AlataLarge(props: TextProps) {
+export function Alata20(props: TextProps) {
   return <Text {...props} style={[props.style, { fontFamily: 'Alata', fontSize: 20, color: Colors.dark.text }]} />;
 }
 
-export function AlataLargeMiddle(props: TextProps) {
-  return <Text {...props} style={[props.style, { fontFamily: 'Alata', fontSize: 24, color: Colors.dark.text, textAlign: 'center'}]} />;
+export function Alata22(props: TextProps) {
+  return <Text {...props} style={[props.style, { fontFamily: 'Alata', fontSize: 22, color: Colors.dark.text }]} />;
 }
-
 

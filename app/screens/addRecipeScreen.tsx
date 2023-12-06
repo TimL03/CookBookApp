@@ -5,7 +5,7 @@ import { db } from '../../FirebaseConfig'
 import { collection, addDoc } from 'firebase/firestore';
 import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { AlataLarge, AlataMedium, AlataText } from '../../components/StyledText';
+import { Alata20, Alata12, AlataText } from '../../components/StyledText';
 import { X, PlusCircle, Plus, Save, ChevronDown } from 'lucide-react-native';
 import TopModalBar from '../../components/topModalBar';
 import DropDown from '../../components/DropDown';
@@ -128,20 +128,20 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
           :
           <Pressable onPress={addImage} style={({ pressed }) => [styles.addImage, { backgroundColor: pressed ? Colors.dark.background : Colors.dark.mainColorLight },]}>
             <PlusCircle color={Colors.dark.text} size={24} style={{ alignSelf: 'center' }} />
-            <AlataLarge>Add Image</AlataLarge>
+            <Alata20>Add Image</Alata20>
           </Pressable>
         }
 
 
         <View style={{ padding: 30 }}>
           {/* adding Recipe name */}
-          <AlataLarge>Name:</AlataLarge>
+          <Alata20>Name:</Alata20>
           <TextInput placeholder="Name" value={name} onChangeText={setName} style={styles.input} placeholderTextColor={Colors.dark.text} />
           {/* adding Recipe category */}
-          <AlataLarge>Category:</AlataLarge>
+          <Alata20>Category:</Alata20>
           <TextInput placeholder="Kategory" value={category} onChangeText={setCategory} style={styles.input} placeholderTextColor={Colors.dark.text} />
           {/* adding Recipe preparation time */}
-          <AlataLarge>Preperation Time:</AlataLarge>
+          <Alata20>Preperation Time:</Alata20>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookHTime} onChangeText={setCookHTime} style={styles.inputNumber} placeholderTextColor={Colors.dark.text} />
             <Text style={{ paddingVertical: 15, textAlign: 'center', fontSize: 16, fontFamily: 'Alata', color: Colors.dark.text }}>hours</Text>
@@ -150,7 +150,7 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
           </View>
 
           {/* adding Recipe ingredients */}
-          <AlataLarge>Ingredients:</AlataLarge>
+          <Alata20>Ingredients:</Alata20>
           {ingredients.map((ingredient, index) => (
             <View key={index} style={{ flexDirection: 'row', gap: 10, zIndex: 1 }}>
               <View style={styles.input}>
@@ -188,7 +188,7 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
           </Pressable>
 
           {/* adding Recipe steps */}
-          <AlataLarge>Instructions:</AlataLarge>
+          <Alata20>Instructions:</Alata20>
           {steps.map((step, index) => (
             <View key={index} style={{ flexDirection: 'row', gap: -1 }}>
               <TextInput
@@ -216,7 +216,7 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
           {/* Save button */}
           <Pressable onPress={handleSave} style={({ pressed }) => [styles.saveButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
             <Save color={Colors.dark.text} size={28} style={{ alignSelf: 'center' }} />
-            <AlataLarge style={{ marginBottom: 5, textAlign: 'center' }}>Save Recipe</AlataLarge>
+            <Alata20 style={{ marginBottom: 5, textAlign: 'center' }}>Save Recipe</Alata20>
           </Pressable>
         </View>
       </ScrollView>

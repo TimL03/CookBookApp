@@ -4,7 +4,7 @@ import { Carrot, EggOff, Fish, MilkOff, Soup, Star, Vegan,  } from 'lucide-react
 import Colors from '../constants/Colors';
 import { DarkTheme } from '@react-navigation/native';
 import { View } from './Themed';
-import { AlataLarge, AlataMedium } from './StyledText';
+import { Alata20, Alata12 } from './StyledText';
 import ViewFeedRecipeScreen from '../app/modals/viewFeedRecipeModal';
 
 interface RecipeProps {
@@ -64,17 +64,17 @@ export default function Recipe({ item, averageRating }: RecipeProps) {
             />
 
             <View style={[styles.innerBox, {flex: 2}]}>
-                <AlataLarge numberOfLines={2}>{item.name}</AlataLarge>
+                <Alata20 numberOfLines={2}>{item.name}</Alata20>
 
-                <AlataMedium>{(item.cookHTime == '0' || item.cookHTime == '') ? '' : item.cookHTime + ' h '}{(item.cookMinTime == '0' || item.cookMinTime == '') ? '' : (item.cookMinTime + ' min ')}</AlataMedium>
+                <Alata12>{(item.cookHTime == '0' || item.cookHTime == '') ? '' : item.cookHTime + ' h '}{(item.cookMinTime == '0' || item.cookMinTime == '') ? '' : (item.cookMinTime + ' min ')}</Alata12>
             </View>
 
             <View style={[styles.innerBox, {marginRight: 5}]}>
                 <View style={{flexDirection: 'row', gap: 5, justifyContent: 'flex-end', backgroundColor: Colors.dark.seeThrough}}>
-                    <AlataMedium style={{textAlign: 'right'}}>{averageRating.average !== undefined ? `${averageRating.average}/5` : '-'}</AlataMedium>
+                    <Alata12 style={{textAlign: 'right'}}>{averageRating.average !== undefined ? `${averageRating.average}/5` : '-'}</Alata12>
                     <Star name="star" style={{alignSelf: 'center'}} size={16} color={Colors.dark.text} />
                 </View>
-                <AlataMedium>{averageRating.totalRatings !== undefined ? `(${averageRating.totalRatings} ratings)` : ''}</AlataMedium>
+                <Alata12>{averageRating.totalRatings !== undefined ? `(${averageRating.totalRatings} ratings)` : ''}</Alata12>
                 <View style={styles.icons}>
                     <CategoryIcon category={item.category} />
                 </View>

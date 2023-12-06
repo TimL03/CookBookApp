@@ -7,7 +7,7 @@ import { db } from '../../FirebaseConfig'
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { Share2, PenSquare, Trash2, Save, ArrowDownToLine } from 'lucide-react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { AlataLarge, AlataMedium, AlataText } from '../../components/StyledText';
+import { Alata20, Alata12, AlataText } from '../../components/StyledText';
 import LoginModalScreen from './logInModal';
 
 interface Ingredient {
@@ -241,7 +241,7 @@ for (let i = 1; i <= 20; i++) {
         </View>
 
         <Pressable onPress={onFindNewRecipe} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-          <AlataLarge style={{ marginBottom: 5, textAlign: 'center' }}>Get new recipe!</AlataLarge>
+          <Alata20 style={{ marginBottom: 5, textAlign: 'center' }}>Get new recipe!</Alata20>
         </Pressable>
       </ScrollView>
       <Modal

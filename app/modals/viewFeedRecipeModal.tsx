@@ -4,7 +4,7 @@ import TopModalBar from "../../components/topModalBar";
 import Colors from '../../constants/Colors';
 import { Share2, PenSquare, Trash2, ArrowDownToLine } from 'lucide-react-native';
 import { FlatList, ScrollView } from 'react-native-gesture-handler';
-import { AlataLarge, AlataMedium, AlataText } from '../../components/StyledText';
+import { Alata20, Alata12, AlataText } from '../../components/StyledText';
 import ItemSelectorSwitch from '../../components/ItemSelectorSwitch';
 import ShareRecipeScreen from './shareRecipeModal';
 import { db } from '../../FirebaseConfig'
@@ -159,7 +159,7 @@ export default function ViewFeedRecipeScreen({ closeModal, recipe }: FeedRecipeS
               </Pressable>
             </View>
           </View>
-          <AlataMedium>{(recipe.cookHTime == '0' || recipe.cookHTime == '') ? '' : (recipe.cookHTime == '1') ? (recipe.cookHTime + ' hour ') : (recipe.cookHTime + ' hours ')}{(recipe.cookHTime == '0' || recipe.cookHTime == '' || recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : 'and '}{(recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : (recipe.cookMinTime == '1') ? (recipe.cookMinTime + ' minute ') : (recipe.cookMinTime + ' minutes ')}</AlataMedium>
+          <Alata12>{(recipe.cookHTime == '0' || recipe.cookHTime == '') ? '' : (recipe.cookHTime == '1') ? (recipe.cookHTime + ' hour ') : (recipe.cookHTime + ' hours ')}{(recipe.cookHTime == '0' || recipe.cookHTime == '' || recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : 'and '}{(recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : (recipe.cookMinTime == '1') ? (recipe.cookMinTime + ' minute ') : (recipe.cookMinTime + ' minutes ')}</Alata12>
 
           <View style={{ justifyContent: 'flex-start', flexDirection: 'row', paddingTop: 20, marginBottom: 20, flexWrap: 'wrap' }}>
             {
@@ -196,7 +196,7 @@ export default function ViewFeedRecipeScreen({ closeModal, recipe }: FeedRecipeS
             </View>
           </View>
           <View>
-            <AlataLarge style={{ color: Colors.dark.text }}>Latest Ratings:</AlataLarge>
+            <Alata20 style={{ color: Colors.dark.text }}>Latest Ratings:</Alata20>
             {sortedRatings.map((rating, index) => (
               <View key={index}>
                 <AlataText>{`${rating.userID} rated ${rating.rating} stars: ${rating.comment} ${rating.timestamp.toDate().toLocaleString()}`} </AlataText>
@@ -206,7 +206,7 @@ export default function ViewFeedRecipeScreen({ closeModal, recipe }: FeedRecipeS
         </View>
         <View>
           <Pressable onPress={() => setIsRatingModalVisible(true)}>
-            <AlataLarge style={{ color: Colors.dark.text }}>Your opionion counts!</AlataLarge>
+            <Alata20 style={{ color: Colors.dark.text }}>Your opionion counts!</Alata20>
           </Pressable>
           <RatingModal
             isVisible={isRatingModalVisible}

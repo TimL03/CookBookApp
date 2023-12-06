@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { Pressable, TextInput, View, StyleSheet } from 'react-native';
 import { ChevronDown, ChevronUp, Search, X } from 'lucide-react-native';
 import Colors from '../constants/Colors';
-import { AlataLarge, AlataMedium, AlataText } from './StyledText';
+import { Alata20, Alata12, AlataText } from './StyledText';
 import { FlatList } from 'react-native-gesture-handler';
 
 type SelectionProps = {
@@ -77,7 +77,7 @@ export default function DropDown({ item, selectedUnit, selectedAmount, onSelect 
                                     { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.mainColorDark },
                                 ]}
                             >
-                                <AlataMedium>{unitItem.value}</AlataMedium>
+                                <Alata12>{unitItem.value}</Alata12>
                             </Pressable>
                         ))}
                     </View>

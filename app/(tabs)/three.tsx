@@ -2,8 +2,9 @@ import { StyleSheet, Text, View, SafeAreaView, SectionList, Button, Pressable, M
 import React from 'react';
 import { Plus } from 'lucide-react-native';
 import Recipe from '../../components/RecipeFeedElement'
-import { AlataLarge, AlataMedium } from '../../components/StyledText'
+import { Alata20 } from '../../components/StyledText'
 import Colors from '../../constants/Colors';
+import gStyles from '../../constants/Global_Styles';
 import { db } from '../../FirebaseConfig'
 import { User } from 'firebase/auth';
 import { useState, useEffect } from "react"
@@ -151,7 +152,7 @@ useEffect(() => {
 }, [data]);
 
   return (
-    <View style={styles.container}>
+    <View style={gStyles.screenContainer}>
       <SectionList
         showsVerticalScrollIndicator={false}
         sections={data}
@@ -160,11 +161,10 @@ useEffect(() => {
           <Recipe item={item} averageRating={averageRatings[item.id] || { average: 0, totalRatings: 0 }} />
         )}
         renderSectionHeader={({ section: { title } }) => (
-          <AlataLarge style={styles.header}>{title}</AlataLarge>
+          <Alata20>{title}</Alata20>
         )}
       />
-      <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-        <Modal
+      <Modal
           animationType="slide"
           transparent={true}
           visible={isLoginModalVisible}
@@ -181,36 +181,6 @@ useEffect(() => {
         >
           <ShowSharedRecipeInvitationModalScreen onClose={() => setIsInvitationModalVisible(false)} invitationData={invitationData} />
         </Modal>
-      </View>
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.dark.background,
-    padding: 30,
-    alignContent: 'center',
-    flexDirection: 'column',
-  },
-  item: {
-    backgroundColor: Colors.dark.background,
-    padding: 20,
-    marginVertical: 8,
-  },
-  header: {
-    fontSize: 32,
-    backgroundColor: Colors.dark.background,
-  },
-  button: {
-    backgroundColor: Colors.dark.mainColorDark,
-    height: 50,
-    width: 50,
-    borderRadius: 30,
-    padding: 12,
-    justifyContent: 'center',
-    marginBottom: -15,
-    marginTop: 10,
-  }
-});
