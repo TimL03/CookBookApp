@@ -22,7 +22,7 @@ interface AddRecipeScreenProps {
   closeModal: () => void;
   recipe: {
     id: string;
-    category: string;
+    categories: string[];
     name: string;
     cookHTime: string;
     cookMinTime: string;
@@ -39,13 +39,8 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedRecipe, setEditedRecipe] = useState(recipe);
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [editedCategories, setEditedCategories] = useState<string[]>(recipe.categories);
   const [editedSteps, setEditedSteps] = useState(recipe.steps);
-
-  const currentCategories = [
-    { key: '1', value: 'Breakfast', selected: null },
-    { key: '2', value: 'Snacks', selected: null },
-    { key: '3', value: 'Desert', selected: null },
-  ];
 
   const units = [
     { key: '1', value: 'tbsp' },
@@ -123,26 +118,43 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
     setEditedRecipe({ ...editedRecipe, ingredients: newIngredients });
   };
 
+  const updateCategory = (index: number, text: string) => {
+    const newCategories = [...editedCategories];
+    newCategories[index] = text;
+    setEditedCategories(newCategories);
+  };
+
+  const addCategory = (index: number) => {
+    const newCategories = [...editedCategories];
+    newCategories.splice(index + 1, 0, '');
+    setEditedCategories(newCategories);
+  };
+
+  const removeCategory = (index: number) => {
+    const newCategories = editedCategories.filter((_, categoryIndex) => categoryIndex !== index);
+    setEditedCategories(newCategories);
+  };
+
   const addImage = async () => {
-  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  if (status !== 'granted') {
-    alert('Sorry, we need camera roll permissions to make this work!');
-    return;
-  }
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Sorry, we need camera roll permissions to make this work!');
+      return;
+    }
 
-  let result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    allowsEditing: true,
-    aspect: [4, 3],
-    quality: 0.3,
-  });
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.3,
+    });
 
-  if (result && !result.canceled && result.assets) {
-    const uri = result.assets[0].uri;
-    const newImageUrl = await uploadImage(uri, editedRecipe.name); 
-    setEditedRecipe({ ...editedRecipe, imageUrl: newImageUrl }); 
-  }
-};
+    if (result && !result.canceled && result.assets) {
+      const uri = result.assets[0].uri;
+      const newImageUrl = await uploadImage(uri, editedRecipe.name);
+      setEditedRecipe({ ...editedRecipe, imageUrl: newImageUrl });
+    }
+  };
 
 
   const uploadImage = async (uri: string, recipeName: string) => {
@@ -227,7 +239,7 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
           </Pressable>
         ) : (
           <Image style={styles.image} source={{ uri: recipe.imageUrl }} />
-          )}
+        )}
 
         {/* Recipe details */}
         <View style={{ padding: 30, marginTop: -20, backgroundColor: Colors.dark.mainColorDark, borderRadius: 15, flex: 1 }}>
@@ -285,13 +297,29 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
           )}
 
           {/* Categories */}
-          <View style={{ justifyContent: 'flex-start', flexDirection: 'row', paddingTop: 20, marginBottom: 20, flexWrap: 'wrap' }}>
-            {currentCategories?.map((item, index) => (
-              <View key={item.key} style={{ backgroundColor: Colors.dark.tint, padding: 10, borderRadius: 20, marginRight: 5 }}>
-                <AlataText style={{ fontSize: 12 }}>{item.value}</AlataText>
+          {isEditMode ? (
+            editedCategories.map((category, index) => (
+              <View key={index} style={{ flexDirection: 'row', gap: -1 }}>
+                <TextInput
+                  value={category}
+                  onChangeText={(text) => updateCategory(index, text)}
+                  style={styles.inputDelete}
+                />
+                <Pressable onPress={() => removeCategory(index)} style={styles.deleteButton}>
+                  <X color={Colors.dark.text} size={22} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
+                </Pressable>
+                <Pressable onPress={() => addCategory(index)} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]}>
+                  <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
+                </Pressable>
               </View>
-            ))}
-          </View>
+            ))
+          ) : (
+            editedCategories.map((category, index) => (
+              <View key={index} style={{ backgroundColor: Colors.dark.tint, padding: 10, borderRadius: 20, marginRight: 5 }}>
+                <AlataText style={{ fontSize: 12 }}>{category}</AlataText>
+              </View>
+            ))
+          )}
 
           {/* Ingredients */}
           <View style={styles.contentBox}>

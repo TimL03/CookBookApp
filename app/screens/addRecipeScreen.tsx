@@ -19,7 +19,7 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
   const [name, setName] = useState('');
   const [cookHTime, setCookHTime] = useState('');
   const [cookMinTime, setCookMinTime] = useState('');
-  const [category, setCategory] = useState('');
+  const [categories, setCategories] = useState<string[]>(['']);
   const [ingredients, setIngredients] = useState([{ name: '', unit: 'x', amount: '' },]);
   const [steps, setSteps] = useState(['']);
   const [imageUri, setImageUri] = useState<string | null>(null);
@@ -79,7 +79,7 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
         name,
         cookHTime,
         cookMinTime,
-        category,
+        categories,
         ingredients,
         steps,
         imageUrl,
@@ -92,6 +92,15 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
     }
   };
 
+  const addCategory = () => {
+    setCategories([...categories, '']);
+  };
+
+  const removeCategory = (index: number) => {
+    const newCategories = [...categories];
+    newCategories.splice(index, 1);
+    setCategories(newCategories);
+  };
 
   const addIngredient = () => {
     setIngredients([...ingredients, { name: '', amount: '', unit: '' }]);
@@ -139,7 +148,27 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
           <TextInput placeholder="Name" value={name} onChangeText={setName} style={styles.input} placeholderTextColor={Colors.dark.text} />
           {/* adding Recipe category */}
           <AlataLarge>Category:</AlataLarge>
-          <TextInput placeholder="Kategory" value={category} onChangeText={setCategory} style={styles.input} placeholderTextColor={Colors.dark.text} />
+          {categories.map((category: string, index: number) => (
+            <View key={index} style={{ flexDirection: 'row', gap: -1 }}>
+              <TextInput
+                placeholder={`Category ${index + 1}`}
+                value={category}
+                placeholderTextColor={Colors.dark.text}
+                onChangeText={(text) => {
+                  const newCategories = [...categories];
+                  newCategories[index] = text;
+                  setCategories(newCategories);
+                }}
+                style={styles.inputDelete}
+              />
+              <Pressable onPress={() => removeCategory(index)} style={styles.deleteButton}>
+                <X color={Colors.dark.text} size={22} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
+              </Pressable>
+            </View>
+          ))}
+          <Pressable onPress={addCategory} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]}>
+            <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
+          </Pressable>
           {/* adding Recipe preparation time */}
           <AlataLarge>Preperation Time:</AlataLarge>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
