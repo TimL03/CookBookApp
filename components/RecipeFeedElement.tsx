@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, Image, Modal } from 'react-native';
 import { Carrot, EggOff, Fish, MilkOff, Soup, Star, Vegan,  } from 'lucide-react-native';
 import Colors from '../constants/Colors';
-import gStyles from '../constants/Global_Styles'
 import { DarkTheme } from '@react-navigation/native';
 import { View } from './Themed';
-import { Alata20, Alata12 } from './StyledText';
+import { AlataLarge, AlataMedium } from './StyledText';
 import ViewFeedRecipeScreen from '../app/modals/viewFeedRecipeModal';
 
 interface RecipeProps {
@@ -60,22 +59,22 @@ export default function Recipe({ item, averageRating }: RecipeProps) {
     return (
         <TouchableOpacity onPress={toggleModal} style={styles.outerBox} activeOpacity={0.2}>
             <Image
-                style={gStyles.imageSmall}
+                style={styles.logoSmall}
                 source={item.imageUrl == '' ? require("../assets/images/no-image.png") : { uri: item.imageUrl }}
             />
 
             <View style={[styles.innerBox, {flex: 2}]}>
-                <Alata20 numberOfLines={2}>{item.name}</Alata20>
+                <AlataLarge numberOfLines={2}>{item.name}</AlataLarge>
 
-                <Alata12>{(item.cookHTime == '0' || item.cookHTime == '') ? '' : item.cookHTime + ' h '}{(item.cookMinTime == '0' || item.cookMinTime == '') ? '' : (item.cookMinTime + ' min ')}</Alata12>
+                <AlataMedium>{(item.cookHTime == '0' || item.cookHTime == '') ? '' : item.cookHTime + ' h '}{(item.cookMinTime == '0' || item.cookMinTime == '') ? '' : (item.cookMinTime + ' min ')}</AlataMedium>
             </View>
 
             <View style={[styles.innerBox, {marginRight: 5}]}>
                 <View style={{flexDirection: 'row', gap: 5, justifyContent: 'flex-end', backgroundColor: Colors.dark.seeThrough}}>
-                    <Alata12 style={{textAlign: 'right'}}>{averageRating.average !== undefined ? `${averageRating.average}/5` : '-'}</Alata12>
+                    <AlataMedium style={{textAlign: 'right'}}>{averageRating.average !== undefined ? `${averageRating.average}/5` : '-'}</AlataMedium>
                     <Star name="star" style={{alignSelf: 'center'}} size={16} color={Colors.dark.text} />
                 </View>
-                <Alata12>{averageRating.totalRatings !== undefined ? `(${averageRating.totalRatings} ratings)` : ''}</Alata12>
+                <AlataMedium>{averageRating.totalRatings !== undefined ? `(${averageRating.totalRatings} ratings)` : ''}</AlataMedium>
                 <View style={styles.icons}>
                     <CategoryIcon category={item.category} />
                 </View>
@@ -112,6 +111,12 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.dark.seeThrough,
         padding: 8,
         justifyContent: 'space-between',
+    },
+    logoSmall: {
+        alignContent: 'flex-start',
+        width: 96,
+        height: 96,
+        borderRadius: 10,
     },
     icons: {
         backgroundColor: Colors.dark.seeThrough,

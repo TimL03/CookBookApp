@@ -1,25 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { View, Image, Pressable, Modal } from "react-native";
+import { Text, View, StyleSheet, Image, Pressable, Modal } from "react-native";
 import TopModalBar from "../../components/topModalBar";
 import Colors from '../../constants/Colors';
-import gStyles from '../../constants/Global_Styles';
-import { Share2, ArrowDownToLine } from 'lucide-react-native';
-import { ScrollView } from 'react-native-gesture-handler';
-import { Alata20, Alata12, Alata16, Alata14, Alata24 } from '../../components/StyledText';
+import { Share2, PenSquare, Trash2, ArrowDownToLine } from 'lucide-react-native';
+import { FlatList, ScrollView } from 'react-native-gesture-handler';
+import { AlataLarge, AlataMedium, AlataText } from '../../components/StyledText';
+import ItemSelectorSwitch from '../../components/ItemSelectorSwitch';
 import ShareRecipeScreen from './shareRecipeModal';
 import { db } from '../../FirebaseConfig'
-import { doc, setDoc, Timestamp, collection, getDocs } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { doc, setDoc, Timestamp, collection, addDoc, getDocs } from 'firebase/firestore';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import RatingModal from './RatingModal';
 
-// Define the Ingredient interface
 interface Ingredient {
   name: string;
   amount: string;
   unit: string;
 }
 
-// Define the props for the ViewFeedRecipeScreen component
 interface FeedRecipeScreenProps {
   closeModal: () => void;
   recipe: {
@@ -36,102 +34,88 @@ interface FeedRecipeScreenProps {
   };
 }
 
-// Get authentication instance
 const auth = getAuth();
 
-// Define the main component
 export default function ViewFeedRecipeScreen({ closeModal, recipe }: FeedRecipeScreenProps) {
-  // State variables
   const [isShareRecipeModalVisible, setIsShareRecipeModalVisible] = useState(false);
   const [isRatingModalVisible, setIsRatingModalVisible] = useState(false);
   const [sortedRatings, setSortedRatings] = useState<Array<{ id: string; userID: string; rating: number; comment: string; timestamp: Timestamp }>>([]);
 
-  // Function to sort ratings by timestamp
   const sortRatingsByTimestamp = (ratings: Array<{ id: string, userID: string, rating: number, comment: string, timestamp: Timestamp }>) => {
     return ratings.sort((a, b) => b.timestamp - a.timestamp);
   };
 
-  // Effect hook to fetch ratings on component mount
   useEffect(() => {
     const fetchRatings = async () => {
       try {
-        // Fetch ratings data from Firebase
         const recipeRef = doc(db, 'feed', recipe.id);
         const ratingsCollectionRef = collection(recipeRef, 'ratings');
+
         const ratingsSnapshot = await getDocs(ratingsCollectionRef);
         const ratingsData: Array<{ id: string, userID: string, rating: number, comment: string, timestamp: Timestamp }> = [];
 
-        // Extract data from snapshot
         ratingsSnapshot.forEach((ratingDoc) => {
           ratingsData.push({ id: ratingDoc.id, ...ratingDoc.data() as { userID: string, rating: number, comment: string, timestamp: Timestamp } });
         });
 
-        // Sort ratings by timestamp
         const sortedRatings = sortRatingsByTimestamp(ratingsData);
         setSortedRatings(sortedRatings);
       } catch (error) {
-        console.error('Error fetching ratings:', error);
+        console.error('Fehler beim Abrufen der Bewertungen:', error);
       }
     };
 
-    // Call the fetchRatings function
     fetchRatings();
   }, []);
 
-  // Function to handle rating submission
   const handleRatingSubmit = async (ratingData: { rating: number; comment: string }) => {
     try {
-      // Get current user
       const user = auth.currentUser;
       const userID = user ? user.uid : null;
 
-      // Check if user is authenticated
       if (!userID) {
-        console.error('User not authenticated.');
+        console.error('Benutzer nicht angemeldet.');
         return;
       }
 
-      // Prepare data for rating submission
       const recipeRef = doc(db, 'feed', recipe.id);
       const ratingsCollectionRef = collection(recipeRef, 'ratings');
+
       const ratingsSnapshot = await getDocs(ratingsCollectionRef);
       const ratingCount = ratingsSnapshot.size;
+
       const ratingID = `rating${ratingCount + 1}`;
+
       const ratingDocRef = doc(ratingsCollectionRef, ratingID);
 
-      // Submit rating to Firebase
       await setDoc(ratingDocRef, {
         userID,
         timestamp: Timestamp.now(),
         ...ratingData,
       });
 
-      console.log('Rating successfully added!');
+      console.log('Bewertung erfolgreich hinzugefügt!');
     } catch (error) {
-      console.error('Error adding rating:', error);
+      console.error('Fehler beim Hinzufügen der Bewertung:', error);
     }
   };
 
-  // Function to toggle the Share Recipe modal
   const toggleModal = () => {
     setIsShareRecipeModalVisible(!isShareRecipeModalVisible);
   };
 
-  // Function to save recipe to the database
   const saveRecipeToDatabase = async () => {
     try {
-      // Get current user
       const user = auth.currentUser;
       const userID = user ? user.uid : null;
 
-      // Check if user is authenticated
       if (!userID) {
-        console.error('User not authenticated.');
+        console.error('Benutzer nicht angemeldet.');
         return;
       }
 
-      // Save recipe data to Firebase
       const recipeRef = doc(db, 'recipes', recipe.id);
+
       await setDoc(recipeRef, {
         name: recipe.name,
         cookHTime: recipe.cookHTime,
@@ -143,104 +127,87 @@ export default function ViewFeedRecipeScreen({ closeModal, recipe }: FeedRecipeS
         category: recipe.category,
       });
 
-      console.log('Recipe successfully saved!');
+      console.log('Rezept erfolgreich gespeichert!');
     } catch (error) {
-      console.error('Error saving recipe:', error);
+      console.error('Fehler beim Speichern des Rezepts:', error);
     }
   };
 
-  // Hardcoded current categories
+
   const currentCategories = [
     { key: '1', value: 'Breakfast', selected: null },
     { key: '2', value: 'Snacks', selected: null },
     { key: '3', value: 'Desert', selected: null },
-  ];
-
-  // Return the JSX for the component
+  ]
   return (
-    <View style={[gStyles.defaultContainer, {backgroundColor: Colors.dark.mainColorDark}]}>
-      {/* Top modal bar component */}
+    <View style={styles.container}>
       <TopModalBar title="From your Cookbook" onClose={closeModal} />
-      <ScrollView style={gStyles.fullScreenBackgroundContainer}>
-        {/* Recipe image */}
+      <ScrollView style={styles.scrollView}>
         <Image
-          style={gStyles.image}
+          style={styles.image}
           source={recipe.imageUrl == '' ? require("../../assets/images/no-image.png") : { uri: recipe.imageUrl }}
         />
-
-        <View style={gStyles.fullScreenContentContainer}>
-          <View>
-            {/* Recipe name and actions */}
-            <View style={gStyles.HorizontalLayout}>
-              <Alata24 style={gStyles.flex}>{recipe.name}</Alata24>
-              <View style={[gStyles.mapHorizontal, gStyles.alignCenter]}>
-                {/* Share recipe button */}
-                <Pressable onPress={toggleModal} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
-                  <Share2 color={Colors.dark.text} size={24} />
-                </Pressable>
-                {/* Save recipe button */}
-                <Pressable onPress={saveRecipeToDatabase} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
-                  <ArrowDownToLine color={Colors.dark.text} size={24}/>
-                </Pressable>
-              </View>
+        <View style={{ padding: 30, marginTop: -20, backgroundColor: Colors.dark.mainColorDark, borderRadius: 15, flex: 1 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Text style={{ fontFamily: 'Alata', fontSize: 25, color: Colors.dark.text }}>{recipe.name}</Text>
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <Pressable onPress={toggleModal} style={{ alignSelf: 'center' }}>
+                <Share2 color={Colors.dark.text} size={24} style={{ marginBottom: -5 }} />
+              </Pressable>
+              <Pressable onPress={saveRecipeToDatabase} style={{ alignSelf: 'center' }}>
+                <ArrowDownToLine color={Colors.dark.text} size={24} style={{ marginBottom: -5 }} />
+              </Pressable>
             </View>
-            {/* Recipe cooking time */}
-            <Alata14>{(recipe.cookHTime == '0' || recipe.cookHTime == '') ? '' : (recipe.cookHTime == '1') ? (recipe.cookHTime + ' hour ') : (recipe.cookHTime + ' hours ')}{(recipe.cookHTime == '0' || recipe.cookHTime == '' || recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : 'and '}{(recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : (recipe.cookMinTime == '1') ? (recipe.cookMinTime + ' minute ') : (recipe.cookMinTime + ' minutes ')}</Alata14>
           </View>
-          
-          {/* Display current categories */}
-          <View style={gStyles.mapHorizontal}>
-            {currentCategories?.map((item, index) => {
-              return (
-                <View key={item.key} style={gStyles.switchButton}>
-                  <Alata12>{item.value}</Alata12>
-                </View>
-              );
-            })}
+          <AlataMedium>{(recipe.cookHTime == '0' || recipe.cookHTime == '') ? '' : (recipe.cookHTime == '1') ? (recipe.cookHTime + ' hour ') : (recipe.cookHTime + ' hours ')}{(recipe.cookHTime == '0' || recipe.cookHTime == '' || recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : 'and '}{(recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : (recipe.cookMinTime == '1') ? (recipe.cookMinTime + ' minute ') : (recipe.cookMinTime + ' minutes ')}</AlataMedium>
+
+          <View style={{ justifyContent: 'flex-start', flexDirection: 'row', paddingTop: 20, marginBottom: 20, flexWrap: 'wrap' }}>
+            {
+              currentCategories?.map((item, index) => {
+                return (
+                  <View key={item.key} style={{ backgroundColor: Colors.dark.tint, padding: 10, borderRadius: 20, marginRight: 5 }}>
+                    <AlataText style={{ fontSize: 12 }}>{item.value}</AlataText>
+                  </View>
+                )
+              })
+            }
           </View>
 
-          {/* Ingredients section */}
-          <View style={gStyles.card}>
-            <Alata20>Ingredients:</Alata20>
-            <View style={gStyles.VerticalLayout}>
+          <View style={styles.contentBox}>
+            <AlataText style={{ fontSize: 20 }}>Ingredients:</AlataText>
+            <View style={{ flexDirection: 'column', flexWrap: 'wrap', paddingHorizontal: 10, paddingTop: 5 }}>
               {recipe.ingredients.map((ingredient, index) => (
-                <View key={index} style={gStyles.IngredientLayout}>
-                  <Alata16 style={gStyles.flex}>{index + 1}. {ingredient.name}</Alata16>
-                  <Alata16>{ingredient.amount} {ingredient.unit}</Alata16>
+                <View key={index} style={{ paddingVertical: 2, justifyContent: 'space-between', flexDirection: 'row' }}>
+                  <AlataText style={{ flex: 1, fontSize: 16 }}>{index + 1}. {ingredient.name}</AlataText>
+                  <AlataText style={{ fontSize: 16 }}>{ingredient.amount} {ingredient.unit}</AlataText>
                 </View>
               ))}
             </View>
           </View>
 
-          {/* Insturctions section */}
-          <View style={gStyles.card}>
-            <Alata20>Steps:</Alata20>
-            <View style={gStyles.VerticalLayout}>
+          <View style={styles.contentBox}>
+            <AlataText style={{ fontSize: 20 }}>Steps:</AlataText>
+            <View style={{ flexDirection: 'column', flexWrap: 'wrap', paddingLeft: 10, paddingTop: 5 }}>
               {recipe.steps.map((step, index) => (
-                <View key={index} style={gStyles.IngredientLayout}>
-                  <Alata16>{index + 1}. {step}</Alata16>
+                <View key={index} style={{ paddingVertical: 10, justifyContent: 'space-between' }}>
+                  <AlataText style={{ fontSize: 16 }}>{index + 1}. {step}</AlataText>
                 </View>
               ))}
             </View>
           </View>
-
-          {/* Display latest ratings */}
-          <View style={gStyles.card}>
-            <Alata20>Latest Ratings:</Alata20>
+          <View>
+            <AlataLarge style={{ color: Colors.dark.text }}>Latest Ratings:</AlataLarge>
             {sortedRatings.map((rating, index) => (
               <View key={index}>
-                <Alata16>{`${rating.userID} rated ${rating.rating} stars: ${rating.comment} ${rating.timestamp.toDate().toLocaleString()}`} </Alata16>
+                <AlataText>{`${rating.userID} rated ${rating.rating} stars: ${rating.comment} ${rating.timestamp.toDate().toLocaleString()}`} </AlataText>
               </View>
             ))}
           </View>
         </View>
-
-        {/* Add your opinion button */}
         <View>
-          <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]} onPress={() => setIsRatingModalVisible(true)}>
-            <Alata20>Your opinion counts!</Alata20>
+          <Pressable onPress={() => setIsRatingModalVisible(true)}>
+            <AlataLarge style={{ color: Colors.dark.text }}>Your opionion counts!</AlataLarge>
           </Pressable>
-          {/* Rating modal */}
           <RatingModal
             isVisible={isRatingModalVisible}
             onClose={() => setIsRatingModalVisible(false)}
@@ -248,8 +215,6 @@ export default function ViewFeedRecipeScreen({ closeModal, recipe }: FeedRecipeS
           />
         </View>
       </ScrollView>
-
-      {/* Share Recipe modal */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -259,7 +224,33 @@ export default function ViewFeedRecipeScreen({ closeModal, recipe }: FeedRecipeS
         <ShareRecipeScreen closeModal={() => setIsShareRecipeModalVisible(false)}
           recipe={recipe} />
       </Modal>
-
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.dark.mainColorDark,
+  },
+  scrollView: {
+    flex: 1,
+    borderRadius: 20,
+    backgroundColor: Colors.dark.mainColorDark,
+    flexDirection: 'column',
+    gap: 20,
+  },
+  image: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'cover',
+    borderRadius: 20,
+  },
+  contentBox: {
+    backgroundColor: Colors.dark.background,
+    borderRadius: 20,
+    padding: 20,
+    marginTop: 15,
+    marginBottom: 15,
+  },
+});

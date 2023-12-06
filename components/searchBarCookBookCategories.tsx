@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Pressable, TextInput, View, StyleSheet, Keyboard, Modal } from 'react-native';
 import { Search, X } from 'lucide-react-native';
 import Colors from '../constants/Colors';
-import { Alata20, Alata12 } from './StyledText';
+import { AlataLarge, AlataMedium } from './StyledText';
 import { db, auth } from '../FirebaseConfig'
 import { User, getAuth, onAuthStateChanged } from 'firebase/auth';
 import { collection, onSnapshot, query, where, getDocs } from 'firebase/firestore';
@@ -162,7 +162,7 @@ export default function SearchBarCookBookCategories({ item, currentListCategorie
                 onPress={() => itemSelected(i.key)}
                 style={({ pressed }) => [styles.button, { backgroundColor: (isItemSelected(i.key)) ? Colors.dark.tint : Colors.dark.mainColorDark }]}
               >
-                <Alata12>{i.value}</Alata12>
+                <AlataMedium>{i.value}</AlataMedium>
               </Pressable>
             ))}
           </View>

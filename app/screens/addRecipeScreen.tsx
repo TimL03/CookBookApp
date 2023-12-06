@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { TextInput, StyleSheet, ScrollView, View, Pressable, Text, Image } from 'react-native';
 import Colors from '../../constants/Colors';
-import gStyles from '../../constants/Global_Styles';
 import { db } from '../../FirebaseConfig'
 import { collection, addDoc } from 'firebase/firestore';
 import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { Alata16, Alata20, Alata12, AlataText } from '../../components/StyledText';
+import { AlataLarge, AlataMedium, AlataText } from '../../components/StyledText';
 import { X, PlusCircle, Plus, Save, ChevronDown } from 'lucide-react-native';
 import TopModalBar from '../../components/topModalBar';
 import DropDown from '../../components/DropDown';
@@ -122,74 +121,83 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
 
 
   return (
-    <View style={[gStyles.defaultContainer, {backgroundColor: Colors.dark.mainColorDark}]}>
+    <View style={styles.container}>
       {/* Top bar with close button */}
       <TopModalBar title="Add Recipe" onClose={closeModal} />
 
       {/* Main content */}
-      <ScrollView style={[gStyles.fullScreenBackgroundContainer, {backgroundColor: Colors.dark.background}]} keyboardShouldPersistTaps='handled'>
+      <ScrollView style={styles.scrollView} keyboardShouldPersistTaps='handled'>
 
         {/* Recipe image selection */}
         {imageUri != null ?
           <Image
-            style={gStyles.image}
+            style={styles.image}
             source={{ uri: imageUri }}
           />
           :
           <Pressable onPress={addImage} style={({ pressed }) => [styles.addImage, { backgroundColor: pressed ? Colors.dark.background : Colors.dark.mainColorLight },]}>
-            <PlusCircle color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
-            <Alata20>Add Image</Alata20>
+            <PlusCircle color={Colors.dark.text} size={24} style={{ alignSelf: 'center' }} />
+            <AlataLarge>Add Image</AlataLarge>
           </Pressable>
         }
 
 
-        <View style={[gStyles.fullScreenContentContainerLessGap]}>
+        <View style={{ padding: 30 }}>
           {/* adding Recipe name */}
-          <Alata20>Name:</Alata20>
-          <View style={gStyles.cardInput}>
-            <TextInput placeholder="Name" value={name} onChangeText={setName} style={gStyles.textInput} placeholderTextColor={Colors.dark.text} />
-          </View>
-          
-          
+          <AlataLarge>Name:</AlataLarge>
+          <TextInput placeholder="Name" value={name} onChangeText={setName} style={styles.input} placeholderTextColor={Colors.dark.text} />
           {/* adding Recipe category */}
           <AlataLarge>Category:</AlataLarge>
-          <TextInput placeholder="Kategory" value={category} onChangeText={setCategory} style={styles.input} placeholderTextColor={Colors.dark.text} />
+          {categories.map((category: string, index: number) => (
+            <View key={index} style={{ flexDirection: 'row', gap: -1 }}>
+              <TextInput
+                placeholder={`Category ${index + 1}`}
+                value={category}
+                placeholderTextColor={Colors.dark.text}
+                onChangeText={(text) => {
+                  const newCategories = [...categories];
+                  newCategories[index] = text;
+                  setCategories(newCategories);
+                }}
+                style={styles.inputDelete}
+              />
+              <Pressable onPress={() => removeCategory(index)} style={styles.deleteButton}>
+                <X color={Colors.dark.text} size={22} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
+              </Pressable>
+            </View>
+          ))}
+          <Pressable onPress={addCategory} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]}>
+            <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
+          </Pressable>
           {/* adding Recipe preparation time */}
-          <Alata20>Preperation Time:</Alata20>
-          <View style={[gStyles.HorizontalLayout,{gap: 12}]}>
-            <View style={[gStyles.cardInput, gStyles.flex]}>
-              <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookHTime} onChangeText={setCookHTime} style={gStyles.textInput} placeholderTextColor={Colors.dark.text} />
-              <Alata16 style={gStyles.alignCenter}>hours</Alata16>
-            </View>
-
-            <View style={[gStyles.cardInput, gStyles.flex]}>
-              <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookMinTime} onChangeText={setCookMinTime} style={gStyles.textInput} placeholderTextColor={Colors.dark.text} />
-              <Alata16 style={gStyles.alignCenter}>minutes</Alata16>
-            </View>
+          <AlataLarge>Preperation Time:</AlataLarge>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookHTime} onChangeText={setCookHTime} style={styles.inputNumber} placeholderTextColor={Colors.dark.text} />
+            <Text style={{ paddingVertical: 15, textAlign: 'center', fontSize: 16, fontFamily: 'Alata', color: Colors.dark.text }}>hours</Text>
+            <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookMinTime} onChangeText={setCookMinTime} style={styles.inputNumber} placeholderTextColor={Colors.dark.text} />
+            <Text style={{ paddingVertical: 15, alignContent: 'center', textAlign: 'center', fontSize: 16, fontFamily: 'Alata', color: Colors.dark.text }}>minutes</Text>
           </View>
 
           {/* adding Recipe ingredients */}
-          <Alata20>Ingredients:</Alata20>
-          <View style={styles.gap}>
+          <AlataLarge>Ingredients:</AlataLarge>
           {ingredients.map((ingredient, index) => (
-            <View key={index} style={[gStyles.HorizontalLayout, {gap: 12, zIndex: 1}]}>
-              <View style={[gStyles.cardInput, {flex: 3}]}>
+            <View key={index} style={{ flexDirection: 'row', gap: 10, zIndex: 1 }}>
+              <View style={styles.input}>
                 <TextInput
                   placeholder={`Ingredient ${index + 1}`}
-                  placeholderTextColor={Colors.dark.text}
                   value={ingredient.name}
                   onChangeText={(text) => {
                     const newIngredients = [...ingredients];
                     newIngredients[index].name = text;
                     setIngredients(newIngredients);
                   }}
-                  style={gStyles.textInput}
+                  style={{ fontFamily: 'Alata', flex: 1, color: Colors.dark.text }}
                 />
-                <Pressable onPress={() => removeIngredient(index)} style={[gStyles.iconButton, styles.marginRight]}>
+                <Pressable onPress={() => removeIngredient(index)} style={{ alignSelf: 'center' }}>
                   <X color={Colors.dark.text} size={22} strokeWidth='2.5' />
                 </Pressable>
               </View>
-              <View style={styles.flex2}>
+              <View style={{ flex: 2 }}>
                 <DropDown
                   item={units}
                   selectedUnit={ingredient.unit}
@@ -204,16 +212,14 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
             </View>
           ))}
 
-          <Pressable onPress={addIngredient} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]}>
-            <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={gStyles.alignCenter} />
+          <Pressable onPress={addIngredient} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+            <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
           </Pressable>
-          </View>
 
           {/* adding Recipe steps */}
-          <Alata20>Instructions:</Alata20>
-          <View style={styles.gap}>
+          <AlataLarge>Instructions:</AlataLarge>
           {steps.map((step, index) => (
-            <View key={index} style={[gStyles.cardInput, gStyles.cardInputMultiline]}>
+            <View key={index} style={{ flexDirection: 'row', gap: -1 }}>
               <TextInput
                 multiline
                 numberOfLines={3}
@@ -225,23 +231,21 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
                   newSteps[index] = text;
                   setSteps(newSteps);
                 }}
-                style={[gStyles.textInput, gStyles.textAlignVerticalTop]}
+                style={styles.inputDelete}
               />
-              <Pressable onPress={() => removeStep(index)} style={gStyles.iconButton}>
-              <X color={Colors.dark.text} size={22} strokeWidth='2.5' style={gStyles.alignCenter} />
+              <Pressable onPress={() => removeStep(index)} style={styles.deleteButton}>
+                <X color={Colors.dark.text} size={22} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
               </Pressable>
-          </View>  
-
+            </View>
           ))}
-          <Pressable onPress={addStep} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-            <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={gStyles.alignCenter} />
+          <Pressable onPress={addStep} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+            <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
           </Pressable>
-          </View>
 
           {/* Save button */}
-          <Pressable onPress={handleSave} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { marginTop: 30, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-            <Save color={Colors.dark.text} size={28} style={gStyles.alignCenter} />
-            <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Save Recipe</Alata20>
+          <Pressable onPress={handleSave} style={({ pressed }) => [styles.saveButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+            <Save color={Colors.dark.text} size={28} style={{ alignSelf: 'center' }} />
+            <AlataLarge style={{ marginBottom: 5, textAlign: 'center' }}>Save Recipe</AlataLarge>
           </Pressable>
         </View>
       </ScrollView>
@@ -251,14 +255,50 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
 
 
 const styles = StyleSheet.create({
-  gap: {
+  container: {
+    flex: 1,
+    backgroundColor: Colors.dark.mainColorDark,
+  },
+  input: {
+    color: Colors.dark.text,
+    backgroundColor: Colors.dark.mainColorLight,
+    flexDirection: 'row',
+    padding: 10,
+    borderRadius: 15,
+    marginBottom: 10,
+    marginTop: 5,
+    fontFamily: 'Alata',
+    flex: 3
+  },
+  inputDelete: {
+    color: Colors.dark.text,
+    backgroundColor: Colors.dark.mainColorLight,
+    padding: 10,
+    borderTopLeftRadius: 15,
+    borderBottomLeftRadius: 15,
+    marginBottom: 10,
+    marginTop: 5,
+    fontFamily: 'Alata',
+    textAlignVertical: 'top',
+    flex: 2
+  },
+  inputNumber: {
+    color: Colors.dark.text,
+    backgroundColor: Colors.dark.mainColorLight,
+    padding: 10,
+    borderRadius: 15,
+    marginBottom: 10,
+    marginTop: 5,
+    width: 100,
+    fontFamily: 'Alata',
+  },
+  scrollView: {
+    flex: 1,
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
+    backgroundColor: Colors.dark.background,
+    flexDirection: 'column',
     gap: 20,
-  },
-  flex2: {
-    flex: 2,
-  },
-  marginRight: {
-    marginRight: -4,
   },
   addImage: {
     flex: 1,
@@ -267,5 +307,38 @@ const styles = StyleSheet.create({
     height: 100,
     backgroundColor: Colors.dark.mainColorLight,
     borderRadius: 20,
-  }
+  },
+  button: {
+    backgroundColor: Colors.dark.mainColorDark,
+    borderRadius: 15,
+    padding: 10,
+    justifyContent: 'center',
+    marginBottom: 10,
+    marginTop: 5,
+  },
+  saveButton: {
+    backgroundColor: Colors.dark.mainColorDark,
+    borderRadius: 15,
+    padding: 10,
+    justifyContent: 'center',
+    marginBottom: 10,
+    marginTop: 30,
+    flexDirection: 'row',
+    gap: 10,
+  },
+  deleteButton: {
+    backgroundColor: Colors.dark.mainColorLight,
+    borderTopRightRadius: 15,
+    borderBottomRightRadius: 15,
+    padding: 10,
+    justifyContent: 'center',
+    marginBottom: 10,
+    marginTop: 5,
+  },
+  image: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'cover',
+    borderRadius: 20,
+  },
 });

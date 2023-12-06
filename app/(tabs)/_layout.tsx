@@ -13,6 +13,16 @@ function TabBarIcon(props: {
 }
 
 export default function TabLayout() {
+  const colorScheme = useColorScheme();
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const openSettingsModal = () => {
+    setModalVisible(true);
+  };
+
+  const closeSettingsModal = () => {
+    setModalVisible(false);
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -55,7 +65,7 @@ export default function TabLayout() {
         },
         headerTitleStyle: {
           fontFamily: 'Alata',
-          fontSize: 22,
+          fontSize: 24,
         },
       }}>
       <Tabs.Screen

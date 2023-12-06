@@ -2,10 +2,9 @@ import { StyleSheet, Text, View, SafeAreaView, SectionList, Button, Pressable, M
 import React from 'react';
 import { Plus } from 'lucide-react-native';
 import Recipe from '../../components/RecipeElement'
-import { Alata20 } from '../../components/StyledText'
+import { AlataLarge, AlataMedium } from '../../components/StyledText'
 import LoginModalScreen from '../modals/logInModal';
 import Colors from '../../constants/Colors';
-import gStyles from '../../constants/Global_Styles';
 import { db } from '../../FirebaseConfig'
 import { User } from 'firebase/auth';
 import { useState, useEffect } from "react"
@@ -115,7 +114,7 @@ export default function TabTwoScreen() {
   }, [userID]);
 
   return (
-    <View style={gStyles.screenContainer}>
+    <View style={styles.container}>
       <SectionList
         showsVerticalScrollIndicator={false}
         sections={data}
@@ -124,11 +123,11 @@ export default function TabTwoScreen() {
           <Recipe item={item} />
         )}
         renderSectionHeader={({ section: { title } }) => (
-          <Alata20>{title}</Alata20>
+          <AlataLarge style={styles.header}>{title}</AlataLarge>
         )}
       />
       <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-        <Pressable onPress={toggleModal} style={({ pressed }) => [gStyles.roundButtonIcon, gStyles.negativeMarginBottom, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+        <Pressable onPress={toggleModal} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
           <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
         </Pressable>
         <Modal
@@ -161,3 +160,31 @@ export default function TabTwoScreen() {
   )
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.dark.background,
+    padding: 30,
+    alignContent: 'center',
+    flexDirection: 'column',
+  },
+  item: {
+    backgroundColor: Colors.dark.background,
+    padding: 20,
+    marginVertical: 8,
+  },
+  header: {
+    fontSize: 32,
+    backgroundColor: Colors.dark.background,
+  },
+  button: {
+    backgroundColor: Colors.dark.mainColorDark,
+    height: 50,
+    width: 50,
+    borderRadius: 30,
+    padding: 12,
+    justifyContent: 'center',
+    marginBottom: -15,
+    marginTop: 10,
+  }
+});

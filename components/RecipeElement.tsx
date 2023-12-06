@@ -3,10 +3,9 @@ import { StyleSheet, Text, TouchableOpacity, Image, Modal, Pressable } from 'rea
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Carrot, Soup, Vegan } from 'lucide-react-native';
 import Colors from '../constants/Colors';
-import gStyles from '../constants/Global_Styles'
 import { DarkTheme } from '@react-navigation/native';
 import { View } from './Themed';
-import { Alata20, Alata12 } from './StyledText';
+import { AlataLarge, AlataMedium } from './StyledText';
 import ViewRecipeScreen from '../app/modals/viewRecipeModal';
 
 interface Ingredient {
@@ -56,17 +55,17 @@ export default function Recipe({ item }: RecipeProps) {
     return (
         <TouchableOpacity onPress={toggleModal} style={styles.outerBox} activeOpacity={0.2}>
             <Image
-                style={gStyles.imageSmall}
+                style={styles.logoSmall}
                 source={item.imageUrl == '' ? require("../assets/images/no-image.png") : { uri: item.imageUrl }}
             />
 
-            <View style={[styles.innerBox, styles.flex]}>
-                <Alata20 numberOfLines={2}>{item.name}</Alata20>
+            <View style={[styles.innerBox, {flex: 2}]}>
+                <AlataLarge numberOfLines={2}>{item.name}</AlataLarge>
 
-                <Alata12>{(item.cookHTime == '0' || item.cookHTime == '') ? '' : item.cookHTime + ' h '}{(item.cookMinTime == '0' || item.cookMinTime == '') ? '' : (item.cookMinTime + ' min ')}</Alata12>
+                <AlataMedium>{(item.cookHTime == '0' || item.cookHTime == '') ? '' : item.cookHTime + ' h '}{(item.cookMinTime == '0' || item.cookMinTime == '') ? '' : (item.cookMinTime + ' min ')}</AlataMedium>
             </View>
 
-            <View style={[styles.innerBox, styles.marginRight]}>
+            <View style={[styles.innerBox, {marginRight: 5}]}>
                 <View style={styles.icons}>
                     <CategoryIcon category={item.category} />
                 </View>
@@ -85,12 +84,6 @@ export default function Recipe({ item }: RecipeProps) {
 }
 
 const styles = StyleSheet.create({
-    flex: {
-        flex: 2,
-    },
-    marginRight: {
-        marginRight: 5,
-    },
     outerBox: {
         backgroundColor: Colors.dark.mainColorDark,
         borderRadius: 10,
@@ -103,6 +96,14 @@ const styles = StyleSheet.create({
     innerBox: {
         backgroundColor: Colors.dark.seeThrough,
         margin: 8,
+        gap: 0,
+    },
+    logoSmall: {
+        backgroundColor: Colors.dark.seeThrough,
+        alignContent: 'flex-start',
+        width: 96,
+        height: 96,
+        borderRadius: 10,
     },
     icons: {
         backgroundColor: Colors.dark.seeThrough,

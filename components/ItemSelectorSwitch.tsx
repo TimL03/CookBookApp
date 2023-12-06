@@ -3,8 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, Image, Pressable } from 'react-nati
 
 
 import Colors from '../constants/Colors';
-import gStyles from '../constants/Global_Styles';
-import { Alata12 } from './StyledText';
+import { AlataMedium } from './StyledText';
 
 type SelectionProps = {
     item: {
@@ -27,18 +26,18 @@ export default function ItemSelectorSwitch({ item, onToggle }: SelectionProps) {
         }
     }
     return (
-        <Pressable onPress={switchPressed} style={() => [styles.switchButton, { backgroundColor: isSelected ? Colors.dark.tint : Colors.dark.mainColorDark }]}>
-            <Alata12 style={[gStyles.alignCenter, gStyles.marginBottom] }>{item.value}</Alata12>
+        <Pressable onPress={switchPressed} style={() => [styles.button, { backgroundColor: isSelected ? Colors.dark.tint : Colors.dark.mainColorDark }]}>
+            <AlataMedium style={{marginBottom: 5, textAlign: 'center'}}>{item.value}</AlataMedium>
         </Pressable>
     )
 }
 
 const styles = StyleSheet.create({
-    switchButton: {
+    button: {
         borderRadius: 120,
         padding: 10,
         paddingHorizontal: 20,
         elevation: 2,
-
+        margin: 5,
     },
 });

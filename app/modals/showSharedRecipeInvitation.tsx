@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Pressable, Image } from 'react-native';
 import Colors from '../../constants/Colors';
-import gStyles from '../../constants/Global_Styles';
 import { db } from '../../FirebaseConfig'
 import { collection, addDoc, updateDoc, getDoc, doc } from 'firebase/firestore';
-import { Alata20, } from '../../components/StyledText';
+import { AlataLarge, AlataMedium, AlataLargeMiddle } from '../../components/StyledText';
 
 
 interface ShowSharedRecipeProps {
@@ -81,19 +80,19 @@ export default function ShowSharedRecipeInvitationModalScreen({ invitationData, 
   return (
     <Pressable style={styles.modalContainer}>
       <View style={styles.modalContent}>
-        <Alata20 style={gStyles.alignCenter}>Somebody shared a recipe with you!</Alata20>
+        <AlataLargeMiddle>Somebody shared a recipe with you!</AlataLargeMiddle>
         {recipeData && (
           <View>
             <Image source={{ uri: recipeData.imageUrl }} style={{ width: 100, height: 100 }} />
-            <Alata20>{recipeData.name}</Alata20>
+            <AlataLarge>{recipeData.name}</AlataLarge>
           </View>
         )}
         <Pressable onPress={handleAccept}>
-          <Alata20>Accept</Alata20>
+          <AlataLarge>Accept</AlataLarge>
         </Pressable>
 
         <Pressable onPress={handleDecline}>
-          <Alata20 style={{ paddingBottom: 4 }}>Decline</Alata20>
+          <AlataLarge style={{ paddingBottom: 4 }}>Decline</AlataLarge>
         </Pressable>
       </View>
     </Pressable>
