@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, Image, Modal } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Carrot, Soup, Vegan,  } from 'lucide-react-native';
+import { Carrot, EggOff, Fish, MilkOff, Soup, Star, Vegan,  } from 'lucide-react-native';
 import Colors from '../constants/Colors';
 import { DarkTheme } from '@react-navigation/native';
 import { View } from './Themed';
@@ -35,10 +34,16 @@ const CategoryIcon: React.FC<CategoryIconProps> = ({ category }) => {
     switch (category) {
         case 'Soup':
             return <Soup color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
-        case 'Salad':
+        case 'Vegetarian':
             return <Carrot color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
         case 'Vegan':
             return <Vegan color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+        case 'Fish':
+            return <Fish color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+        case 'No Egg':
+            return <EggOff color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+        case 'No Milk':
+            return <MilkOff color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
         default:
             return null;
     }
@@ -57,19 +62,24 @@ export default function Recipe({ item, averageRating }: RecipeProps) {
                 style={styles.logoSmall}
                 source={item.imageUrl == '' ? require("../assets/images/no-image.png") : { uri: item.imageUrl }}
             />
-            <View style={styles.innerBox}>
-                <AlataLarge>{item.name}</AlataLarge>
+
+            <View style={[styles.innerBox, {flex: 2}]}>
+                <AlataLarge numberOfLines={2}>{item.name}</AlataLarge>
+
                 <AlataMedium>{(item.cookHTime == '0' || item.cookHTime == '') ? '' : item.cookHTime + ' h '}{(item.cookMinTime == '0' || item.cookMinTime == '') ? '' : (item.cookMinTime + ' min ')}</AlataMedium>
             </View>
-            <AlataMedium>
-                {averageRating.average !== undefined ? `${averageRating.average}/5` : '4.5'}
-            </AlataMedium>
-            <AlataMedium>
-                {averageRating.totalRatings !== undefined ? `(${averageRating.totalRatings} ratings)` : ''}
-            </AlataMedium>
-            <View style={styles.icons}>
-                <CategoryIcon category={item.category} />
+
+            <View style={[styles.innerBox, {marginRight: 5}]}>
+                <View style={{flexDirection: 'row', gap: 5, justifyContent: 'flex-end', backgroundColor: Colors.dark.seeThrough}}>
+                    <AlataMedium style={{textAlign: 'right'}}>{averageRating.average !== undefined ? `${averageRating.average}/5` : '-'}</AlataMedium>
+                    <Star name="star" style={{alignSelf: 'center'}} size={16} color={Colors.dark.text} />
+                </View>
+                <AlataMedium>{averageRating.totalRatings !== undefined ? `(${averageRating.totalRatings} ratings)` : ''}</AlataMedium>
+                <View style={styles.icons}>
+                    <CategoryIcon category={item.category} />
+                </View>
             </View>
+
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -88,14 +98,19 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         height: 96,
         flexDirection: 'row',
-        justifyContent: 'flex-start',
+        justifyContent: 'space-between',
         gap: 5,
         marginVertical: 8,
     },
     innerBox: {
-        backgroundColor: Colors.dark.mainColorDark,
-        margin: 8,
+        backgroundColor: Colors.dark.seeThrough,
+        padding: 8,
         gap: 0,
+    },
+    innerBox2: {
+        backgroundColor: Colors.dark.seeThrough,
+        padding: 8,
+        justifyContent: 'space-between',
     },
     logoSmall: {
         alignContent: 'flex-start',
@@ -104,7 +119,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     icons: {
-        backgroundColor: Colors.dark.mainColorDark,
+        backgroundColor: Colors.dark.seeThrough,
         flex: 2,
         margin: 8,
         justifyContent: 'flex-end',
