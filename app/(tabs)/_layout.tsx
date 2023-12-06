@@ -3,7 +3,6 @@ import { Library, Utensils, Menu, FileSearch } from 'lucide-react-native'
 import { Tabs, router } from 'expo-router';
 import { Pressable, useColorScheme, View } from 'react-native';
 
-import Fonts from '../../constants/fonts';
 import Colors from '../../constants/Colors';
 import React, { useState } from 'react';
 function TabBarIcon(props: {
@@ -14,7 +13,7 @@ function TabBarIcon(props: {
 }
 
 export default function TabLayout() {
-  
+
   return (
     <View style={{ flex: 1 }}>
     <Tabs
@@ -55,8 +54,8 @@ export default function TabLayout() {
           padding: 4, 
         },
         headerTitleStyle: {
-          fontFamily: Fonts.family.primary,
-          fontSize: Fonts.size.font22,
+          fontFamily: 'Alata',
+          fontSize: 22,
         },
       }}>
       <Tabs.Screen
@@ -64,7 +63,7 @@ export default function TabLayout() {
         options={{
           title: 'Selection',
           tabBarLabelStyle: {
-            fontFamily: Fonts.family.primary,
+            fontFamily: 'Alata'
           },
           tabBarIcon: ({ color }) => <Utensils color={color} size={28} style={{ marginBottom: -10 }} />,
         }}

@@ -15,6 +15,30 @@ export default StyleSheet.create({
         justifyContent: 'space-between',
         gap: 15
     },
+    fullScreenBackgroundContainer: {
+        flex: 1,
+        borderRadius: 20,
+        backgroundColor: Colors.dark.mainColorDark,
+        flexDirection: 'column',
+        gap: 20,
+    },
+    fullScreenContentContainer: {
+        padding: 30, 
+        marginTop: -20, 
+        backgroundColor: Colors.dark.mainColorDark, 
+        borderRadius: 15, 
+        flex: 1,
+        gap: 20,
+    },
+    fullScreenContentContainerLessGap: {
+        padding: 30,
+        backgroundColor: Colors.dark.background,
+        gap: 8,
+        flex: 1,
+    },
+    transparentContainer: {
+        backgroundColor: Colors.dark.mainColorDark,
+    },
 
     textInput: {
         fontFamily: 'Alata',
@@ -23,11 +47,16 @@ export default StyleSheet.create({
     },
 
     mapHorizontal: {
-        flexDirection: 'row', 
-        marginBottom: 20, 
-        flexWrap: 'wrap'
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 12,
     },
 
+    card: {
+        backgroundColor: Colors.dark.background,
+        borderRadius: 20,
+        padding: 20,
+    },
     cardHorizontal: {
         flexDirection: 'row',
         justifyContent: 'flex-start',
@@ -38,10 +67,36 @@ export default StyleSheet.create({
     cardInput: {
         flexDirection: 'row',
         backgroundColor: Colors.dark.mainColorLight,
-        paddingHorizontal: 10,
-        height: 45,
+        paddingHorizontal: 15,
+        height: 50,
         borderRadius: 10,
         gap: 10,
+    },
+    cardInputMultiline: {
+        height: 80,
+        textAlignVertical: 'top',
+    },
+    image: {
+        width: '100%',
+        height: 200,
+        resizeMode: 'cover',
+        borderRadius: 20,
+      },
+
+    HorizontalLayout: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        gap: 5,
+    },
+    VerticalLayout: {
+        flexDirection: 'column', 
+        paddingHorizontal: 10,
+        paddingTop: 5
+    },
+    IngredientLayout: {
+        paddingVertical: 4, 
+        justifyContent: 'space-between', 
+        flexDirection: 'row'
     },
 
     roundButtonIcon: {
@@ -50,8 +105,6 @@ export default StyleSheet.create({
         borderRadius: 30,
         padding: 12,
         justifyContent: 'center',
-        marginBottom: -15,
-        marginTop: 10,
     },
     squareButtonText: {
         borderRadius: 10,
@@ -60,12 +113,23 @@ export default StyleSheet.create({
         justifyContent: 'center',
         alignSelf: 'center',    
     },
+    switchButton: {
+        backgroundColor: Colors.dark.tint, 
+        padding: 10, 
+        paddingHorizontal: 15,
+        borderRadius: 20
+    },
+    iconButton: {
+        alignSelf: 'center', 
+        padding: 5, 
+        borderRadius: 20,
+    },
 
     modalBackgroundContainer: {
         flex: 1,
         justifyContent: 'flex-end',
         alignItems: 'center',
-        backgroundColor: '#0000'
+        backgroundColor: Colors.dark.seeThrough,
     },
     modalContentContainer: {
         backgroundColor: Colors.dark.mainColorDark,
@@ -80,6 +144,10 @@ export default StyleSheet.create({
         textAlign: 'center',
         alignSelf: 'center',
     },
+    textAlignVerticalTop:{
+        textAlignVertical: 'top',
+        paddingTop: 10,
+    },
     justifyCenter: {
         justifyContent: 'center',
     },
@@ -89,4 +157,10 @@ export default StyleSheet.create({
     marginBottom: {
         marginBottom: 5,
     },
+    negativeMarginBottom: {
+        marginBottom: -15,
+    },
+    flex: {
+        flex: 1,
+    }
 });

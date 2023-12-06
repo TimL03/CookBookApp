@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet, Image, Pressable, Modal } from "react-native";
+import { View, Image, Pressable, Modal } from "react-native";
 import TopModalBar from "../../components/topModalBar";
 import Colors from '../../constants/Colors';
+import gStyles from '../../constants/Global_Styles';
 import { Share2, PenSquare, Trash2, ArrowUpToLine } from 'lucide-react-native';
-import { FlatList, ScrollView } from 'react-native-gesture-handler';
-import { Alata20, Alata12, AlataText } from '../../components/StyledText';
-import ItemSelectorSwitch from '../../components/ItemSelectorSwitch';
+import { ScrollView } from 'react-native-gesture-handler';
+import { Alata20, Alata12, Alata24, Alata14, Alata16 } from '../../components/StyledText';
 import ShareRecipeScreen from './shareRecipeModal';
 import { db } from '../../FirebaseConfig'
 import { doc, setDoc, Timestamp } from 'firebase/firestore';
@@ -68,78 +68,79 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
   ];
 
   return (
-    <View style={styles.container}>
+    <View style={[gStyles.defaultContainer, {backgroundColor: Colors.dark.mainColorDark}]}>
       {/* Top bar with close button */}
       <TopModalBar title="From your Cookbook" onClose={closeModal} />
 
       {/* Main content */}
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={gStyles.fullScreenBackgroundContainer}>
         {/* Recipe image */}
         <Image
-          style={styles.image}
+          style={gStyles.image}
           source={recipe.imageUrl == '' ? require("../../assets/images/no-image.png") : { uri: recipe.imageUrl }}
         />
 
         {/* Recipe details */}
-        <View style={{ padding: 30, marginTop: -20, backgroundColor: Colors.dark.mainColorDark, borderRadius: 15, flex: 1 }}>
-          {/* Recipe name and action buttons */}
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <AlataText style={{ fontSize: 25, color: Colors.dark.text, flex: 2 }}>{recipe.name}</AlataText>
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8, flex: 1 }}>
+        <View style={gStyles.fullScreenContentContainer}>
+          
+          <View>
+            {/* Recipe name and action buttons */}
+            <View style={gStyles.HorizontalLayout}>
+              <Alata24 style={gStyles.flex}>{recipe.name}</Alata24>
               {/* Share button */}
-              <Pressable onPress={toggleModal} style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                <Share2 color={Colors.dark.text} size={24} />
-              </Pressable>
-             
-              {/* Push to discover button */}
-              <Pressable onPress={handleDatabaseSave} style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                <ArrowUpToLine color={Colors.dark.text} size={24} />
-              </Pressable>
+              <Pressable onPress={toggleModal} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                  <Share2 color={Colors.dark.text} size={24} />
+                </Pressable>
+              
+                {/* Push to discover button */}
+                <Pressable onPress={handleDatabaseSave} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                  <ArrowUpToLine color={Colors.dark.text} size={24} />
+                </Pressable>
 
-              {/* Delete button */}
-              <Pressable style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                <Trash2 color={Colors.dark.text} size={24} />
-              </Pressable>
+                {/* Delete button */}
+                <Pressable style={({ pressed }) => [gStyles.iconButton, {backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                  <Trash2 color={Colors.dark.text} size={24} />
+                </Pressable>
 
-              {/* Edit button */}
-              <Pressable style={({ pressed }) => [{ alignSelf: 'center', padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                <PenSquare color={Colors.dark.text} size={24} />
-              </Pressable>
+                {/* Edit button */}
+                <Pressable style={({ pressed }) => [gStyles.iconButton, {backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                  <PenSquare color={Colors.dark.text} size={24} />
+                </Pressable>  
             </View>
+
+            {/* Cook time */}
+            <Alata14>{(recipe.cookHTime == '0' || recipe.cookHTime == '') ? '' : (recipe.cookHTime == '1') ? (recipe.cookHTime + ' hour ') : (recipe.cookHTime + ' hours ')}{(recipe.cookHTime == '0' || recipe.cookHTime == '' || recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : 'and '}{(recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : (recipe.cookMinTime == '1') ? (recipe.cookMinTime + ' minute ') : (recipe.cookMinTime + ' minutes ')}</Alata14>
           </View>
 
-          {/* Cook time */}
-          <Alata12>{(recipe.cookHTime == '0' || recipe.cookHTime == '') ? '' : (recipe.cookHTime == '1') ? (recipe.cookHTime + ' hour ') : (recipe.cookHTime + ' hours ')}{(recipe.cookHTime == '0' || recipe.cookHTime == '' || recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : 'and '}{(recipe.cookMinTime == '0' || recipe.cookMinTime == '') ? '' : (recipe.cookMinTime == '1') ? (recipe.cookMinTime + ' minute ') : (recipe.cookMinTime + ' minutes ')}</Alata12>
-
           {/* Categories */}
-          <View style={{ justifyContent: 'flex-start', flexDirection: 'row', paddingTop: 20, marginBottom: 20, flexWrap: 'wrap' }}>
+          <View style={gStyles.mapHorizontal}>
             {currentCategories?.map((item, index) => (
-              <View key={item.key} style={{ backgroundColor: Colors.dark.tint, padding: 10, borderRadius: 20, marginRight: 5 }}>
-                <AlataText style={{ fontSize: 12 }}>{item.value}</AlataText>
+              <View key={item.key} style={gStyles.switchButton}>
+                <Alata12>{item.value}</Alata12>
               </View>
             ))}
           </View>
 
           {/* Ingredients */}
-          <View style={styles.contentBox}>
-            <AlataText style={{ fontSize: 20 }}>Ingredients:</AlataText>
-            <View style={{ flexDirection: 'column', flexWrap: 'wrap', paddingHorizontal: 10, paddingTop: 5 }}>
+          <View style={gStyles.card}>
+            <Alata20>Ingredients:</Alata20>
+            <View style={gStyles.VerticalLayout}>
               {recipe.ingredients.map((ingredient, index) => (
-                <View key={index} style={{ paddingVertical: 2, justifyContent: 'space-between', flexDirection: 'row' }}>
-                  <AlataText style={{ flex: 1, fontSize: 16 }}>{index + 1}. {ingredient.name}</AlataText>
-                  <AlataText style={{ fontSize: 16 }}>{ingredient.amount} {ingredient.unit}</AlataText>
+                <View key={index} style={gStyles.IngredientLayout}>
+                  <Alata16 style={gStyles.flex}>{index + 1}. {ingredient.name}</Alata16>
+                  <Alata16>{ingredient.amount} {ingredient.unit}</Alata16>
                 </View>
               ))}
             </View>
           </View>
 
           {/* Steps */}
-          <View style={styles.contentBox}>
-            <AlataText style={{ fontSize: 20 }}>Steps:</AlataText>
-            <View style={{ flexDirection: 'column', flexWrap: 'wrap', paddingLeft: 10, paddingTop: 5 }}>
+          <View style={gStyles.card}>
+            <Alata20>Steps:</Alata20>
+            <View style={gStyles.VerticalLayout}>
               {recipe.steps.map((step, index) => (
-                <View key={index} style={{ paddingVertical: 10, justifyContent: 'space-between' }}>
-                  <AlataText style={{ fontSize: 16 }}>{index + 1}. {step}</AlataText>
+                <View key={index} style={gStyles.IngredientLayout}>
+                  <Alata16>{index + 1}. {step}</Alata16>
                 </View>
               ))}
             </View>
@@ -161,30 +162,3 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.dark.mainColorDark,
-  },
-  scrollView: {
-    flex: 1,
-    borderRadius: 20,
-    backgroundColor: Colors.dark.mainColorDark,
-    flexDirection: 'column',
-    gap: 20,
-  },
-  image: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
-    borderRadius: 20,
-  },
-  contentBox: {
-    backgroundColor: Colors.dark.background,
-    borderRadius: 20,
-    padding: 20,
-    marginTop: 15,
-    marginBottom: 15,
-  },
-});
