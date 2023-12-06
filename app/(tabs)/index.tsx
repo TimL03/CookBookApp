@@ -1,4 +1,4 @@
-import { View, Pressable, ScrollView, Modal } from 'react-native';
+import { View, Pressable, ScrollView, Modal, StyleSheet } from 'react-native';
 import React, {useState } from 'react';
 import ItemSelectorSwitch from '../../components/ItemSelectorSwitch'
 import { Alata20 } from '../../components/StyledText'
@@ -10,6 +10,7 @@ import SearchBarCookBookCategories from '../../components/searchBarCookBookCateg
 import ViewRandomRecipeScreen from '../modals/viewRandomRecipeModal';
 import SearchSwitch from '../../components/SearchSwitch';
 import { searchRecipesInFirebase } from '../../components/searchRecipesInFirebase';
+import { ScreenContainer } from 'react-native-screens';
 
 
 const dataIngredients = [
@@ -218,21 +219,18 @@ export default function TabOneScreen() {
       <ScrollView showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps='handled'>
         {searchMode === 'database' && (
           <View>
-            <Alata20>Select Ingredients:</Alata20>
+            <Alata20 style={styles.margin}>Select Ingredients:</Alata20>
             <SearchBarAPI
               item={getDisplayedAPIIngredients()}
               currentListAPI={recomendedAPIListIngredients}
               onCurrentListAPIUpdated={handleCurrentListAPIIngredientsUpdate}
               onIngredientSelectedAPI={handleIngredientAPISelection}
             />
-            <View style={gStyles.mapHorizontal}>
+            <View style={[gStyles.mapHorizontal, styles.margin]}>
               {getDisplayedAPIIngredients().map((item) => (
                 <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleIngredientSelectedAPI(item.key)} />
               ))}
             </View>
-            <Pressable onPress={getMeal} style={({ pressed }) => [gStyles.squareButtonText, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-              <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Get a Recipe</Alata20>
-            </Pressable>
           </View>
         )}
         {searchMode === 'cookbook' && (
@@ -261,12 +259,13 @@ export default function TabOneScreen() {
                 <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleCategorySelectedCookBook(item.key)} />
               ))}
             </View>
-            <Pressable onPress={handleSearchInFirebase} style={({ pressed }) => [gStyles.squareButtonText, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-              <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Get a Recipe</Alata20>
-            </Pressable>
+            
           </View>
         )}
       </ScrollView>
+      <Pressable onPress={searchMode === 'cookbook' ? handleSearchInFirebase : getMeal} style={({ pressed }) => [gStyles.squareButtonText, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+        <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Get a Recipe</Alata20>
+      </Pressable>
       <Modal
         animationType="slide"
         transparent={true}
@@ -278,3 +277,10 @@ export default function TabOneScreen() {
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  margin: {
+    marginBottom: 10,
+    marginTop: 10,
+  }
+});
