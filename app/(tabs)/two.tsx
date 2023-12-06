@@ -128,7 +128,7 @@ export default function TabTwoScreen() {
         )}
       />
       <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-        <Pressable onPress={toggleModal} style={({ pressed }) => [gStyles.roundButtonIcon, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+        <Pressable onPress={toggleModal} style={({ pressed }) => [gStyles.roundButtonIcon, gStyles.negativeMarginBottom, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
           <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
         </Pressable>
         <Modal

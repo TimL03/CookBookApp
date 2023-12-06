@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { TextInput, StyleSheet, ScrollView, View, Pressable, Text, Image } from 'react-native';
 import Colors from '../../constants/Colors';
+import gStyles from '../../constants/Global_Styles';
 import { db } from '../../FirebaseConfig'
 import { collection, addDoc } from 'firebase/firestore';
 import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { Alata20, Alata12, AlataText } from '../../components/StyledText';
+import { Alata16, Alata20, Alata12, AlataText } from '../../components/StyledText';
 import { X, PlusCircle, Plus, Save, ChevronDown } from 'lucide-react-native';
 import TopModalBar from '../../components/topModalBar';
 import DropDown from '../../components/DropDown';
@@ -112,63 +113,77 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
 
 
   return (
-    <View style={styles.container}>
+    <View style={[gStyles.defaultContainer, {backgroundColor: Colors.dark.mainColorDark}]}>
       {/* Top bar with close button */}
       <TopModalBar title="Add Recipe" onClose={closeModal} />
 
       {/* Main content */}
-      <ScrollView style={styles.scrollView} keyboardShouldPersistTaps='handled'>
+      <ScrollView style={[gStyles.fullScreenBackgroundContainer, {backgroundColor: Colors.dark.background}]} keyboardShouldPersistTaps='handled'>
 
         {/* Recipe image selection */}
         {imageUri != null ?
           <Image
-            style={styles.image}
+            style={gStyles.image}
             source={{ uri: imageUri }}
           />
           :
           <Pressable onPress={addImage} style={({ pressed }) => [styles.addImage, { backgroundColor: pressed ? Colors.dark.background : Colors.dark.mainColorLight },]}>
-            <PlusCircle color={Colors.dark.text} size={24} style={{ alignSelf: 'center' }} />
+            <PlusCircle color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
             <Alata20>Add Image</Alata20>
           </Pressable>
         }
 
 
-        <View style={{ padding: 30 }}>
+        <View style={[gStyles.fullScreenContentContainerLessGap]}>
           {/* adding Recipe name */}
           <Alata20>Name:</Alata20>
-          <TextInput placeholder="Name" value={name} onChangeText={setName} style={styles.input} placeholderTextColor={Colors.dark.text} />
+          <View style={gStyles.cardInput}>
+            <TextInput placeholder="Name" value={name} onChangeText={setName} style={gStyles.textInput} placeholderTextColor={Colors.dark.text} />
+          </View>
+          
+          
           {/* adding Recipe category */}
           <Alata20>Category:</Alata20>
-          <TextInput placeholder="Kategory" value={category} onChangeText={setCategory} style={styles.input} placeholderTextColor={Colors.dark.text} />
+          <View style={gStyles.cardInput}>
+            <TextInput placeholder="Kategory" value={category} onChangeText={setCategory} style={gStyles.textInput} placeholderTextColor={Colors.dark.text} />
+          </View>
+          
+          
           {/* adding Recipe preparation time */}
           <Alata20>Preperation Time:</Alata20>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookHTime} onChangeText={setCookHTime} style={styles.inputNumber} placeholderTextColor={Colors.dark.text} />
-            <Text style={{ paddingVertical: 15, textAlign: 'center', fontSize: 16, fontFamily: 'Alata', color: Colors.dark.text }}>hours</Text>
-            <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookMinTime} onChangeText={setCookMinTime} style={styles.inputNumber} placeholderTextColor={Colors.dark.text} />
-            <Text style={{ paddingVertical: 15, alignContent: 'center', textAlign: 'center', fontSize: 16, fontFamily: 'Alata', color: Colors.dark.text }}>minutes</Text>
+          <View style={[gStyles.HorizontalLayout,{gap: 12}]}>
+            <View style={[gStyles.cardInput, gStyles.flex]}>
+              <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookHTime} onChangeText={setCookHTime} style={gStyles.textInput} placeholderTextColor={Colors.dark.text} />
+              <Alata16 style={gStyles.alignCenter}>hours</Alata16>
+            </View>
+
+            <View style={[gStyles.cardInput, gStyles.flex]}>
+              <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookMinTime} onChangeText={setCookMinTime} style={gStyles.textInput} placeholderTextColor={Colors.dark.text} />
+              <Alata16 style={gStyles.alignCenter}>minutes</Alata16>
+            </View>
           </View>
 
           {/* adding Recipe ingredients */}
           <Alata20>Ingredients:</Alata20>
           {ingredients.map((ingredient, index) => (
-            <View key={index} style={{ flexDirection: 'row', gap: 10, zIndex: 1 }}>
-              <View style={styles.input}>
+            <View key={index} style={[gStyles.HorizontalLayout, {gap: 12, zIndex: 1}]}>
+              <View style={[gStyles.cardInput, {flex: 3}]}>
                 <TextInput
                   placeholder={`Ingredient ${index + 1}`}
+                  placeholderTextColor={Colors.dark.text}
                   value={ingredient.name}
                   onChangeText={(text) => {
                     const newIngredients = [...ingredients];
                     newIngredients[index].name = text;
                     setIngredients(newIngredients);
                   }}
-                  style={{ fontFamily: 'Alata', flex: 1, color: Colors.dark.text }}
+                  style={gStyles.textInput}
                 />
                 <Pressable onPress={() => removeIngredient(index)} style={{ alignSelf: 'center' }}>
                   <X color={Colors.dark.text} size={22} strokeWidth='2.5' />
                 </Pressable>
               </View>
-              <View style={{ flex: 2 }}>
+              <View style={styles.flex2}>
                 <DropDown
                   item={units}
                   selectedUnit={ingredient.unit}
@@ -183,14 +198,15 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
             </View>
           ))}
 
-          <Pressable onPress={addIngredient} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+          <Pressable onPress={addIngredient} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]} onPress={() => setIsRatingModalVisible(true)}>
             <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
           </Pressable>
 
           {/* adding Recipe steps */}
           <Alata20>Instructions:</Alata20>
+          <View style={styles.gap}>
           {steps.map((step, index) => (
-            <View key={index} style={{ flexDirection: 'row', gap: -1 }}>
+            <View key={index} style={[gStyles.cardInput, gStyles.cardInputMultiline]}>
               <TextInput
                 multiline
                 numberOfLines={3}
@@ -202,19 +218,21 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
                   newSteps[index] = text;
                   setSteps(newSteps);
                 }}
-                style={styles.inputDelete}
+                style={[gStyles.textInput, gStyles.textAlignVerticalTop]}
               />
               <Pressable onPress={() => removeStep(index)} style={styles.deleteButton}>
-                <X color={Colors.dark.text} size={22} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
+              <X color={Colors.dark.text} size={22} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
               </Pressable>
-            </View>
+          </View>  
+
           ))}
-          <Pressable onPress={addStep} style={({ pressed }) => [styles.button, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+          <Pressable onPress={addStep} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
             <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
           </Pressable>
+          </View>
 
           {/* Save button */}
-          <Pressable onPress={handleSave} style={({ pressed }) => [styles.saveButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+          <Pressable onPress={handleSave} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { marginTop: 30, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
             <Save color={Colors.dark.text} size={28} style={{ alignSelf: 'center' }} />
             <Alata20 style={{ marginBottom: 5, textAlign: 'center' }}>Save Recipe</Alata20>
           </Pressable>
@@ -226,9 +244,11 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
 
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.dark.mainColorDark,
+  gap: {
+    gap: 20,
+  },
+  flex2: {
+    flex: 2,
   },
   input: {
     color: Colors.dark.text,

@@ -28,7 +28,7 @@ export default function ItemSelectorSwitch({ item, onToggle }: SelectionProps) {
     }
     return (
         <Pressable onPress={switchPressed} style={() => [styles.button, { backgroundColor: isSelected ? Colors.dark.tint : Colors.dark.mainColorDark }]}>
-            <Alata12 style={[gStyles.textAlignCenter, gStyles.marginBottom] }>{item.value}</Alata12>
+            <Alata12 style={[gStyles.alignCenter, gStyles.marginBottom] }>{item.value}</Alata12>
         </Pressable>
     )
 }
@@ -39,6 +39,6 @@ const styles = StyleSheet.create({
         padding: 10,
         paddingHorizontal: 20,
         elevation: 2,
-        margin: 5,
+
     },
 });
