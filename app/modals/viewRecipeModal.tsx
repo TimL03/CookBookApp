@@ -24,7 +24,6 @@ interface AddRecipeScreenProps {
     name: string;
     cookHTime: string;
     cookMinTime: string;
-    description: string;
     ingredients: Ingredient[];
     steps: string[];
     imageUrl: string;
@@ -34,6 +33,23 @@ interface AddRecipeScreenProps {
 
 export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreenProps) {
   const [isShareRecipeModalVisible, setIsShareRecipeModalVisible] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editedRecipe, setEditedRecipe] = useState(recipe);
+  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [editedCategories, setEditedCategories] = useState<string[]>(recipe.categories || []);
+  const [editedSteps, setEditedSteps] = useState(recipe.steps);
+
+
+  const units = [
+    { key: '1', value: 'tbsp' },
+    { key: '2', value: 'tsp' },
+    { key: '3', value: 'cup' },
+    { key: '4', value: 'ml' },
+    { key: '5', value: 'l' },
+    { key: '6', value: 'g' },
+    { key: '7', value: 'kg' },
+    { key: '8', value: 'x' },
+  ];
 
   const toggleModal = () => {
     setIsShareRecipeModalVisible(!isShareRecipeModalVisible);
@@ -118,8 +134,14 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
               <View key={item.key} style={gStyles.switchButton}>
                 <Alata12>{item.value}</Alata12>
               </View>
-            ))}
-          </View>
+             ))
+             ) : (
+               editedCategories.map((category, index) => (
+                 <View key={index} style={{ backgroundColor: Colors.dark.tint, padding: 10, borderRadius: 20, marginRight: 5 }}>
+                   <AlataText style={{ fontSize: 12 }}>{category}</AlataText>
+                 </View>
+               ))
+             )}
 
           {/* Ingredients */}
           <View style={gStyles.card}>

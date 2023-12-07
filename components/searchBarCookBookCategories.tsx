@@ -75,14 +75,17 @@ export default function SearchBarCookBookCategories({ item, currentListCategorie
       const categorySet = new Set();
 
       recipes.forEach((recipe) => {
-        if (recipe.category && typeof recipe.category === 'string') {
-          categorySet.add(recipe.category);
+        // Gehe davon aus, dass `categories` ein Array von Strings ist
+        if (recipe.categories && Array.isArray(recipe.categories)) {
+          recipe.categories.forEach(category => {
+            categorySet.add(category);
+          });
         }
       });
 
       const newCategories = Array.from(categorySet).map((category, index) => ({
         key: index.toString(),
-        value: category as string, 
+        value: category, // `category` ist jetzt sicher ein String
         selected: false,
       }));
 
@@ -95,7 +98,6 @@ export default function SearchBarCookBookCategories({ item, currentListCategorie
     }
     setIsLoading(false);
   };
-
 
 
   const searchActive = async () => {

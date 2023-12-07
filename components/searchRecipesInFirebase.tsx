@@ -19,41 +19,32 @@ const getCurrentUserId = (): Promise<string | null> => {
   });
 };
 
-const searchRecipesInFirebase = async (selectedIngredients: string[], selectedCategory: string) => {
-  try {
-    const userId = await getCurrentUserId();
+const searchRecipesByIngredients = async (selectedCookBookIngredients: string[], userId:  string) => {
+  const recipesCollection = collection(db, 'recipes');
+  let ingredientQuery = query(
+    recipesCollection,
+    where('userID', '==', userId),
+    where('ingredientNames', 'array-contains-any', selectedCookBookIngredients)
+  );
 
-    if (!userId) {
-      console.error('Benutzer ist nicht angemeldet.');
-      return null;
-    }
-
-    const recipesCollection = collection(db, 'recipes');
-
-    const q = query(
-      recipesCollection,
-      where('category', '==', selectedCategory),
-      where('userID', '==', userId),
-    );
-
-    const querySnapshot = await getDocs(q);
-
-    if (querySnapshot.empty) {
-      console.log('Kein passendes Rezept gefunden.');
-      return null;
-    }
-
-    const matchingRecipes = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-    const randomIndex = Math.floor(Math.random() * matchingRecipes.length);
-    const matchingRecipe = matchingRecipes[randomIndex];
-
-    return matchingRecipe;
-  } catch (error) {
-    console.error('Fehler bei der Suche nach Rezepten in Firebase:', error);
-    return null;
-  }
+  const querySnapshot = await getDocs(ingredientQuery);
+  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
-export { searchRecipesInFirebase };
+const searchRecipesByCategories = async (selectedCookBookCategories: string[], userId: string) => {
+  const recipesCollection = collection(db, 'recipes');
+  let categoryQuery = query(
+    recipesCollection,
+    where('userID', '==', userId),
+    where('categories', 'array-contains-any', selectedCookBookCategories)
+  );
+
+  const querySnapshot = await getDocs(categoryQuery);
+  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+};
+
+export { searchRecipesByIngredients, searchRecipesByCategories, getCurrentUserId };
+
+
+
 

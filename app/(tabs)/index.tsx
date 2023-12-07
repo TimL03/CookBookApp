@@ -8,10 +8,28 @@ import SearchBarAPI from '../../components/searchBarAPI';
 import SearchBarCookBookIngredients from '../../components/searchBarCookBookIngredients';
 import SearchBarCookBookCategories from '../../components/searchBarCookBookCategories';
 import ViewRandomRecipeScreen from '../modals/viewRandomRecipeModal';
+import ViewRecipeScreen from '../modals/viewRecipeModal';
 import SearchSwitch from '../../components/SearchSwitch';
-import { searchRecipesInFirebase } from '../../components/searchRecipesInFirebase';
+import { searchRecipesByIngredients, searchRecipesByCategories, getCurrentUserId } from '../../components/searchRecipesInFirebase';
 import { ScreenContainer } from 'react-native-screens';
 
+interface Ingredient {
+  name: string;
+  amount: string;
+  unit: string;
+}
+
+type Recipe = {
+  id: string;
+  categories: string[];
+  name: string;
+  cookHTime: string;
+  cookMinTime: string;
+  ingredients: Ingredient[];
+  steps: string[];
+  imageUrl: string;
+  userID: string;
+};
 
 const dataIngredients = [
   { key: '1', value: 'Tomato', selected: false },
@@ -42,12 +60,13 @@ export default function TabOneScreen() {
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [searchMode, setSearchMode] = useState<'database' | 'cookbook'>('database');
-
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [isRecipeModalVisible, setIsRecipeModalVisible] = useState(false);
 
   // API Ingredients
   const getDisplayedAPIIngredients = () => {
     const displayedAPIIngredients = currentListAPIIngredients.filter(
-      (item) => item.selected || item.key === '1' || item.key === '2' || item.key === '3'
+      (item) => item.selected 
     );
     return displayedAPIIngredients;
   };
@@ -82,28 +101,25 @@ export default function TabOneScreen() {
       .join(',');
   };
 
-
   // CookBookIngredients
-  const getCurrentSelectedCookBookIngredients = () => {
-    return currentListCookBookIngredients
-      .filter(item => item.selected)
-      .map(item => item.value);
-  };
-
   const getDisplayedCookBookIngredients = () => {
     const displayedCookBookIngredients = currentListCookBookIngredients.filter(
-      (item) => item.selected || item.key === '1' || item.key === '2' || item.key === '3'
+      (item) => item.selected 
     );
     return displayedCookBookIngredients;
   };
-  
+
   const handleIngredientCookBookSelection = (ingredientKey: string) => {
     setCurrentListCookBookIngredients(prevList => {
       const ingredientIndex = prevList.findIndex(ingredient => ingredient.key === ingredientKey);
-      
+  
       if (ingredientIndex > -1) {
-        return prevList;
+        // Aktualisieren Sie den 'selected'-Status der vorhandenen Zutat
+        return prevList.map((ingredient, index) => 
+          index === ingredientIndex ? { ...ingredient, selected: true } : ingredient
+        );
       } else {
+        // Fügen Sie das neue Element hinzu, wenn es nicht vorhanden ist
         const selectedIngredientCookBook = recomendedCookBookListIngredients.find(ingredient => ingredient.key === ingredientKey);
         return selectedIngredientCookBook ? [...prevList, { ...selectedIngredientCookBook, selected: true }] : prevList;
       }
@@ -121,24 +137,100 @@ export default function TabOneScreen() {
       return updatedIngredients;
     });
   };
-  
+
   const handleCurrentListCookBookIngredientsUpdate = (updatedListCookBook: { key: string, value: string, selected: boolean }[]) => {
     setCurrentListCookBookIngredients(updatedListCookBook);
   };
 
-  // CookBookSearch
-  const handleSearchInFirebase = async () => {
-    const selectedCookBookIngredients = getCurrentSelectedCookBookIngredients();
-    const selectedCookBookCategories = getCurrentSelectedCookBookCategories().join(',');
-
-    console.log('Selected Ingredients for Firebase Search:', selectedCookBookIngredients);
-    console.log('Selected Category for Firebase Search:', selectedCookBookCategories);
-
-    const matchingRecipes = await searchRecipesInFirebase(selectedCookBookIngredients, selectedCookBookCategories);
-    console.log('Gefundene Rezepte in Firebase:', matchingRecipes);
+  // CookBookCategories 
+  const getDisplayedCookBookCategories = () => {
+    return currentListCookBookCategories.filter(category =>
+      category.selected 
+    );
   };
 
-  // Firebase Search
+  const handleCategoryCookBookSelection = (categoryKey: string) => {
+    setCurrentListCookBookCategories(prevList => {
+      const categoryIndex = prevList.findIndex(category => category.key === categoryKey);
+
+      if (categoryIndex > -1) {
+        return prevList;
+      } else {
+        const selectedCategoryCookBook = recomendedCookBookListCategories.find(category => category.key === categoryKey);
+        return selectedCategoryCookBook ? [...prevList, { ...selectedCategoryCookBook, selected: true }] : prevList;
+      }
+    });
+  };
+
+  const toggleCategorySelectedCookBook = (key: string) => {
+    setCurrentListCookBookCategories(categories =>
+      categories.map(category => {
+        if (category.key === key) {
+          return { ...category, selected: !category.selected };
+        } else {
+          return { ...category, selected: false };
+        }
+      })
+    );
+  };
+
+  const handleCurrentListCookBookCategoriesUpdate = (updatedListCookBookCategories: { key: string, value: string, selected: boolean }[]) => {
+    setCurrentListCookBookCategories(updatedListCookBookCategories);
+  };
+
+  // CookBookSearch
+  const getCurrentSelectedCookBookIngredients = () => {
+    return currentListCookBookIngredients
+      .filter(item => item.selected)
+      .map(item => item.value);
+  };
+
+  const getCurrentSelectedCookBookCategories = () => {
+    return currentListCookBookCategories
+      .filter(item => item.selected)
+      .map(item => item.value);
+  };
+
+  const handleSearchInFirebase = async () => {
+    const selectedIngredients = getCurrentSelectedCookBookIngredients();
+    const selectedCategories = getCurrentSelectedCookBookCategories();
+    const userId = await getCurrentUserId();
+
+    if (!userId) {
+      console.error('Benutzer ist nicht angemeldet.');
+      return;
+    }
+
+    try {
+      const recipesByIngredients = selectedIngredients.length > 0
+        ? await searchRecipesByIngredients(selectedIngredients, userId)
+        : [];
+
+      console.log('Gefundene Rezepte basierend auf Zutaten:', recipesByIngredients);
+
+
+      const recipesByCategories = selectedCategories.length > 0
+        ? await searchRecipesByCategories(selectedCategories, userId)
+        : [];
+
+      console.log('Gefundene Rezepte basierend auf Kategorien:', recipesByCategories);
+
+
+      const ingredientsIds = new Set(recipesByIngredients.map(recipe => recipe.id));
+      const combinedRecipes = recipesByCategories.filter(recipe => ingredientsIds.has(recipe.id));
+
+      if (combinedRecipes.length > 0) {
+        setSelectedRecipe(combinedRecipes[0] as Recipe);
+        setIsRecipeModalVisible(true);        // Öffnen Sie den Modal
+      } else {
+        console.log('Kein passendes Rezept gefunden.');
+      }
+    } catch (error) {
+      console.error('Fehler bei der Suche nach Rezepten in Firebase:', error);
+    }
+  };
+
+  // API Search
   const getMeal = async () => {
     const selectedAPIIngredients = getSelectedAPIIngredients();
     console.log('Selected Ingredients:', selectedAPIIngredients);
@@ -168,50 +260,6 @@ export default function TabOneScreen() {
     getMeal();
   };
 
-  // CookBookCategories 
-  const getCurrentSelectedCookBookCategories = () => {
-    return currentListCookBookCategories
-      .filter(item => item.selected)
-      .map(item => item.value);
-  };
-
-
-  const getDisplayedCookBookCategories = () => {
-    return currentListCookBookCategories.filter(category => 
-      category.selected || category.key === '0' 
-    );
-  };  
-  
-  
-  const handleCategoryCookBookSelection = (categoryKey: string) => {
-    setCurrentListCookBookCategories(prevList => {
-      const categoryIndex = prevList.findIndex(category => category.key === categoryKey);
-      
-      if (categoryIndex > -1) {
-        return prevList;
-      } else {
-        const selectedCategoryCookBook = recomendedCookBookListCategories.find(category => category.key === categoryKey);
-        return selectedCategoryCookBook ? [...prevList, { ...selectedCategoryCookBook, selected: true }] : prevList;
-      }
-    });
-  };
-
-  const toggleCategorySelectedCookBook = (key: string) => {
-    setCurrentListCookBookCategories(categories =>
-      categories.map(category => {
-        if (category.key === key) {
-          return { ...category, selected: !category.selected };
-        } else {
-          return { ...category, selected: false };
-        }
-      })
-    );
-  };
-  
-  
-  const handleCurrentListCookBookCategoriesUpdate = (updatedListCookBookCategories: { key: string, value: string, selected: boolean }[]) => {
-    setCurrentListCookBookCategories(updatedListCookBookCategories);
-  };
 
   return (
     <View style={gStyles.screenContainer}>
@@ -248,11 +296,11 @@ export default function TabOneScreen() {
               ))}
             </View>
             <Alata20>Select Category:</Alata20>
-            <SearchBarCookBookCategories 
-            item={getDisplayedCookBookCategories()} 
-            currentListCategories={recomendedCookBookListCategories} 
-            onCurrentListCategoriesUpdated={handleCurrentListCookBookCategoriesUpdate} 
-            onCategorySelectedCookBook={handleCategoryCookBookSelection}
+            <SearchBarCookBookCategories
+              item={getDisplayedCookBookCategories()}
+              currentListCategories={recomendedCookBookListCategories}
+              onCurrentListCategoriesUpdated={handleCurrentListCookBookCategoriesUpdate}
+              onCategorySelectedCookBook={handleCategoryCookBookSelection}
             />
             <View style={gStyles.mapHorizontal}>
               {getDisplayedCookBookCategories().map((item) => (
@@ -274,6 +322,20 @@ export default function TabOneScreen() {
       >
         <ViewRandomRecipeScreen closeModal={() => setModalVisible(false)} recipe={selectedMeal} onFindNewRecipe={findNewRecipe} />
       </Modal>
+      {/* ViewRecipeModal */}
+      {selectedRecipe && (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isRecipeModalVisible}
+          onRequestClose={() => setIsRecipeModalVisible(false)}
+        >
+          <ViewRecipeScreen
+            closeModal={() => setIsRecipeModalVisible(false)}
+            recipe={selectedRecipe}
+          />
+        </Modal>
+      )}
     </View>
   )
 }

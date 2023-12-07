@@ -90,7 +90,7 @@ export default function SearchBarCookBookIngredients({ item, currentListCookBook
         });
       });
 
-      console.log("Extrahierte Zutaten für Dropdown:", newIngredients); // Ausgabe der extrahierten Zutaten für das Dropdown
+      console.log("Extrahierte Zutaten für Dropdown:", newIngredients); 
 
 
       const updatedIngredients = newIngredients.map(newIngredient => {
@@ -109,8 +109,8 @@ export default function SearchBarCookBookIngredients({ item, currentListCookBook
 
 
   const searchActive = async () => {
-    setSearch(true);
     await fetchIngredientsFromFirebase();
+    setSearch(true);
   }
 
   const searchInactive = () => {
