@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useRef } from 'react';
 import { Pressable, TextInput, View, StyleSheet } from 'react-native';
 import { ChevronDown, ChevronUp, Search, X } from 'lucide-react-native';
 import Colors from '../constants/Colors';
@@ -21,14 +21,13 @@ export default function DropDown({ item, selectedUnit, selectedAmount, onSelect 
     const [unit, setUnit] = React.useState('x');
     const [amount, setAmount] = React.useState('');
 
-    React.useEffect(() => {
-        setUnit(selectedUnit);
-        setAmount(selectedAmount);
-    }, [selectedUnit, selectedAmount]);
+    const activateDropDown = () => {
+        setDropDrown(true);
+    }
 
-    
-      const activateDropDown = () => setDropDrown(true);
-      const deactivateDropDown = () => setDropDrown(false);
+    const deactivateDropDown = () => {
+        setDropDrown(false);
+    }
 
     const handleSelectUnit = (selectedUnit: string) => {
         setUnit(selectedUnit);

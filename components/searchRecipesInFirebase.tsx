@@ -19,7 +19,7 @@ const getCurrentUserId = (): Promise<string | null> => {
   });
 };
 
-const searchRecipesInFirebase = async (selectedCookBookIngredients: string[], selectedCookBookCategories: string) => {
+const searchRecipesInFirebase = async (selectedIngredients: string[], selectedCategory: string) => {
   try {
     const userId = await getCurrentUserId();
 
@@ -32,8 +32,7 @@ const searchRecipesInFirebase = async (selectedCookBookIngredients: string[], se
 
     const q = query(
       recipesCollection,
-      where('category', '==', selectedCookBookCategories),
-      where('ingredients.name', 'array-contains-any', selectedCookBookIngredients),
+      where('category', '==', selectedCategory),
       where('userID', '==', userId),
     );
 
@@ -46,13 +45,8 @@ const searchRecipesInFirebase = async (selectedCookBookIngredients: string[], se
 
     const matchingRecipes = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    console.log('Gefundene Rezepte in Firebase:', matchingRecipes);
-
     const randomIndex = Math.floor(Math.random() * matchingRecipes.length);
     const matchingRecipe = matchingRecipes[randomIndex];
-
-    console.log('Ausgewähltes Rezept:', matchingRecipe);
-
 
     return matchingRecipe;
   } catch (error) {
