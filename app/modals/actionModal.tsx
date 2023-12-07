@@ -13,7 +13,7 @@ interface ActionsModalProps {
 }
 
 const ActionsModal = ({ visible, onClose}: ActionsModalProps) => {
-
+  
   return (
       <Pressable style={gStyles.modalBackgroundContainer} onPress={router.back}>
         <View style={gStyles.modalContentContainer}>

@@ -6,13 +6,15 @@ import React from 'react';
 import { Link, Stack } from 'expo-router';
 import { ChevronLeft} from 'lucide-react-native'
 import Colors from '../../constants/Colors';
+import gStyles from '../../constants/Global_Styles';
+import { Alata16, Alata18, Alata20 } from '../../components/StyledText';
 
 
 export default function aboutScreen() {    
     return (
       <>
         <Stack.Screen options={{ 
-          title: 'About the App',
+          title: 'About (Legal Notice)',
           headerStyle: {
             backgroundColor: Colors.dark.mainColorDark,
           },
@@ -23,10 +25,18 @@ export default function aboutScreen() {
           </Link>
         }} 
         />
-        <View style={styles.container}>
-          <Text style={styles.title}>About Screen</Text>
-          <Link href="/">
-            <Text style={styles.linkText}>Go to home screen!</Text>
+        <View style={[gStyles.screenContainer, {justifyContent: 'flex-start'}]}>
+          <View style={gStyles.HorizontalLayout}>
+            <Alata18 style={gStyles.alignCenter}>Name: </Alata18>
+            <Alata16 style={gStyles.alignCenter}>Tim Liesegang</Alata16>
+          </View>
+          <View style={gStyles.HorizontalLayout}>
+            <Alata18 style={gStyles.alignCenter}>Street, House Number: </Alata18>
+            <Alata16 style={gStyles.alignCenter}>Zwischen den Gärten, 1c</Alata16>
+          </View>
+          
+          <Link href={"https://github.com/TimL03/CookBookApp"}>
+            <Text style={styles.linkText}>Go to Git</Text>
           </Link>
         </View>
       </>
