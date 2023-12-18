@@ -1,5 +1,5 @@
 import { View, Pressable, ScrollView, Modal, StyleSheet } from 'react-native';
-import React, {useState } from 'react';
+import React, {useEffect, useState } from 'react';
 import ItemSelectorSwitch from '../../components/ItemSelectorSwitch'
 import { Alata20 } from '../../components/StyledText'
 import Colors from '../../constants/Colors';
@@ -11,6 +11,9 @@ import ViewRandomRecipeScreen from '../modals/viewRandomRecipeModal';
 import SearchSwitch from '../../components/SearchSwitch';
 import { searchRecipesInFirebase } from '../../components/searchRecipesInFirebase';
 import { ScreenContainer } from 'react-native-screens';
+import SearchBarSelector from '../../components/searchBarSelector';
+import { Ingredient } from '../../api/externalRecipesLibrary/model';
+import { useIngredients, useRandomRecipe } from '../../api/externalRecipesLibrary/client';
 
 
 const dataIngredients = [
@@ -30,12 +33,35 @@ const dataCategories = [
   { key: '2', value: 'Snacks', selected: false },
 ];
 
+const categories = '';
+
 const recomendedAPIListIngredients = dataIngredients.filter((i) => i.key === '1' || i.key === '2' || i.key === '3');
 const recomendedCookBookListIngredients = dataIngredientsCookBook.filter((i) => i.key === '1' || i.key === '2' || i.key === '3');
 const recomendedCookBookListCategories = dataCategories.filter((i) => i.key === '1' || i.key === '2');
 
 
 export default function TabOneScreen() {
+  const ingredients: Ingredient[] = useIngredients();
+  const [selectedIngredients, setSelectedIngredients] = useState<Ingredient[]>([]);
+
+  useEffect(() => {
+      setSelectedIngredients(ingredients.map(ingredient => ({ ...ingredient, selected: false })));
+  }, [ingredients]);
+
+  const selectedIngredientsToCSV = () => {
+    return selectedIngredients
+      .filter(item => item.selected)
+      .map(item => item.value.toLowerCase())
+      .join(',');
+  };
+
+  const getRandomRecipe = async () => {
+    const randomRecipe = await useRandomRecipe(selectedIngredientsToCSV(), categories);
+    setSelectedMeal(randomRecipe);
+    setModalVisible(true);
+    console.log('Random Recipe:', randomRecipe);
+  };
+
   const [currentListCookBookIngredients, setCurrentListCookBookIngredients] = useState(recomendedCookBookListIngredients);
   const [currentListCookBookCategories, setCurrentListCookBookCategories] = useState(recomendedCookBookListCategories);
   const [currentListAPIIngredients, setCurrentListAPIIngredients] = useState(recomendedAPIListIngredients);
@@ -138,9 +164,10 @@ export default function TabOneScreen() {
     console.log('Gefundene Rezepte in Firebase:', matchingRecipes);
   };
 
-  // Firebase Search
+  // Themealdb Search
   const getMeal = async () => {
-    const selectedAPIIngredients = getSelectedAPIIngredients();
+    console.log('test');
+    const selectedAPIIngredients = selectedIngredientsToCSV();
     console.log('Selected Ingredients:', selectedAPIIngredients);
     try {
       const response = await fetch(`https://www.themealdb.com/api/json/v2/9973533/filter.php?i=${selectedAPIIngredients}`);
@@ -231,6 +258,9 @@ export default function TabOneScreen() {
                 <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleIngredientSelectedAPI(item.key)} />
               ))}
             </View>
+            <SearchBarSelector
+              selectedIngredients={selectedIngredients} 
+              setSelectedIngredients={setSelectedIngredients} />
           </View>
         )}
         {searchMode === 'cookbook' && (
@@ -263,7 +293,7 @@ export default function TabOneScreen() {
           </View>
         )}
       </ScrollView>
-      <Pressable onPress={searchMode === 'cookbook' ? handleSearchInFirebase : getMeal} style={({ pressed }) => [gStyles.squareButtonText, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+      <Pressable onPress={() => getMeal()} style={({ pressed }) => [gStyles.squareButtonText, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
         <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Get a Recipe</Alata20>
       </Pressable>
       <Modal

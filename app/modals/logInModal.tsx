@@ -22,8 +22,6 @@ export default function LoginModalScreen({ onClose, setIsAuthenticated, setUserI
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-
-
   const showPassword = () => {
     setHidePassword(false);
   };
