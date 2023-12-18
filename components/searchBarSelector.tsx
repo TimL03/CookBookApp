@@ -39,8 +39,9 @@ export default function SearchBarSelector({ selectedIngredients, setSelectedIngr
                     <TextInput
                     onPressIn={() => setSearch(true)}
                     onEndEditing={() => Keyboard.dismiss()}
-                    placeholder={`search...`}
-                    onChangeText={setSearchCriteria}
+                    placeholder={`search...`}                    
+                    value={searchCriteria}
+                    onChangeText={text => setSearchCriteria(text)}
                     placeholderTextColor={Colors.dark.text}
                     style={gStyles.textInput}
                     />
@@ -86,7 +87,6 @@ export default function SearchBarSelector({ selectedIngredients, setSelectedIngr
 }
 
 const styles = StyleSheet.create({
-
     marginRight: {
       marginRight: -4,
     },

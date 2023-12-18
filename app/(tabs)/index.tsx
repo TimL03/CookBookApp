@@ -13,7 +13,7 @@ import { searchRecipesInFirebase } from '../../components/searchRecipesInFirebas
 import { ScreenContainer } from 'react-native-screens';
 import SearchBarSelector from '../../components/searchBarSelector';
 import { Ingredient } from '../../api/externalRecipesLibrary/model';
-import { useIngredients, useRandomRecipe } from '../../api/externalRecipesLibrary/client';
+import { useIngredients } from '../../api/externalRecipesLibrary/client';
 
 
 const dataIngredients = [
@@ -247,17 +247,6 @@ export default function TabOneScreen() {
         {searchMode === 'database' && (
           <View>
             <Alata20 style={styles.margin}>Select Ingredients:</Alata20>
-            <SearchBarAPI
-              item={getDisplayedAPIIngredients()}
-              currentListAPI={recomendedAPIListIngredients}
-              onCurrentListAPIUpdated={handleCurrentListAPIIngredientsUpdate}
-              onIngredientSelectedAPI={handleIngredientAPISelection}
-            />
-            <View style={[gStyles.mapHorizontal, styles.margin]}>
-              {getDisplayedAPIIngredients().map((item) => (
-                <ItemSelectorSwitch key={item.key} item={item} onToggle={() => toggleIngredientSelectedAPI(item.key)} />
-              ))}
-            </View>
             <SearchBarSelector
               selectedIngredients={selectedIngredients} 
               setSelectedIngredients={setSelectedIngredients} />
