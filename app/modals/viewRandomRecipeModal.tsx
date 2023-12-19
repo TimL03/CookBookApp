@@ -8,7 +8,7 @@ import { db } from '../../FirebaseConfig'
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { Share2, Save, ArrowDownToLine } from 'lucide-react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { Alata16, Alata20, Alata24 } from '../../components/StyledText';
+import { Alata12, Alata16, Alata20, Alata24 } from '../../components/StyledText';
 import LoginModalScreen from './logInModal';
 
 // Define the Ingredient interface
@@ -27,6 +27,7 @@ interface ViewRandomRecipeScreenProps {
     strMealThumb: string;
     idMeal: string;
     strInstructions: string;
+    strCategory?: string;
     // Additional ingredients and measures for dynamic data
     strIngredient1?: string;
     strIngredient2?: string;
@@ -216,6 +217,13 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
             </View>
             </>
           )}
+
+          {/* Categories */}
+          <View style={gStyles.mapHorizontal}>
+              <View style={gStyles.switchButton}>
+                <Alata12>{recipe.strCategory}</Alata12>
+              </View>
+          </View>
 
           {/* Ingredients section */}
           <View style={gStyles.card}>

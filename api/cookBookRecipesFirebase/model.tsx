@@ -1,5 +1,5 @@
 
-export type Item = {
+export type Ingredient = {
     key: string;
     value: string;
     selected: boolean;

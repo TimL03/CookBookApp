@@ -1,18 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { useIngredients } from "../api/externalRecipesLibrary/client";
-import { Pressable, Text, TextInput, View, StyleSheet, Keyboard } from "react-native";
-import { Ingredient } from "../api/externalRecipesLibrary/model";
+import React, { useState } from "react";
+import { Pressable, TextInput, View, StyleSheet, Keyboard } from "react-native";
+import { Item } from "../api/externalRecipesLibrary/model";
 import { Search, X } from "lucide-react-native";
 import gStyles from "../constants/Global_Styles";
 import Colors from "../constants/Colors";
 import { Alata12 } from "./StyledText";
 
-export default function SearchBarSelector({ selectedIngredients, setSelectedIngredients }: { selectedIngredients: Ingredient[], setSelectedIngredients: React.Dispatch<React.SetStateAction<Ingredient[]>> }) {
+export default function SearchBarSelector({ selectedItems, setSelectedItems }: { selectedItems: Item[], setSelectedItems: React.Dispatch<React.SetStateAction<Item[]>> }) {
     const [search, setSearch] = useState(false);
     const [searchCriteria, setSearchCriteria] = useState('');
 
-    const filteredIngredients = selectedIngredients.filter((ingredient: Ingredient) => ingredient.value.includes(searchCriteria));
-
+    const filteredItems = selectedItems.filter((item: Item) => item.value.includes(searchCriteria));
 
     const searchFinished = () => {
         setSearch(false);
@@ -21,15 +19,15 @@ export default function SearchBarSelector({ selectedIngredients, setSelectedIngr
     }
 
     const toggleSelected = (key: string) => {
-        setSelectedIngredients(prevIngredients => 
-            prevIngredients.map(ingredient => 
-                ingredient.key === key ? { ...ingredient, selected: !ingredient.selected } : ingredient
+        setSelectedItems(prevItems => 
+            prevItems.map(item => 
+                item.key === key ? { ...item, selected: !item.selected } : item
             )
         );
     }
 
     const isSelected = (key: string) => {
-        return selectedIngredients.find(ingredient => ingredient.key === key)?.selected;
+        return selectedItems.find(item => item.key === key)?.selected;
     }
 
     return (
@@ -61,7 +59,7 @@ export default function SearchBarSelector({ selectedIngredients, setSelectedIngr
             {
                 (search) ?
                 <View style={styles.searchList}>
-                    {filteredIngredients.slice(0,5).map((i) => (
+                    {filteredItems.slice(0,5).map((i) => (
                     <Pressable
                         key={i.key}
                         style={({ pressed }) => [styles.padding, { backgroundColor: (isSelected(i.key)) ? Colors.dark.tint : Colors.dark.mainColorDark }]}
@@ -74,8 +72,8 @@ export default function SearchBarSelector({ selectedIngredients, setSelectedIngr
                 : null
             }
             <View style={[gStyles.mapHorizontal, styles.paddingVertical]}>
-                {filteredIngredients.filter((item) => item.selected)
-                 .concat(filteredIngredients.filter((item) => !item.selected).slice(0,3))
+                {filteredItems.filter((item) => item.selected)
+                 .concat(filteredItems.filter((item) => !item.selected).slice(0,3))
                  .map((item) => (
                     <Pressable onPress={() => toggleSelected(item.key)} style={() => [styles.switchButton, { backgroundColor: isSelected(item.key) ? Colors.dark.tint : Colors.dark.mainColorDark }]}>
                         <Alata12 style={[gStyles.alignCenter, gStyles.marginBottom] }>{item.value}</Alata12>
@@ -93,14 +91,6 @@ const styles = StyleSheet.create({
     paddingVertical: {
       paddingTop: 10,
       paddingBottom: 10,
-    },
-    addImage: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: 100,
-      backgroundColor: Colors.dark.mainColorLight,
-      borderRadius: 20,
     },
     searchList: {
         backgroundColor: Colors.dark.mainColorDark,

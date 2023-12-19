@@ -12,8 +12,8 @@ import SearchSwitch from '../../components/SearchSwitch';
 import { searchRecipesInFirebase } from '../../components/searchRecipesInFirebase';
 import { ScreenContainer } from 'react-native-screens';
 import SearchBarSelector from '../../components/searchBarSelector';
-import { Ingredient } from '../../api/externalRecipesLibrary/model';
-import { useIngredients } from '../../api/externalRecipesLibrary/client';
+import { Item } from '../../api/externalRecipesLibrary/model';
+import { ItemListToCSVString, useCategories, useIngredients } from '../../api/externalRecipesLibrary/client';
 
 
 const dataIngredients = [
@@ -33,7 +33,6 @@ const dataCategories = [
   { key: '2', value: 'Snacks', selected: false },
 ];
 
-const categories = '';
 
 const recomendedAPIListIngredients = dataIngredients.filter((i) => i.key === '1' || i.key === '2' || i.key === '3');
 const recomendedCookBookListIngredients = dataIngredientsCookBook.filter((i) => i.key === '1' || i.key === '2' || i.key === '3');
@@ -41,13 +40,23 @@ const recomendedCookBookListCategories = dataCategories.filter((i) => i.key === 
 
 
 export default function TabOneScreen() {
-  const ingredients: Ingredient[] = useIngredients();
-  const [selectedIngredients, setSelectedIngredients] = useState<Ingredient[]>([]);
+  const ingredients: Item[] = useIngredients();
+  const [selectedIngredients, setSelectedIngredients] = useState<Item[]>([]);
+  const categories: Item[] = useCategories();
+  const [selectedCategories, setSelectedCategories] = useState<Item[]>([]);
+  const [searchMode, setSearchMode] = useState<'database' | 'cookbook'>('database');
 
+  //add Selection Property to Ingredients
   useEffect(() => {
       setSelectedIngredients(ingredients.map(ingredient => ({ ...ingredient, selected: false })));
   }, [ingredients]);
 
+   //add Selection Property to Categories
+   useEffect(() => {
+    setSelectedCategories(categories.map(categories => ({ ...categories, selected: false })));
+}, [categories]);
+
+  //add selected Ingredients to csv String
   const selectedIngredientsToCSV = () => {
     return selectedIngredients
       .filter(item => item.selected)
@@ -55,19 +64,12 @@ export default function TabOneScreen() {
       .join(',');
   };
 
-  const getRandomRecipe = async () => {
-    const randomRecipe = await useRandomRecipe(selectedIngredientsToCSV(), categories);
-    setSelectedMeal(randomRecipe);
-    setModalVisible(true);
-    console.log('Random Recipe:', randomRecipe);
-  };
-
   const [currentListCookBookIngredients, setCurrentListCookBookIngredients] = useState(recomendedCookBookListIngredients);
   const [currentListCookBookCategories, setCurrentListCookBookCategories] = useState(recomendedCookBookListCategories);
   const [currentListAPIIngredients, setCurrentListAPIIngredients] = useState(recomendedAPIListIngredients);
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState(null);
-  const [searchMode, setSearchMode] = useState<'database' | 'cookbook'>('database');
+  
 
 
   // API Ingredients
@@ -164,16 +166,30 @@ export default function TabOneScreen() {
     console.log('Gefundene Rezepte in Firebase:', matchingRecipes);
   };
 
-  // Themealdb Search
+  // Themealdb get a random meal
   const getMeal = async () => {
     console.log('test');
-    const selectedAPIIngredients = selectedIngredientsToCSV();
+    const selectedAPIIngredients = ItemListToCSVString(selectedIngredients);
+    const selectedAPICategories = ItemListToCSVString(selectedCategories);
     console.log('Selected Ingredients:', selectedAPIIngredients);
+    console.log('Selected Categories:', selectedAPICategories);
     try {
-      const response = await fetch(`https://www.themealdb.com/api/json/v2/9973533/filter.php?i=${selectedAPIIngredients}`);
-      const data = await response.json();
-      if (data.meals) {
-        const randomMealId = data.meals[Math.floor(Math.random() * data.meals.length)].idMeal;
+      const responseIngredients = await fetch(`https://www.themealdb.com/api/json/v2/9973533/filter.php?i=${selectedAPIIngredients}`);
+      const dataIngredients = await responseIngredients.json();
+      console.log('dataIngredients', dataIngredients.meals.length);
+
+      const responseCategories = await fetch(`https://www.themealdb.com/api/json/v2/9973533/filter.php?c=${selectedAPICategories}`);
+      const dataCategories = await responseCategories.json();
+      console.log('dataCategories', dataCategories.meals.length);
+
+      const data = dataIngredients.meals.filter(ingredientMeal => 
+        dataCategories.meals.some(categoryMeal => categoryMeal.idMeal === ingredientMeal.idMeal)
+      );
+      console.log('data beide zusammen', data);
+      console.log('data.length', data.length);
+
+      if (data.length > 0 && data) {
+        const randomMealId = data[Math.floor(Math.random() * data.length)].idMeal;
         const detailedResponse = await fetch(`https://www.themealdb.com/api/json/v2/9973533/lookup.php?i=${randomMealId}`);
         const detailedData = await detailedResponse.json();
         if (detailedData.meals) {
@@ -248,8 +264,12 @@ export default function TabOneScreen() {
           <View>
             <Alata20 style={styles.margin}>Select Ingredients:</Alata20>
             <SearchBarSelector
-              selectedIngredients={selectedIngredients} 
-              setSelectedIngredients={setSelectedIngredients} />
+              selectedItems={selectedIngredients} 
+              setSelectedItems={setSelectedIngredients} />
+            <Alata20 style={styles.margin}>Select Categories:</Alata20>
+            <SearchBarSelector
+              selectedItems={selectedCategories} 
+              setSelectedItems={setSelectedCategories} />
           </View>
         )}
         {searchMode === 'cookbook' && (
