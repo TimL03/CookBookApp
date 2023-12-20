@@ -232,7 +232,7 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
               {ingredients.map((item, index) => (
                 <View key={index} style={gStyles.IngredientLayout}>
                   <Alata16 style={gStyles.flex}>{index + 1}. {item.name}</Alata16>
-                  <Alata16>{item.measure}</Alata16>
+                  <Alata16>{item.amount} {item.unit}</Alata16>
                 </View>
               ))}
             </View>

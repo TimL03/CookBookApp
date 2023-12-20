@@ -88,7 +88,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <FileSearch color={color} size={28} style={{ marginBottom: -10 }} />,
         }}
       />
-    
     </Tabs>
     </View>
   );

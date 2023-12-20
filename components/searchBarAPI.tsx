@@ -27,8 +27,6 @@ export default function SearchBarAPI({ item, currentListAPI, onCurrentListAPIUpd
   const [thiscurrentList, setCurrentList] = React.useState(currentListAPI);
   const [search, setSearch] = React.useState(false);
 
-  
-
   const searchActive = () => {
     setSearch(true);
   }

@@ -9,11 +9,11 @@ import SearchBarCookBookIngredients from '../../components/searchBarCookBookIngr
 import SearchBarCookBookCategories from '../../components/searchBarCookBookCategories';
 import ViewRandomRecipeScreen from '../modals/viewRandomRecipeModal';
 import SearchSwitch from '../../components/SearchSwitch';
-import { searchRecipesInFirebase } from '../../components/searchRecipesInFirebase';
+import { searchRecipesInFirebase } from '../../api/cookBookRecipesFirebase/client';
 import { ScreenContainer } from 'react-native-screens';
 import SearchBarSelector from '../../components/searchBarSelector';
 import { Item } from '../../api/externalRecipesLibrary/model';
-import { ItemListToCSVString, useCategories, useIngredients } from '../../api/externalRecipesLibrary/client';
+import { ItemListToCSVString, useCategories, useGetRandomMeal, useIngredients } from '../../api/externalRecipesLibrary/client';
 
 
 const dataIngredients = [
@@ -45,6 +45,7 @@ export default function TabOneScreen() {
   const categories: Item[] = useCategories();
   const [selectedCategories, setSelectedCategories] = useState<Item[]>([]);
   const [searchMode, setSearchMode] = useState<'database' | 'cookbook'>('database');
+  const {selectedMeal, fetchMeal} = useGetRandomMeal(ItemListToCSVString(selectedIngredients), ItemListToCSVString(selectedCategories));
 
   //add Selection Property to Ingredients
   useEffect(() => {
@@ -56,59 +57,10 @@ export default function TabOneScreen() {
     setSelectedCategories(categories.map(categories => ({ ...categories, selected: false })));
 }, [categories]);
 
-  //add selected Ingredients to csv String
-  const selectedIngredientsToCSV = () => {
-    return selectedIngredients
-      .filter(item => item.selected)
-      .map(item => item.value.toLowerCase())
-      .join(',');
-  };
 
   const [currentListCookBookIngredients, setCurrentListCookBookIngredients] = useState(recomendedCookBookListIngredients);
   const [currentListCookBookCategories, setCurrentListCookBookCategories] = useState(recomendedCookBookListCategories);
-  const [currentListAPIIngredients, setCurrentListAPIIngredients] = useState(recomendedAPIListIngredients);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [selectedMeal, setSelectedMeal] = useState(null);
-  
-
-
-  // API Ingredients
-  const getDisplayedAPIIngredients = () => {
-    const displayedAPIIngredients = currentListAPIIngredients.filter(
-      (item) => item.selected || item.key === '1' || item.key === '2' || item.key === '3'
-    );
-    return displayedAPIIngredients;
-  };
-
-  const handleIngredientAPISelection = (ingredientKey: string) => {
-    const selectedIngredient = recomendedAPIListIngredients.find((ingredient) => ingredient.key === ingredientKey);
-    if (selectedIngredient) {
-      setCurrentListAPIIngredients((prevList) => [...prevList, { ...selectedIngredient }]);
-    }
-  };
-
-  const toggleIngredientSelectedAPI = (key: string) => {
-    setCurrentListAPIIngredients(ingredients =>
-      ingredients.map(ingredient =>
-        ingredient.key === key ? { ...ingredient, selected: !ingredient.selected } : ingredient
-      )
-    );
-
-    setCurrentListAPIIngredients((updatedIngredients) => {
-      return updatedIngredients;
-    });
-  };
-
-  const handleCurrentListAPIIngredientsUpdate = (updatedList: { key: string, value: string, selected: boolean }[]) => {
-    setCurrentListAPIIngredients(updatedList);
-  };
-
-  const getSelectedAPIIngredients = () => {
-    return currentListAPIIngredients
-      .filter(item => item.selected)
-      .map(item => item.value.toLowerCase())
-      .join(',');
-  };
 
 
   // CookBookIngredients
@@ -168,43 +120,11 @@ export default function TabOneScreen() {
 
   // Themealdb get a random meal
   const getMeal = async () => {
-    console.log('test');
     const selectedAPIIngredients = ItemListToCSVString(selectedIngredients);
     const selectedAPICategories = ItemListToCSVString(selectedCategories);
-    console.log('Selected Ingredients:', selectedAPIIngredients);
-    console.log('Selected Categories:', selectedAPICategories);
-    try {
-      const responseIngredients = await fetch(`https://www.themealdb.com/api/json/v2/9973533/filter.php?i=${selectedAPIIngredients}`);
-      const dataIngredients = await responseIngredients.json();
-      console.log('dataIngredients', dataIngredients.meals.length);
 
-      const responseCategories = await fetch(`https://www.themealdb.com/api/json/v2/9973533/filter.php?c=${selectedAPICategories}`);
-      const dataCategories = await responseCategories.json();
-      console.log('dataCategories', dataCategories.meals.length);
-
-      const data = dataIngredients.meals.filter(ingredientMeal => 
-        dataCategories.meals.some(categoryMeal => categoryMeal.idMeal === ingredientMeal.idMeal)
-      );
-      console.log('data beide zusammen', data);
-      console.log('data.length', data.length);
-
-      if (data.length > 0 && data) {
-        const randomMealId = data[Math.floor(Math.random() * data.length)].idMeal;
-        const detailedResponse = await fetch(`https://www.themealdb.com/api/json/v2/9973533/lookup.php?i=${randomMealId}`);
-        const detailedData = await detailedResponse.json();
-        if (detailedData.meals) {
-          const detailedMeal = detailedData.meals[0];
-          setSelectedMeal(detailedMeal);
-          setModalVisible(true);
-        } else {
-          alert("Details for the selected meal not found!");
-        }
-      } else {
-        alert("Sorry, we didn't find any meal!");
-      }
-    } catch (error) {
-      console.error(error);
-    }
+    await fetchMeal();
+  	setModalVisible(true);
   };
 
   const findNewRecipe = () => {
@@ -302,7 +222,7 @@ export default function TabOneScreen() {
           </View>
         )}
       </ScrollView>
-      <Pressable onPress={() => getMeal()} style={({ pressed }) => [gStyles.squareButtonText, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+      <Pressable onPress={() => searchMode == 'cookbook' ? handleSearchInFirebase : getMeal()} style={({ pressed }) => [gStyles.squareButtonText, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
         <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Get a Recipe</Alata20>
       </Pressable>
       <Modal
