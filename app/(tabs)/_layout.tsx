@@ -38,7 +38,7 @@ export default function TabLayout() {
         },
         headerRight: () => (
           <View style={{paddingHorizontal: 20}}>
-            <Pressable onPress={() => router.push('/modals/actionModal')} style={({ pressed }) => [ {padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+            <Pressable onPress={() => router.push('/screens/authentificationScreen')} style={({ pressed }) => [ {padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
               <Menu color={Colors.dark.text} size={28} />
             </Pressable>    
           </View>                
