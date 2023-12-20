@@ -1,23 +1,6 @@
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { db } from '../../FirebaseConfig';
+import getCurrentUserId from '../firebaseAuthentication/client';
 import { collection, getDocs, where, query } from 'firebase/firestore';
-
-const getCurrentUserId = (): Promise<string | null> => {
-  return new Promise<string | null>((resolve, reject) => {
-    const auth = getAuth();
-
-    const unsubscribe: () => void = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        resolve(user.uid);
-      } else {
-        resolve(null);
-      }
-      unsubscribe();
-    }, (error) => {
-      reject(error);
-    });
-  });
-};
 
 const searchRecipesInFirebase = async (selectedIngredients: string[], selectedCategory: string) => {
   try {
