@@ -1,8 +1,8 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Library, Utensils, Menu, FileSearch } from 'lucide-react-native'
-import { Tabs, router } from 'expo-router';
-import { Pressable, useColorScheme, View } from 'react-native';
-
+import { Tabs, router, Redirect } from 'expo-router';
+import { Pressable, useColorScheme, View, Text } from 'react-native';
+import { useSession } from '../../api/firebaseAuthentication/client';
 import Colors from '../../constants/Colors';
 import React, { useState } from 'react';
 function TabBarIcon(props: {
@@ -13,6 +13,15 @@ function TabBarIcon(props: {
 }
 
 export default function TabLayout() {
+  const { session, isLoading } = useSession();
+
+  if (isLoading) {
+    return <Text>Loading...</Text>;
+  }
+
+  if (!session) {
+    return <Redirect href="/screens/authentificationScreen" />;
+  }
 
   return (
     <View style={{ flex: 1 }}>
