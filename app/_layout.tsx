@@ -6,7 +6,7 @@ import React from 'react';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import Colors from '../constants/Colors';
-
+import { SessionProvider } from '../api/firebaseAuthentication/client';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -50,6 +50,7 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
+    <SessionProvider>
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false, navigationBarColor: Colors.dark.mainColorDark }} />
@@ -58,7 +59,9 @@ function RootLayoutNav() {
         <Stack.Screen name="screens/settingsScreen" options={{ headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop'}} />
         <Stack.Screen name="screens/aboutScreen" options={{ headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop'}} />
         <Stack.Screen name="screens/accountScreen" options={{ headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop'}} />
+        <Stack.Screen name="screens/authentificationScreen" options={{ headerShown: false, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop'}} />
       </Stack>
     </ThemeProvider>
+    </SessionProvider>
   );
 }

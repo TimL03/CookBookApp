@@ -12,6 +12,7 @@ import { useState, useEffect } from "react"
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import AddRecipeScreen from '../screens/addRecipeScreen';
 import ShowSharedRecipeInvitationModalScreen from '../modals/showSharedRecipeInvitation';
+import { RecipeData } from '../../api/cookBookRecipesFirebase/model';
 
 
 interface Ingredient {
@@ -19,18 +20,6 @@ interface Ingredient {
   amount: string;
   unit: string;
 }
-interface RecipeData {
-    id: string;
-    category: string;
-    name: string;
-    cookHTime: string;
-    cookMinTime: string;
-    description: string;
-    ingredients: Ingredient[];
-    steps: string[];
-    imageUrl: string;
-    userID: string;
-  };
 
 
 interface GroupedByCategory {

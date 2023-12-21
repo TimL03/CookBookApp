@@ -156,6 +156,7 @@ export default StyleSheet.create({
         width: '100%',
     },
 
+
     alignCenter: {
         textAlign: 'center',
         alignSelf: 'center',
