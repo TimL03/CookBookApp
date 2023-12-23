@@ -14,6 +14,7 @@ export default function LoginModalScreen() {
   const [loginMode, setLoginMode] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
   const { signIn, signUp, isLoading } = useSession();
 
   const logIn = async () => {
@@ -29,7 +30,7 @@ export default function LoginModalScreen() {
 
   const handleSignUp = async () => {
     if (!loginMode) {
-      await signUp(email, password); 
+      await signUp(email, password, username); 
       router.replace('/');
     } else {
       setLoginMode(false);
@@ -44,7 +45,7 @@ export default function LoginModalScreen() {
           !loginMode ?
             <View style={gStyles.cardInput}>
               <User2 color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
-              <TextInput placeholder="Name" placeholderTextColor={Colors.dark.text} style={gStyles.textInput} />
+              <TextInput value={username} onChangeText={setUsername} placeholder="Name" placeholderTextColor={Colors.dark.text} style={gStyles.textInput} />
             </View>
             : null
         }

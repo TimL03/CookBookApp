@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from '../../FirebaseConfig';
+import { collection, addDoc } from "firebase/firestore";
+import { auth, db } from '../../FirebaseConfig';
 
 interface AuthContextType {
-  session: any; 
+  session: any;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, username: string) => Promise<void>;
   signOut: () => void;
   isLoading: boolean;
 }
@@ -18,18 +19,18 @@ const AuthContext = createContext<AuthContextType>({
   signUp: async () => {
     return new Promise<void>((resolve) => resolve());
   },
-  signOut: () => {},
+  signOut: () => { },
   isLoading: false,
 });
 
 export const useSession = () => useContext(AuthContext);
 
 interface SessionProviderProps {
-  children: ReactNode; 
+  children: ReactNode;
 }
 
 export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
-  const [session, setSession] = useState<any | null>(null); 
+  const [session, setSession] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const signIn = async (email: string, password: string) => {
@@ -37,8 +38,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const userID = userCredential.user.uid; 
-      // Hier kannst du weitere Aktionen nach der Anmeldung durchführen
+      const userID = userCredential.user.uid;
       setSession(userID);
     } catch (error) {
       console.error("Fehler bei der Anmeldung: ", error);
@@ -48,12 +48,18 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     }
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, username: string) => {
     setIsLoading(true);
 
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const userID = userCredential.user.uid; 
+      const userID = userCredential.user.uid;
+
+      await addDoc(collection(db, 'users'), {
+        uid: userID,
+        username: username
+      });
+      
       setSession(userID);
     } catch (error) {
       console.error("Fehler bei der Registrierung: ", error);
