@@ -10,8 +10,8 @@ import { useSession } from '../../api/firebaseAuthentication/client';
 import { router } from 'expo-router';
 
 export default function LoginModalScreen() {
-  const [hidePassword, setHidePassword] = React.useState(true);
-  const [loginMode, setLoginMode] = React.useState(true);
+  const [hidePassword, setHidePassword] = useState(true);
+  const [loginMode, setLoginMode] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { signIn, signUp, isLoading } = useSession();
@@ -59,12 +59,12 @@ export default function LoginModalScreen() {
           <TextInput placeholder="Password" onChangeText={setPassword} value={password}
             placeholderTextColor={Colors.dark.text} style={gStyles.textInput} secureTextEntry={hidePassword} />
           {hidePassword ?
-            <Pressable onPress={() => setHidePassword(true)} style={gStyles.alignCenter}>
+            <Pressable onPress={() => setHidePassword(false)} style={gStyles.alignCenter}>
               <Eye color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
             </Pressable>
             :
-            <Pressable onPress={() => setHidePassword(false)} style={gStyles.alignCenter}>
-              <EyeOff color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
+            <Pressable onPress={() => setHidePassword(true)} style={gStyles.alignCenter}>
+              <EyeOff color={Colors.dark.text} size={24} style={gStyles.alignCenter}/>
             </Pressable>
           }
         </View>
@@ -75,11 +75,11 @@ export default function LoginModalScreen() {
               <KeyRound color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
               <TextInput placeholder="Repeat Password" placeholderTextColor={Colors.dark.text} style={gStyles.textInput} secureTextEntry={hidePassword} />
               {hidePassword ?
-                <Pressable onPress={() => setHidePassword(true)} style={gStyles.alignCenter}>
+                <Pressable onPress={() => setHidePassword(false)} style={gStyles.alignCenter}>
                   <Eye color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
                 </Pressable>
                 :
-                <Pressable onPress={() => setHidePassword(false)} style={gStyles.alignCenter}>
+                <Pressable onPress={() => setHidePassword(true)} style={gStyles.alignCenter}>
                   <EyeOff color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
                 </Pressable>
               }
