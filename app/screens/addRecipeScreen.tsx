@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextInput, StyleSheet, ScrollView, View, Pressable, Text, Image } from 'react-native';
+import { TextInput, StyleSheet, ScrollView, View, Pressable, Text, Image, Alert } from 'react-native';
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
 import { db } from '../../FirebaseConfig'
@@ -39,7 +39,6 @@ export default function AddRecipeScreen() {
     { key: '8', value: 'x' },
   ];
 
-
   const addImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -58,6 +57,46 @@ export default function AddRecipeScreen() {
       const uri = result.assets[0].uri;
       setImageUri(uri);
     }
+  };
+
+  const takePhoto = async () => {
+    const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
+    if (cameraPermission.status !== 'granted') {
+      alert('Camera permission is required to take a photo.');
+      return;
+    }
+  
+    let result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+  
+    if (result && !result.canceled && result.assets) {
+      const uri = result.assets[0].uri;
+      setImageUri(uri);
+    }
+  };
+
+  const showImagePickerOptions = () => {
+    Alert.alert(
+      "Foto hinzufügen",
+      "Wählen Sie eine Option",
+      [
+        {
+          text: "Foto aufnehmen",
+          onPress: () => takePhoto()
+        },
+        {
+          text: "Bild aus Galerie wählen",
+          onPress: () => addImage()
+        },
+        {
+          text: "Abbrechen",
+          style: "cancel"
+        }
+      ]
+    );
   };
 
   const handleSave = async () => {
@@ -131,7 +170,7 @@ export default function AddRecipeScreen() {
             source={{ uri: imageUri }}
           />
           :
-          <Pressable onPress={addImage} style={({ pressed }) => [styles.addImage, { backgroundColor: pressed ? Colors.dark.background : Colors.dark.mainColorLight },]}>
+          <Pressable onPress={showImagePickerOptions} style={({ pressed }) => [styles.addImage, { backgroundColor: pressed ? Colors.dark.background : Colors.dark.mainColorLight },]}>
             <PlusCircle color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
             <Alata20>Add Image</Alata20>
           </Pressable>
