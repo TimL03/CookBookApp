@@ -7,6 +7,7 @@ import { Share2, PenSquare, Trash2, ArrowUpToLine } from 'lucide-react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Alata20, Alata12, Alata24, Alata14, Alata16 } from '../../components/StyledText';
 import ShareRecipeScreen from './shareRecipeModal';
+import AddRecipeScreen from '../screens/addRecipeScreen';
 import { db } from '../../FirebaseConfig'
 import { doc, setDoc, Timestamp } from 'firebase/firestore';
 
@@ -20,7 +21,7 @@ interface AddRecipeScreenProps {
   closeModal: () => void;
   recipe: {
     id: string;
-    category: string;
+    categories: string[];
     name: string;
     cookHTime: string;
     cookMinTime: string;
@@ -33,6 +34,11 @@ interface AddRecipeScreenProps {
 
 export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreenProps) {
   const [isShareRecipeModalVisible, setIsShareRecipeModalVisible] = useState(false);
+  const [isAddRecipeModalVisible, setIsAddRecipeModalVisible] = useState(false);
+
+  const openEditModal = () => {
+    setIsAddRecipeModalVisible(true);
+  };
 
   const toggleModal = () => {
     setIsShareRecipeModalVisible(!isShareRecipeModalVisible);
@@ -44,7 +50,7 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
 
       await setDoc(recipeRef, {
         name: recipe.name,
-        category: recipe.category,
+        categories: recipe.categories,
         cookHTime: recipe.cookHTime,
         cookMinTime: recipe.cookMinTime,
         imageUrl: recipe.imageUrl,
@@ -67,7 +73,7 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
   ];
 
   return (
-    <View style={[gStyles.defaultContainer, {backgroundColor: Colors.dark.mainColorDark}]}>
+    <View style={[gStyles.defaultContainer, { backgroundColor: Colors.dark.mainColorDark }]}>
       {/* Top bar with close button */}
       <TopModalBar title="From your Cookbook" onClose={closeModal} />
 
@@ -81,30 +87,30 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
 
         {/* Recipe details */}
         <View style={gStyles.fullScreenContentContainer}>
-          
+
           <View>
             {/* Recipe name and action buttons */}
             <View style={gStyles.HorizontalLayout}>
               <Alata24 style={gStyles.flex}>{recipe.name}</Alata24>
               {/* Share button */}
               <Pressable onPress={toggleModal} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                  <Share2 color={Colors.dark.text} size={24} />
-                </Pressable>
-              
-                {/* Push to discover button */}
-                <Pressable onPress={handleDatabaseSave} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                  <ArrowUpToLine color={Colors.dark.text} size={24} />
-                </Pressable>
+                <Share2 color={Colors.dark.text} size={24} />
+              </Pressable>
 
-                {/* Delete button */}
-                <Pressable style={({ pressed }) => [gStyles.iconButton, {backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                  <Trash2 color={Colors.dark.text} size={24} />
-                </Pressable>
+              {/* Push to discover button */}
+              <Pressable onPress={handleDatabaseSave} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                <ArrowUpToLine color={Colors.dark.text} size={24} />
+              </Pressable>
 
-                {/* Edit button */}
-                <Pressable style={({ pressed }) => [gStyles.iconButton, {backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                  <PenSquare color={Colors.dark.text} size={24} />
-                </Pressable>  
+              {/* Delete button */}
+              <Pressable style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                <Trash2 color={Colors.dark.text} size={24} />
+              </Pressable>
+
+              {/* Edit button */}
+              <Pressable onPress={openEditModal} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                <PenSquare color={Colors.dark.text} size={24} />
+              </Pressable>
             </View>
 
             {/* Cook time */}
@@ -157,6 +163,14 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
       >
         {/* Pass closeModal and recipe as props to ShareRecipeScreen */}
         <ShareRecipeScreen closeModal={() => setIsShareRecipeModalVisible(false)} recipe={recipe} />
+      </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isAddRecipeModalVisible}
+        onRequestClose={() => setIsAddRecipeModalVisible(false)}
+      >
+<AddRecipeScreen closeModal={() => setIsAddRecipeModalVisible(false)} recipeToEdit={recipe} userID={recipe.userID} />
       </Modal>
     </View>
   );

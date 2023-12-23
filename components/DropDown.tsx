@@ -18,8 +18,8 @@ type SelectionProps = {
 
 export default function DropDown({ item, selectedUnit, selectedAmount, onSelect }: SelectionProps) {
     const [dropDown, setDropDrown] = React.useState(false);
-    const [unit, setUnit] = React.useState('x');
-    const [amount, setAmount] = React.useState('');
+    const [unit, setUnit] = React.useState(selectedUnit || 'x');
+    const [amount, setAmount] = React.useState(selectedAmount || '');
 
     const activateDropDown = () => {
         setDropDrown(true);
