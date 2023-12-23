@@ -30,6 +30,7 @@ export default function LoginModalScreen() {
   const handleSignUp = async () => {
     if (!loginMode) {
       await signUp(email, password); 
+      router.replace('/');
     } else {
       setLoginMode(false);
     }

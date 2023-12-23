@@ -5,6 +5,7 @@ import { auth } from '../../FirebaseConfig';
 interface AuthContextType {
   session: any; 
   signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<void>;
   signOut: () => void;
   isLoading: boolean;
 }
@@ -12,6 +13,9 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   session: null,
   signIn: async () => {
+    return new Promise<void>((resolve) => resolve());
+  },
+  signUp: async () => {
     return new Promise<void>((resolve) => resolve());
   },
   signOut: () => {},
@@ -44,6 +48,21 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     }
   };
 
+  const signUp = async (email: string, password: string) => {
+    setIsLoading(true);
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userID = userCredential.user.uid; 
+      setSession(userID);
+    } catch (error) {
+      console.error("Fehler bei der Registrierung: ", error);
+      setSession(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const signOut = () => {
     setIsLoading(true);
     // Implementiere die Abmelde-Logik hier
@@ -52,7 +71,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
   };
 
   return (
-    <AuthContext.Provider value={{ session, signIn, signOut, isLoading }}>
+    <AuthContext.Provider value={{ session, signIn, signUp, signOut, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
