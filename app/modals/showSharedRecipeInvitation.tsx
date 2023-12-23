@@ -3,9 +3,18 @@ import { View, StyleSheet, Pressable, Image } from 'react-native';
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
 import { db } from '../../FirebaseConfig'
-import { collection, addDoc, updateDoc, getDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, getDoc, doc, query, where, getDocs } from 'firebase/firestore';
 import { Alata20, } from '../../components/StyledText';
 
+const getUsernameByUserId = async (userId: string) => {
+  const usersRef = collection(db, 'users');
+  const q = query(usersRef, where("uid", "==", userId));
+  const querySnapshot = await getDocs(q);
+
+  if (!querySnapshot.empty) {
+    return querySnapshot.docs[0].data().username;
+  } 
+};
 
 interface ShowSharedRecipeProps {
   invitationData: any;
@@ -19,52 +28,56 @@ interface RecipeData {
 
 export default function ShowSharedRecipeInvitationModalScreen({ invitationData, onClose }: ShowSharedRecipeProps) {
   const [recipeData, setRecipeData] = useState<RecipeData | null>(null);
+  const [senderUsername, setSenderUsername] = useState('');
+
 
   useEffect(() => {
-    async function getRecipeData(recipeId: string) {
+    async function getRecipeAndSenderData() {
       try {
-        const docRef = doc(db, 'recipes', recipeId);
-        const docSnapshot = await getDoc(docRef);
-        if (docSnapshot.exists()) {
-          const recipeData = docSnapshot.data() as RecipeData;
-          setRecipeData(recipeData);
-        } else {
-          console.log('Das Rezept wurde nicht gefunden.');
+        if (invitationData.recipeId) {
+          const recipeDocRef = doc(db, 'recipes', invitationData.recipeId);
+          const recipeDocSnapshot = await getDoc(recipeDocRef);
+          if (recipeDocSnapshot.exists()) {
+            setRecipeData(recipeDocSnapshot.data() as RecipeData);
+          } else {
+            console.log('Das Rezept wurde nicht gefunden.');
+          }
+        }
+
+        if (invitationData.senderId) {
+          const username = await getUsernameByUserId(invitationData.senderId);
+          setSenderUsername(username);
         }
       } catch (error) {
-        console.error('Fehler beim Abrufen des Rezepts:', error);
+        console.error('Fehler beim Abrufen der Daten:', error);
       }
     }
 
-    if (invitationData.recipeId) {
-      getRecipeData(invitationData.recipeId);
-    }
-  }, [invitationData.recipeId]);
+    getRecipeAndSenderData();
+  }, [invitationData.recipeId, invitationData.senderId]);
 
   const handleAccept = async () => {
     try {
-      await updateDoc(doc(db, 'invitations', invitationData.id), {
-        status: 'accepted',
-      });
+        await updateDoc(doc(db, 'invitations', invitationData.id), {
+            status: 'accepted',
+        });
 
-      if (recipeData) {
-        const recipeToDuplicate = await getDoc(doc(db, 'recipes', invitationData.recipeId));
-        if (recipeToDuplicate.exists()) {
-          const recipeData = recipeToDuplicate.data();
+        if (recipeData) {
+            const newRecipeData = {
+                ...recipeData,
+                userID: invitationData.receiverId 
+            };
 
-          const duplicatedRecipeData = { ...recipeData, userID: invitationData.receiverId };
+            const newRecipeRef = await addDoc(collection(db, 'recipes'), newRecipeData);
 
-          const newRecipeRef = await addDoc(collection(db, 'recipes'), duplicatedRecipeData);
-
-          console.log('Duplicated Recipe ID:', newRecipeRef.id);
+            console.log('Neue Rezept-ID:', newRecipeRef.id);
         }
-      }
 
-      onClose();
+        onClose();
     } catch (error) {
-      console.error('Error accepting invitation:', error);
+        console.error('Fehler beim Akzeptieren der Einladung:', error);
     }
-  };
+};
 
   const handleDecline = async () => {
     try {
@@ -81,7 +94,7 @@ export default function ShowSharedRecipeInvitationModalScreen({ invitationData, 
   return (
     <Pressable style={styles.modalContainer}>
       <View style={styles.modalContent}>
-        <Alata20 style={gStyles.alignCenter}>Somebody shared a recipe with you!</Alata20>
+        <Alata20 style={gStyles.alignCenter}>{senderUsername} shared a recipe with you!</Alata20>
         {recipeData && (
           <View>
             <Image source={{ uri: recipeData.imageUrl }} style={{ width: 100, height: 100 }} />

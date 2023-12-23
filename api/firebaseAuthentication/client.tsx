@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { auth, db } from '../../FirebaseConfig';
 
 interface AuthContextType {
@@ -24,6 +24,13 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export const useSession = () => useContext(AuthContext);
+
+const isUsernameUnique = async (username: string) => {
+  const usersRef = collection(db, 'users');
+  const q = query(usersRef, where("username", "==", username));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.empty; // Gibt true zurück, wenn kein Dokument gefunden wurde
+};
 
 interface SessionProviderProps {
   children: ReactNode;
@@ -49,7 +56,12 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
   };
 
   const signUp = async (email: string, password: string, username: string) => {
-    setIsLoading(true);
+
+    if (!await isUsernameUnique(username)) {
+      console.error("Benutzername ist bereits vergeben.");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);

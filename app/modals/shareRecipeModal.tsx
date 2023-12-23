@@ -3,7 +3,7 @@ import { TextInput, StyleSheet, View, Pressable } from 'react-native';
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
 import { db } from '../../FirebaseConfig'
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
 import { Alata20, Alata24 } from '../../components/StyledText';
 import { Send } from 'lucide-react-native';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -11,6 +11,17 @@ import { getRecipeById } from '../../api/cookBookRecipesFirebase/client';
 import { RecipeData } from '../../api/cookBookRecipesFirebase/model';
 import { useSession } from '../../api/firebaseAuthentication/client';
 
+const getUserIdByUsername = async (username: string) => {
+  const usersRef = collection(db, 'users');
+  const q = query(usersRef, where("username", "==", username));
+  const querySnapshot = await getDocs(q);
+
+  if (!querySnapshot.empty) {
+    return querySnapshot.docs[0].data().uid;
+  } else {
+    return null;
+  }
+};
 export default function ShareRecipeScreen() {
   const [recipient, setRecipient] = useState('');
   const [message, setMessage] = useState('');
@@ -40,11 +51,16 @@ export default function ShareRecipeScreen() {
 
   const saveInvitation = async () => {
     try {
-      const invitationsCollection = collection(db, 'recipes');
+      const recipientUserId = await getUserIdByUsername(recipient);
+      if (!recipientUserId) {
+        console.error('Benutzername nicht gefunden.');
+        return;
+      }
 
+      const invitationsCollection = collection(db, 'invitations');
       const invitationData = {
         message,
-        receiverId: recipient,
+        receiverId: recipientUserId,
         recipeId: recipe.id,
         senderId: recipe.userID,
         status: 'pending',
@@ -77,7 +93,7 @@ export default function ShareRecipeScreen() {
         <View style={gStyles.HorizontalLayout}>
           <View style={[gStyles.cardInput,gStyles.flex]}>
             <TextInput
-              placeholder="Recipient (UserID or E-Mail)"
+              placeholder="Recipient (Username)"
               value={recipient}
               onChangeText={text => setRecipient(text)}
               style={gStyles.textInput}
