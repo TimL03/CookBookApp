@@ -1,43 +1,50 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Image, Pressable, Modal } from "react-native";
 import TopModalBar from "../../components/topModalBar";
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
-import { Share2, PenSquare, Trash2, ArrowUpToLine } from 'lucide-react-native';
+import { Share2, PenSquare, Trash2, ArrowUpToLine, ChevronLeft, X } from 'lucide-react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Alata20, Alata12, Alata24, Alata14, Alata16 } from '../../components/StyledText';
-import ShareRecipeScreen from './shareRecipeModal';
+import ShareRecipeScreen from '../modals/shareRecipeModal';
 import { db } from '../../FirebaseConfig'
 import { doc, setDoc, Timestamp } from 'firebase/firestore';
+import { getRecipeById } from '../../api/cookBookRecipesFirebase/client';
+import { useSession } from '../../api/firebaseAuthentication/client';
+import { Link, Stack, router, useLocalSearchParams } from 'expo-router';
+import { RecipeData } from '../../api/cookBookRecipesFirebase/model';
 
-interface Ingredient {
-  name: string;
-  amount: string;
-  unit: string;
-}
-
-interface AddRecipeScreenProps {
-  closeModal: () => void;
-  recipe: {
-    id: string;
-    category: string;
-    name: string;
-    cookHTime: string;
-    cookMinTime: string;
-    description: string;
-    ingredients: Ingredient[];
-    steps: string[];
-    imageUrl: string;
-    userID: string;
-  };
-}
-
-export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreenProps) {
+export default function ViewRecipeScreen() {
   const [isShareRecipeModalVisible, setIsShareRecipeModalVisible] = useState(false);
+  const [recipe, setRecipe] = useState<RecipeData | null>(null);
 
-  const toggleModal = () => {
-    setIsShareRecipeModalVisible(!isShareRecipeModalVisible);
-  };
+  // Get recipe id from router params
+  const params = useLocalSearchParams();
+  
+  // Get user id from session
+  const { session } = useSession();
+  const userID = session;
+
+  // Fetch recipe from database
+  useEffect(() => {
+    const fetchRecipe = async () => {
+      const fetchedRecipe = await getRecipeById(userID.toString(), params.recipeID.toString());
+      setRecipe(fetchedRecipe);
+    };
+
+    fetchRecipe();
+  }, [userID, params.recipeID]);
+ 
+  // If recipe is null (data is still loading), return a View with the same background color
+  if (!recipe) {
+    return (
+      <>
+      <Stack.Screen options={{
+        headerShown: false, }} />
+      <View style={{flex: 1, backgroundColor: Colors.dark.mainColorDark}} />
+      </>
+    );
+  }
 
   const handleDatabaseSave = async () => {
     try {
@@ -68,9 +75,23 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
   ];
 
   return (
+    <>
+    <Stack.Screen options={{ 
+      headerShown: true,
+      title: 'From your Cookbook',
+
+      headerStyle: {
+        backgroundColor: Colors.dark.mainColorDark,
+      },
+      headerRight: () => 
+      <Pressable onPress={router.back} style={({ pressed }) => [ {padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}> 
+        <X color={Colors.dark.text} size={28}/>
+      </Pressable>,
+      headerLeft: () =>
+      <></>
+    }} 
+    />
     <View style={[gStyles.defaultContainer, {backgroundColor: Colors.dark.mainColorDark}]}>
-      {/* Top bar with close button */}
-      <TopModalBar title="From your Cookbook" onClose={closeModal} />
 
       {/* Main content */}
       <ScrollView style={gStyles.fullScreenBackgroundContainer}>
@@ -88,7 +109,7 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
             <View style={gStyles.HorizontalLayout}>
               <Alata24 style={gStyles.flex}>{recipe.name}</Alata24>
               {/* Share button */}
-              <Pressable onPress={toggleModal} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+              <Pressable onPress={() => router.push({pathname: "/modals/shareRecipeModal", params: {recipeID: recipe.id}}  )} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
                   <Share2 color={Colors.dark.text} size={24} />
                 </Pressable>
               
@@ -148,17 +169,7 @@ export default function ViewRecipeScreen({ closeModal, recipe }: AddRecipeScreen
 
         </View>
       </ScrollView>
-
-      {/* Share Recipe Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isShareRecipeModalVisible}
-        onRequestClose={() => setIsShareRecipeModalVisible(false)}
-      >
-        {/* Pass closeModal and recipe as props to ShareRecipeScreen */}
-        <ShareRecipeScreen closeModal={() => setIsShareRecipeModalVisible(false)} recipe={recipe} />
-      </Modal>
     </View>
+    </>
   );
 }

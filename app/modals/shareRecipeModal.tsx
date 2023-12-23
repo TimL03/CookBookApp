@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TextInput, StyleSheet, View, Pressable } from 'react-native';
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
@@ -6,26 +6,37 @@ import { db } from '../../FirebaseConfig'
 import { collection, addDoc } from 'firebase/firestore';
 import { Alata20, Alata24 } from '../../components/StyledText';
 import { Send } from 'lucide-react-native';
+import { router, useLocalSearchParams } from 'expo-router';
+import { getRecipeById } from '../../api/cookBookRecipesFirebase/client';
+import { RecipeData } from '../../api/cookBookRecipesFirebase/model';
+import { useSession } from '../../api/firebaseAuthentication/client';
 
-interface ShareRecipeScreenProps {
-  closeModal: () => void;
-  recipe: {
-    id: string; 
-    name: string;
-    category: string;
-    cookHTime: string;
-    cookMinTime: string;
-    description: string;
-    ingredients: string[];
-    steps: string[];
-    imageUrl: string;
-    userID: string;
-  };
-}
-
-export default function ShareRecipeScreen({ closeModal, recipe }: ShareRecipeScreenProps) {
+export default function ShareRecipeScreen() {
   const [recipient, setRecipient] = useState('');
   const [message, setMessage] = useState('');
+
+  const [recipe, setRecipe] = useState<RecipeData | null>(null);
+
+  // Get recipe id from router params
+  const params = useLocalSearchParams();
+  
+  // Get user id from session
+  const { session } = useSession();
+  const userID = session;
+
+  // Fetch recipe from database
+  useEffect(() => {
+    const fetchRecipe = async () => {
+      const fetchedRecipe = await getRecipeById(userID.toString(), params.recipeID.toString());
+      setRecipe(fetchedRecipe);
+    };
+
+    fetchRecipe();
+  }, [userID, params.recipeID]);
+
+  if(!recipe) {
+    return null;
+  }
 
   const saveInvitation = async () => {
     try {
@@ -40,15 +51,13 @@ export default function ShareRecipeScreen({ closeModal, recipe }: ShareRecipeScr
       };
 
       await addDoc(invitationsCollection, invitationData);
-
-      closeModal();
     } catch (error) {
       console.error('Fehler beim Speichern der Einladung:', error);
     }
   };
 
   return (
-    <Pressable style={gStyles.modalBackgroundContainer} onPress={closeModal}>
+    <Pressable onPress={router.back} style={gStyles.modalBackgroundContainer}>
       <View style={[gStyles.modalContentContainer,{backgroundColor: Colors.dark.background}]}>
         <Alata24 style={gStyles.alignCenter}>Share {recipe.name} Recipe</Alata24>
         <Alata20>Message:</Alata20>
@@ -84,4 +93,5 @@ export default function ShareRecipeScreen({ closeModal, recipe }: ShareRecipeScr
       </View>
     </Pressable>
   )
+  
 }

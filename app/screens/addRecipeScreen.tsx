@@ -10,13 +10,16 @@ import { Alata16, Alata20, Alata12, AlataText } from '../../components/StyledTex
 import { X, PlusCircle, Plus, Save, ChevronDown } from 'lucide-react-native';
 import TopModalBar from '../../components/topModalBar';
 import DropDown from '../../components/DropDown';
+import { useSession } from '../../api/firebaseAuthentication/client';
+import { uploadImage } from '../../api/cookBookRecipesFirebase/client';
+import { Stack, useRouter } from 'expo-router';
 
-interface AddRecipeScreenProps {
-  closeModal: () => void;
-  userID: string | null;
-}
-
-export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenProps) {
+export default function AddRecipeScreen() {
+  const router = useRouter();
+   // Get user id from session
+   const { session } = useSession();
+   const userID = session;
+   
   const [name, setName] = useState('');
   const [cookHTime, setCookHTime] = useState('');
   const [cookMinTime, setCookMinTime] = useState('');
@@ -57,18 +60,6 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
     }
   };
 
-  const uploadImage = async (uri: string, recipeName: string) => {
-    const response = await fetch(uri);
-    const blob = await response.blob();
-
-    const storage = getStorage();
-    const imagePath = `images/${recipeName}/${Date.now()}.jpg`;
-    const storageRef = ref(storage, imagePath);
-
-    const snapshot = await uploadBytes(storageRef, blob);
-    return await getDownloadURL(snapshot.ref);
-  };
-
   const handleSave = async () => {
     try {
       let imageUrl = '';
@@ -87,7 +78,7 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
         userID
       });
       console.log('Dokument geschrieben mit ID: ', docRef.id);
-      closeModal();
+      router.back();
     } catch (e) {
       console.error('Fehler beim Hinzufügen des Dokuments: ', e);
     }
@@ -113,10 +104,23 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
 
 
   return (
+    <>
+    <Stack.Screen options={{ 
+      headerShown: true,
+      title: 'Add a Recipe',
+      headerStyle: {
+        backgroundColor: Colors.dark.mainColorDark,
+      },
+      headerRight: () => 
+      <Pressable onPress={router.back} style={({ pressed }) => [ {padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}> 
+        <X color={Colors.dark.text} size={28}/>
+      </Pressable>,
+      headerLeft: () =>
+      <></>
+    }} 
+    />
+    
     <View style={[gStyles.defaultContainer, {backgroundColor: Colors.dark.mainColorDark}]}>
-      {/* Top bar with close button */}
-      <TopModalBar title="Add Recipe" onClose={closeModal} />
-
       {/* Main content */}
       <ScrollView style={[gStyles.fullScreenBackgroundContainer, {backgroundColor: Colors.dark.background}]} keyboardShouldPersistTaps='handled'>
 
@@ -241,6 +245,7 @@ export default function AddRecipeScreen({ closeModal, userID }: AddRecipeScreenP
         </View>
       </ScrollView>
     </View>
+    </>
   );
 }
 

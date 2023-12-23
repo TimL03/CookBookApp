@@ -7,7 +7,8 @@ import gStyles from '../constants/Global_Styles'
 import { DarkTheme } from '@react-navigation/native';
 import { View } from './Themed';
 import { Alata20, Alata12 } from './StyledText';
-import ViewRecipeScreen from '../app/modals/viewRecipeModal';
+import ViewRecipeScreen from '../app/screens/viewRecipeScreen';
+import { router } from 'expo-router';
 
 interface Ingredient {
     name: string;
@@ -46,6 +47,8 @@ const CategoryIcon: React.FC<CategoryIconProps> = ({ category }) => {
             return null;
     }
 };
+
+
 export default function Recipe({ item }: RecipeProps) {
     const [isModalVisible, setModalVisible] = useState(false);
 
@@ -54,7 +57,7 @@ export default function Recipe({ item }: RecipeProps) {
     };
 
     return (
-        <TouchableOpacity onPress={toggleModal} style={styles.outerBox} activeOpacity={0.2}>
+        <TouchableOpacity onPress={() => router.push({pathname: "/screens/viewRecipeScreen", params: {recipeID: item.id}}  )} style={styles.outerBox} activeOpacity={0.2}>
             <Image
                 style={gStyles.imageSmall}
                 source={item.imageUrl == '' ? require("../assets/images/no-image.png") : { uri: item.imageUrl }}
@@ -71,15 +74,7 @@ export default function Recipe({ item }: RecipeProps) {
                     <CategoryIcon category={item.category} />
                 </View>
             </View>
-
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={isModalVisible}
-                onRequestClose={toggleModal}
-            >
-                <ViewRecipeScreen closeModal={toggleModal} recipe={item} />
-            </Modal>
+            
         </TouchableOpacity>
     )
 }

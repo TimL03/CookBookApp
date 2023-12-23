@@ -23,3 +23,7 @@ export type RecipeData = {
   imageUrl: string;
   userID: string; 
 };  
+
+export type GroupedByCategory = {
+  [key: string]: RecipeData[];
+};
