@@ -44,10 +44,10 @@ export default function ViewFeedRecipeScreen({ closeModal, recipe }: FeedRecipeS
   // State variables
   const [isShareRecipeModalVisible, setIsShareRecipeModalVisible] = useState(false);
   const [isRatingModalVisible, setIsRatingModalVisible] = useState(false);
-  const [sortedRatings, setSortedRatings] = useState<Array<{ id: string; userID: string; rating: number; comment: string; timestamp: Timestamp }>>([]);
+  const [sortedRatings, setSortedRatings] = useState<Array<{ id: string; username: string; rating: number; comment: string; timestamp: Timestamp }>>([]);
 
   // Function to sort ratings by timestamp
-  const sortRatingsByTimestamp = (ratings: Array<{ id: string, userID: string, rating: number, comment: string, timestamp: Timestamp }>) => {
+  const sortRatingsByTimestamp = (ratings: Array<{ id: string, username: string, rating: number, comment: string, timestamp: Timestamp }>) => {
     return ratings.sort((a, b) => b.timestamp - a.timestamp);
   };
 
@@ -55,26 +55,41 @@ export default function ViewFeedRecipeScreen({ closeModal, recipe }: FeedRecipeS
   useEffect(() => {
     const fetchRatings = async () => {
       try {
-        // Fetch ratings data from Firebase
+        // Holen Sie alle Benutzerdaten
+        const usersSnapshot = await getDocs(collection(db, 'users'));
+        const usersMap = new Map();
+        usersSnapshot.forEach(doc => {
+          const userData = doc.data();
+          usersMap.set(userData.uid, userData.username);
+        });
+  
+        // Holen Sie die Bewertungen für das Rezept
         const recipeRef = doc(db, 'feed', recipe.id);
         const ratingsCollectionRef = collection(recipeRef, 'ratings');
         const ratingsSnapshot = await getDocs(ratingsCollectionRef);
-        const ratingsData: Array<{ id: string, userID: string, rating: number, comment: string, timestamp: Timestamp }> = [];
-
-        // Extract data from snapshot
-        ratingsSnapshot.forEach((ratingDoc) => {
-          ratingsData.push({ id: ratingDoc.id, ...ratingDoc.data() as { userID: string, rating: number, comment: string, timestamp: Timestamp } });
+  
+        // Extrahieren und Zuordnen der Bewertungsdaten
+        let ratingsData = [];
+        ratingsSnapshot.forEach(ratingDoc => {
+          const ratingData = ratingDoc.data();
+          const username = usersMap.get(ratingData.userID) || 'Unbekannter Benutzer';
+          ratingsData.push({
+            id: ratingDoc.id,
+            username, // Verwenden Sie den Benutzernamen anstelle von userID
+            rating: ratingData.rating,
+            comment: ratingData.comment,
+            timestamp: ratingData.timestamp
+          });
         });
-
-        // Sort ratings by timestamp
-        const sortedRatings = sortRatingsByTimestamp(ratingsData);
-        setSortedRatings(sortedRatings);
+  
+        // Sortieren und Zustand setzen
+        ratingsData = sortRatingsByTimestamp(ratingsData);
+        setSortedRatings(ratingsData);
       } catch (error) {
         console.error('Error fetching ratings:', error);
       }
     };
-
-    // Call the fetchRatings function
+  
     fetchRatings();
   }, []);
 
@@ -229,7 +244,7 @@ export default function ViewFeedRecipeScreen({ closeModal, recipe }: FeedRecipeS
             <Alata20>Latest Ratings:</Alata20>
             {sortedRatings.map((rating, index) => (
               <View key={index}>
-                <Alata16>{`${rating.userID} rated ${rating.rating} stars: ${rating.comment} ${rating.timestamp.toDate().toLocaleString()}`} </Alata16>
+                <Alata16>{`${rating.username} rated ${rating.rating} stars: ${rating.comment} ${rating.timestamp.toDate().toLocaleString()}`} </Alata16>
               </View>
             ))}
           </View>
