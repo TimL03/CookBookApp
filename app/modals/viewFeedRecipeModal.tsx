@@ -55,7 +55,6 @@ export default function ViewFeedRecipeScreen({ closeModal, recipe }: FeedRecipeS
   useEffect(() => {
     const fetchRatings = async () => {
       try {
-        // Holen Sie alle Benutzerdaten
         const usersSnapshot = await getDocs(collection(db, 'users'));
         const usersMap = new Map();
         usersSnapshot.forEach(doc => {
@@ -63,19 +62,17 @@ export default function ViewFeedRecipeScreen({ closeModal, recipe }: FeedRecipeS
           usersMap.set(userData.uid, userData.username);
         });
   
-        // Holen Sie die Bewertungen für das Rezept
         const recipeRef = doc(db, 'feed', recipe.id);
         const ratingsCollectionRef = collection(recipeRef, 'ratings');
         const ratingsSnapshot = await getDocs(ratingsCollectionRef);
   
-        // Extrahieren und Zuordnen der Bewertungsdaten
         let ratingsData = [];
         ratingsSnapshot.forEach(ratingDoc => {
           const ratingData = ratingDoc.data();
-          const username = usersMap.get(ratingData.userID) || 'Unbekannter Benutzer';
+          const username = usersMap.get(ratingData.userID) || 'Unknown';
           ratingsData.push({
             id: ratingDoc.id,
-            username, // Verwenden Sie den Benutzernamen anstelle von userID
+            username, 
             rating: ratingData.rating,
             comment: ratingData.comment,
             timestamp: ratingData.timestamp
