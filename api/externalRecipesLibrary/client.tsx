@@ -70,6 +70,19 @@ export const useGetRandomMeal = (selectedIngredients: string, selectedCategories
 
   const fetchMeal = async () => {
     try {
+
+      if (selectedIngredients === '' && selectedCategories === '') {
+        const randomResponse = await fetch('https://www.themealdb.com/api/json/v1/1/random.php');
+        const randomData = await randomResponse.json();
+
+        if (randomData.meals) {
+          setSelectedMeal(randomData.meals[0]);
+        } else {
+          alert("Details for the selected meal not found!");
+        }
+        return;
+      }
+      
       console.log('Selected Ingredients:', selectedIngredients);
       console.log('Selected Categories:', selectedCategories);
       const responseIngredients = await fetch(`https://www.themealdb.com/api/json/v2/9973533/filter.php?i=${selectedIngredients}`);
