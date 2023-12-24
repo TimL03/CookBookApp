@@ -124,7 +124,11 @@ export default function TabOneScreen() {
     const selectedAPICategories = ItemListToCSVString(selectedCategories);
 
     await fetchMeal();
+    if (selectedMeal) {
   	setModalVisible(true);
+  } else {
+    alert('Kein Rezept gefunden. Bitte versuchen Sie es erneut.');
+}
   };
 
   const findNewRecipe = () => {
@@ -185,11 +189,13 @@ export default function TabOneScreen() {
             <Alata20 style={styles.margin}>Select Ingredients:</Alata20>
             <SearchBarSelector
               selectedItems={selectedIngredients} 
-              setSelectedItems={setSelectedIngredients} />
+              setSelectedItems={setSelectedIngredients}
+              singleSelection={false} />
             <Alata20 style={styles.margin}>Select Categories:</Alata20>
             <SearchBarSelector
               selectedItems={selectedCategories} 
-              setSelectedItems={setSelectedCategories} />
+              setSelectedItems={setSelectedCategories} 
+              singleSelection={true}/>
           </View>
         )}
         {searchMode === 'cookbook' && (

@@ -6,7 +6,7 @@ import gStyles from "../constants/Global_Styles";
 import Colors from "../constants/Colors";
 import { Alata12 } from "./StyledText";
 
-export default function SearchBarSelector({ selectedItems, setSelectedItems }: { selectedItems: Item[], setSelectedItems: React.Dispatch<React.SetStateAction<Item[]>> }) {
+export default function SearchBarSelector({ selectedItems, setSelectedItems, singleSelection }: { selectedItems: Item[], setSelectedItems: React.Dispatch<React.SetStateAction<Item[]>>, singleSelection?: boolean }) {
     const [search, setSearch] = useState(false);
     const [searchCriteria, setSearchCriteria] = useState('');
 
@@ -20,11 +20,17 @@ export default function SearchBarSelector({ selectedItems, setSelectedItems }: {
 
     const toggleSelected = (key: string) => {
         setSelectedItems(prevItems => 
-            prevItems.map(item => 
-                item.key === key ? { ...item, selected: !item.selected } : item
-            )
+          prevItems.map(item => {
+            if (item.key === key) {
+              return { ...item, selected: !item.selected };
+            } else if (singleSelection) {
+              return { ...item, selected: false };
+            } else {
+              return item;
+            }
+          })
         );
-    }
+      };
 
     const isSelected = (key: string) => {
         return selectedItems.find(item => item.key === key)?.selected;
