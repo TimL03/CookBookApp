@@ -1,10 +1,116 @@
 import { useState, useEffect } from 'react';
 import { db } from '../../FirebaseConfig';
-import { getCurrentUserId } from '../firebaseAuthentication/client';
 import { collection, getDocs, where, query, onSnapshot, doc, getDoc, addDoc } from 'firebase/firestore';
 import { GroupedByCategory, RecipeData } from './model';
 import Recipe from '../../components/RecipeFeedElement';
 import { getStorage, ref, uploadBytes, getDownloadURL } from '@firebase/storage';
+import { useSession } from '../../api/firebaseAuthentication/client';
+
+export const useFirebaseIngredients = () => {
+  const [currentList, setCurrentList] = useState<{ key: string; value: string; selected: boolean; }[]>([]);
+  const { session } = useSession();
+  const userID = session;
+
+  useEffect(() => {
+    const fetchIngredientsFromFirebase = async () => {
+      try {
+        const q = query(collection(db, 'recipes'), where('userID', '==', userID));
+        const recipesSnapshot = await getDocs(q);
+        const recipes = recipesSnapshot.docs.map((doc) => doc.data());
+
+        const FirebaseIngredientsList = new Set();
+        recipes.forEach((recipe) => {
+          recipe.ingredients.forEach((ingredient: any) => {
+            FirebaseIngredientsList.add(ingredient.name);
+          });
+        });
+
+        const FirebaseIngredients = Array.from(FirebaseIngredientsList).map((ingredient, index): { key: string; value: string; selected: boolean } => ({
+          key: index.toString(),
+          value: ingredient as string,
+          selected: false,
+        }));
+
+
+        setCurrentList(FirebaseIngredients);
+      } catch (error) {
+        console.error('Error fetching user recipes:', error);
+      }
+    };
+
+    fetchIngredientsFromFirebase();
+  }, [userID]);
+
+  return currentList;
+};
+
+export const useFirebaseCategories = () => {
+  const [currentList, setCurrentList] = useState<{ key: string; value: string; selected: boolean; }[]>([]);
+  const { session } = useSession();
+  const userID = session;
+
+  useEffect(() => {
+    const fetchCategoriesFromFirebase = async () => {
+      try {
+        const q = query(collection(db, 'recipes'), where('userID', '==', userID));
+        const recipesSnapshot = await getDocs(q);
+        const recipes = recipesSnapshot.docs.map((doc) => doc.data());
+
+        const firebaseCategoriesSet = new Set();
+        recipes.forEach((recipe) => {
+          if (recipe.categories) {
+            recipe.categories.forEach((category: string) => {
+              firebaseCategoriesSet.add(category);
+            });
+          }
+        });
+
+        const firebaseCategories = Array.from(firebaseCategoriesSet).map((category, index) => ({
+          key: index.toString(),
+          value: category as string,
+          selected: false,
+        }));
+
+        setCurrentList(firebaseCategories);
+      } catch (error) {
+        console.error('Error fetching categories from user recipes:', error);
+      }
+    };
+
+    fetchCategoriesFromFirebase();
+  }, [userID]);
+
+  return currentList;
+};
+
+export const searchRecipesInFirebase = async (selectedIngredients: string[], selectedCategories: string[], userID: string) => {
+
+  try {
+    const recipesCollection = collection(db, 'recipes');
+
+    let queries = [];
+    if (selectedIngredients.length > 0) {
+      queries.push(query(recipesCollection, where('ingredientNames', 'array-contains-any', selectedIngredients), where('userID', '==', userID)));
+    }
+    if (selectedCategories.length > 0) {
+      queries.push(query(recipesCollection, where('categories', 'array-contains-any', selectedCategories), where('userID', '==', userID)));
+    }
+
+    // Kombinieren der Ergebnisse aus beiden Abfragen
+    const querySnapshots = await Promise.all(queries.map(q => getDocs(q)));
+    const combinedRecipes = new Map();
+    querySnapshots.forEach(snapshot => {
+      snapshot.docs.forEach(doc => {
+        combinedRecipes.set(doc.id, doc.data());
+      });
+    });
+
+    return Array.from(combinedRecipes.values());
+  } catch (error) {
+    console.error('Fehler bei der Suche nach Rezepten in Firebase:', error);
+    return [];
+  }
+};
 
 //Returns all recipes from the database that belong to the current user
 export function useRecipes(userID: string | null) {
@@ -17,7 +123,7 @@ export function useRecipes(userID: string | null) {
         const recipes: RecipeData[] = [];
         querySnapshot.forEach((doc) => {
           const recipeData = doc.data() as Omit<RecipeData, 'id'>;
-          console.log("Fetched recipe data:", recipeData); 
+          console.log("Fetched recipe data:", recipeData);
           recipes.push({ id: doc.id, ...recipeData });
         });
 
@@ -75,43 +181,6 @@ export const uploadImage = async (uri: string, recipeName: string) => {
   return await getDownloadURL(snapshot.ref);
 };
 
-const searchRecipesInFirebase = async (selectedIngredients: string[], selectedCategory: string) => {
-  try {
-    const userId = await getCurrentUserId();
-
-    if (!userId) {
-      console.error('Benutzer ist nicht angemeldet.');
-      return null;
-    }
-
-    const recipesCollection = collection(db, 'recipes');
-
-    const q = query(
-      recipesCollection,
-      where('category', '==', selectedCategory),
-      where('userID', '==', userId),
-    );
-
-    const querySnapshot = await getDocs(q);
-
-    if (querySnapshot.empty) {
-      console.log('Kein passendes Rezept gefunden.');
-      return null;
-    }
-
-    const matchingRecipes = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-    const randomIndex = Math.floor(Math.random() * matchingRecipes.length);
-    const matchingRecipe = matchingRecipes[randomIndex];
-
-    return matchingRecipe;
-  } catch (error) {
-    console.error('Fehler bei der Suche nach Rezepten in Firebase:', error);
-    return null;
-  }
-};
-
-export { searchRecipesInFirebase };
 
 
 
