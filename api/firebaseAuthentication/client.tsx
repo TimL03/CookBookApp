@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs, doc, getDoc } from "firebase/firestore";
 import { auth, db } from '../../FirebaseConfig';
 
 interface AuthContextType {
@@ -29,7 +29,7 @@ const isUsernameUnique = async (username: string) => {
   const usersRef = collection(db, 'users');
   const q = query(usersRef, where("username", "==", username));
   const querySnapshot = await getDocs(q);
-  return querySnapshot.empty; // Gibt true zurück, wenn kein Dokument gefunden wurde
+  return querySnapshot.empty; 
 };
 
 interface SessionProviderProps {
@@ -48,7 +48,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
       const userID = userCredential.user.uid;
       setSession(userID);
     } catch (error) {
-      console.error("Fehler bei der Anmeldung: ", error);
+      alert("E-Mail or password is wrong");
       setSession(null);
     } finally {
       setIsLoading(false);
@@ -58,7 +58,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
   const signUp = async (email: string, password: string, username: string) => {
 
     if (!await isUsernameUnique(username)) {
-      console.error("Benutzername ist bereits vergeben.");
+      alert("Username is already in use.");
       setIsLoading(false);
       return;
     }
@@ -74,7 +74,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
       
       setSession(userID);
     } catch (error) {
-      console.error("Fehler bei der Registrierung: ", error);
+      alert("Error with registration");
       setSession(null);
     } finally {
       setIsLoading(false);
@@ -83,7 +83,6 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
 
   const signOut = () => {
     setIsLoading(true);
-    // Implementiere die Abmelde-Logik hier
     setSession(null);
     setIsLoading(false);
   };

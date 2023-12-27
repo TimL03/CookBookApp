@@ -53,7 +53,7 @@ export default function ShareRecipeScreen() {
     try {
       const recipientUserId = await getUserIdByUsername(recipient);
       if (!recipientUserId) {
-        console.error('Benutzername nicht gefunden.');
+        alert('Username not found!');
         return;
       }
 
@@ -68,7 +68,7 @@ export default function ShareRecipeScreen() {
 
       await addDoc(invitationsCollection, invitationData);
     } catch (error) {
-      console.error('Fehler beim Speichern der Einladung:', error);
+      alert('Error by sending the recipe!');
     }
   };
 

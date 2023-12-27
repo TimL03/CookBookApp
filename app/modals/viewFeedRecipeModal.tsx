@@ -97,12 +97,6 @@ export default function ViewFeedRecipeScreen({ closeModal, recipe }: FeedRecipeS
       const user = auth.currentUser;
       const userID = user ? user.uid : null;
 
-      // Check if user is authenticated
-      if (!userID) {
-        console.error('User not authenticated.');
-        return;
-      }
-
       // Prepare data for rating submission
       const recipeRef = doc(db, 'feed', recipe.id);
       const ratingsCollectionRef = collection(recipeRef, 'ratings');
@@ -135,12 +129,6 @@ export default function ViewFeedRecipeScreen({ closeModal, recipe }: FeedRecipeS
       // Get current user
       const user = auth.currentUser;
       const userID = user ? user.uid : null;
-
-      // Check if user is authenticated
-      if (!userID) {
-        console.error('User not authenticated.');
-        return;
-      }
 
       // Save recipe data to Firebase
       const recipeRef = doc(db, 'recipes', recipe.id);

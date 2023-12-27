@@ -26,7 +26,6 @@ export default function aboutScreen() {
   const [authData, setAuthData] = useState<AuthData | null>(null);
   const [newPassword, setNewPassword] = useState('');
   const [isPasswordChangeVisible, setIsPasswordChangeVisible] = useState(false);
-  const [oldPassword, setOldPassword] = useState('');
 
   useEffect(() => {
     const fetchFirestoreData = async () => {
@@ -37,7 +36,6 @@ export default function aboutScreen() {
       if (!querySnapshot.empty) {
         const userDocData = querySnapshot.docs[0].data();
 
-        // Typüberprüfung
         if ('username' in userDocData) {
           const userDocument: UserData = {
             username: userDocData.username,
@@ -61,7 +59,6 @@ export default function aboutScreen() {
         const authInfo: AuthData = {
           email: currentUser.email || 'Keine E-Mail vorhanden',
           uid: currentUser.uid,
-          // andere benötigte Felder
         };
         setAuthData(authInfo);
         console.log('Firebase Auth-Benutzerdaten:', authInfo);

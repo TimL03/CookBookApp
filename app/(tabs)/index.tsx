@@ -70,7 +70,7 @@ export default function TabOneScreen() {
       setSelectedFirebaseRecipe(matchingRecipes[0]);
       router.push("/screens/viewRecipeScreen")
       } else {
-      alert('Kein Rezept gefunden. Bitte versuchen Sie es erneut.');
+      alert('No meal found!. Please try again.');
     }
   };
 
@@ -84,7 +84,7 @@ const getMeal = async () => {
   if (selectedMeal) {
     setModalVisible(true);
   } else {
-    alert('Kein Rezept gefunden. Bitte versuchen Sie es erneut.');
+    alert('No meal found!. Please try again.');
   }
 };
 
