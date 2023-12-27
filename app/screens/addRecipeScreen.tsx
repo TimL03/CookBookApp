@@ -171,17 +171,19 @@ export default function AddRecipeScreen({ closeModal, userID, recipeToEdit }: Ad
       <ScrollView style={[gStyles.fullScreenBackgroundContainer, { backgroundColor: Colors.dark.background }]} keyboardShouldPersistTaps='handled'>
 
         {/* Recipe image selection */}
-        {imageUri != null ?
-          <Image
-            style={gStyles.image}
-            source={{ uri: imageUri }}
-          />
-          :
-          <Pressable onPress={addImage} style={({ pressed }) => [styles.addImage, { backgroundColor: pressed ? Colors.dark.background : Colors.dark.mainColorLight },]}>
-            <PlusCircle color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
-            <Alata20>Add Image</Alata20>
-          </Pressable>
-        }
+        <Pressable onPress={addImage}>
+          {imageUri != null ?
+            <Image
+              style={gStyles.image}
+              source={{ uri: imageUri }}
+            />
+            :
+            <View>
+              <PlusCircle color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
+              <Alata20>Add Image</Alata20>
+            </View>
+          }
+        </Pressable>
 
 
         <View style={[gStyles.fullScreenContentContainerLessGap]}>
