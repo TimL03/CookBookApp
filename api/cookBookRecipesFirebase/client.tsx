@@ -84,11 +84,10 @@ export const useFirebaseCategories = () => {
 };
 
 export const searchRecipesInFirebase = async (selectedIngredients: string[], selectedCategories: string[], userID: string) => {
-
   try {
     const recipesCollection = collection(db, 'recipes');
-
     let queries = [];
+
     if (selectedIngredients.length > 0) {
       queries.push(query(recipesCollection, where('ingredientNames', 'array-contains-any', selectedIngredients), where('userID', '==', userID)));
     }
@@ -96,7 +95,10 @@ export const searchRecipesInFirebase = async (selectedIngredients: string[], sel
       queries.push(query(recipesCollection, where('categories', 'array-contains-any', selectedCategories), where('userID', '==', userID)));
     }
 
-    // Kombinieren der Ergebnisse aus beiden Abfragen
+    if (queries.length === 0) {
+      queries.push(query(recipesCollection, where('userID', '==', userID)));
+    }
+
     const querySnapshots = await Promise.all(queries.map(q => getDocs(q)));
     const combinedRecipes = new Map();
     querySnapshots.forEach(snapshot => {
@@ -105,12 +107,18 @@ export const searchRecipesInFirebase = async (selectedIngredients: string[], sel
       });
     });
 
-    return Array.from(combinedRecipes.values());
+    const allRecipes = Array.from(combinedRecipes.values());
+    if (allRecipes.length === 0) {
+      return null; 
+    }
+    const randomIndex = Math.floor(Math.random() * allRecipes.length);
+    return allRecipes[randomIndex];
   } catch (error) {
     console.error('Fehler bei der Suche nach Rezepten in Firebase:', error);
-    return [];
+    return null;
   }
 };
+
 
 //Returns all recipes from the database that belong to the current user
 export function useRecipes(userID: string | null) {
