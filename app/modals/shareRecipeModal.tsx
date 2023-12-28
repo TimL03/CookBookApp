@@ -22,6 +22,8 @@ const getUserIdByUsername = async (username: string) => {
     return null;
   }
 };
+
+
 export default function ShareRecipeScreen() {
   const [recipient, setRecipient] = useState('');
   const [message, setMessage] = useState('');

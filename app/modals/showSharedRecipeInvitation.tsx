@@ -5,6 +5,7 @@ import gStyles from '../../constants/Global_Styles';
 import { db } from '../../FirebaseConfig'
 import { collection, addDoc, updateDoc, getDoc, doc, query, where, getDocs } from 'firebase/firestore';
 import { Alata20, } from '../../components/StyledText';
+import RecipeElement from '../../components/RecipeElement';
 
 const getUsernameByUserId = async (userId: string) => {
   const usersRef = collection(db, 'users');
@@ -92,21 +93,17 @@ export default function ShowSharedRecipeInvitationModalScreen({ invitationData, 
   };
 
   return (
-    <Pressable style={styles.modalContainer}>
-      <View style={styles.modalContent}>
+    <Pressable style={gStyles.modalBackgroundContainer}>
+      <View style={[gStyles.modalContentContainer,{backgroundColor: Colors.dark.background}]}>
         <Alata20 style={gStyles.alignCenter}>{senderUsername} shared a recipe with you!</Alata20>
         {recipeData && (
-          <View>
-            <Image source={{ uri: recipeData.imageUrl }} style={{ width: 100, height: 100 }} />
-            <Alata20>{recipeData.name}</Alata20>
-          </View>
+          <RecipeElement item={recipeData} />
         )}
-        <Pressable onPress={handleAccept}>
-          <Alata20>Accept</Alata20>
+        <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]} onPress={handleAccept}>
+          <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Accept Shared Recipe</Alata20>
         </Pressable>
-
-        <Pressable onPress={handleDecline}>
-          <Alata20 style={{ paddingBottom: 4 }}>Decline</Alata20>
+        <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.alertPressed : Colors.dark.alert }]} onPress={handleDecline}>
+          <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Decline Shared Recipe</Alata20>
         </Pressable>
       </View>
     </Pressable>

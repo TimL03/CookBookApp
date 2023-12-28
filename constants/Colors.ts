@@ -26,6 +26,8 @@ export default {
     tint: '#5EAF97',
     tabIconDefault: '#8499B1',
     tabIconSelected: '#DDE5E8',
+    alert: '#DC544B',
+    alertPressed: '#C1342B',
     seeThrough: 'rgba(0,0,0,0)',
   },
 };

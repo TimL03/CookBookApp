@@ -3,12 +3,14 @@ import { Modal, Platform, Pressable, StyleSheet, Alert, TextInput, Button } from
 import { Text, View } from '../../components/Themed';
 import React, { useEffect, useState } from 'react';
 import { Link, Stack } from 'expo-router';
-import { ChevronLeft } from 'lucide-react-native'
+import { ChevronLeft, Eye, EyeOff, KeyRound, UserCircle2Icon } from 'lucide-react-native'
 import Colors from '../../constants/Colors';
 import { getAuth, updateEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { useSession } from '../../api/firebaseAuthentication/client';
 import { db } from '../../FirebaseConfig';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { Alata16, Alata20 } from '../../components/StyledText';
+import gStyles from '../../constants/Global_Styles';
 
 interface UserData {
   username: string;
@@ -25,7 +27,9 @@ export default function aboutScreen() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [authData, setAuthData] = useState<AuthData | null>(null);
   const [newPassword, setNewPassword] = useState('');
+  const [newPasswordRepeat, setNewPasswordRepeat] = useState('');
   const [isPasswordChangeVisible, setIsPasswordChangeVisible] = useState(false);
+  const [hidePassword, setHidePassword] = useState(true);
 
   useEffect(() => {
     const fetchFirestoreData = async () => {
@@ -57,11 +61,10 @@ export default function aboutScreen() {
 
       if (currentUser) {
         const authInfo: AuthData = {
-          email: currentUser.email || 'Keine E-Mail vorhanden',
+          email: currentUser.email || 'no saved email',
           uid: currentUser.uid,
         };
         setAuthData(authInfo);
-        console.log('Firebase Auth-Benutzerdaten:', authInfo);
       }
     };
 
@@ -76,13 +79,18 @@ export default function aboutScreen() {
     const user = auth.currentUser;
 
     if (user) {
-      updatePassword(user, newPassword).then(() => {
-        Alert.alert('Erfolg', 'Passwort erfolgreich geändert');
-      }).catch((error) => {
-        Alert.alert('Fehler', error.message);
-      });
+      if(newPassword === newPasswordRepeat) {
+        updatePassword(user, newPassword).then(() => {
+          setIsPasswordChangeVisible(false);
+          Alert.alert('Success', 'successfully changed password');
+        }).catch((error) => {
+          Alert.alert('Fehler', error.message);
+        });
+      } else {
+        Alert.alert('Fehler', 'passwords do not match');
+      }
     } else {
-      Alert.alert('Fehler', 'Kein Benutzer angemeldet');
+      Alert.alert('Fehler', 'no user found');
     }
   };
 
@@ -101,30 +109,52 @@ export default function aboutScreen() {
       }}
       />
       <View style={styles.container}>
-        <Text style={styles.title}>Account</Text>
-        <Text style={styles.infoText}>Username: {userData ? userData.username : 'Lädt...'}</Text>
-        <Text style={styles.infoText}>E-Mail: {authData ? authData.email : 'Lädt...'}</Text>
-        <Text style={styles.infoText}>UID: {authData ? authData.uid : 'Lädt...'}</Text>
-        <Link href="/">
-          <Text style={styles.linkText}>Go to home screen!</Text>
-        </Link>
+        <UserCircle2Icon size={80} strokeWidth={1.6} color={Colors.dark.text} />
+        <Alata20>Currently logged in as {userData ? userData.username : 'Lädt...'}</Alata20>
+        <Alata16>E-Mail: {authData ? authData.email : 'Lädt...'}</Alata16>
+        <Alata16>UID: {authData ? authData.uid : 'Lädt...'}</Alata16>
       </View>
-      <View>
-        <Button
-          title={isPasswordChangeVisible ? "Passwort ändern verbergen" : "Passwort ändern"}
-          onPress={() => setIsPasswordChangeVisible(!isPasswordChangeVisible)}
-        />
+      <View style={styles.buttonContainer}>
+        
         {isPasswordChangeVisible && (
           <>
-            <TextInput
-              placeholder="Neues Passwort"
-              secureTextEntry
-              value={newPassword}
-              onChangeText={setNewPassword}
-            />
-            <Button title="Passwort aktualisieren" onPress={handleChangePassword} />
+            <View style={gStyles.cardInput}>
+              <KeyRound color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
+              <TextInput placeholder="new password" onChangeText={setNewPassword} value={newPassword}
+                placeholderTextColor={Colors.dark.text} style={gStyles.textInput} secureTextEntry={hidePassword} />
+              {hidePassword ?
+                <Pressable onPress={() => setHidePassword(false)} style={gStyles.alignCenter}>
+                  <Eye color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
+                </Pressable>
+                :
+                <Pressable onPress={() => setHidePassword(true)} style={gStyles.alignCenter}>
+                  <EyeOff color={Colors.dark.text} size={24} style={gStyles.alignCenter}/>
+                </Pressable>
+              }
+            </View>
+            <View style={gStyles.cardInput}>
+              <KeyRound color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
+              <TextInput placeholder="repeat new password" onChangeText={setNewPasswordRepeat} value={newPasswordRepeat}
+                placeholderTextColor={Colors.dark.text} style={gStyles.textInput} secureTextEntry={hidePassword} />
+              {hidePassword ?
+                <Pressable onPress={() => setHidePassword(false)} style={gStyles.alignCenter}>
+                  <Eye color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
+                </Pressable>
+                :
+                <Pressable onPress={() => setHidePassword(true)} style={gStyles.alignCenter}>
+                  <EyeOff color={Colors.dark.text} size={24} style={gStyles.alignCenter}/>
+                </Pressable>
+              }
+            </View>
+            <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]} onPress={handleChangePassword}>
+              <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Update Password</Alata20>
+            </Pressable>
           </>
         )}
+        <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, 
+          { backgroundColor:  isPasswordChangeVisible ? (pressed ? Colors.dark.alertPressed : Colors.dark.alert) : (pressed ? Colors.dark.mainColorLight : Colors.dark.tint) }]} onPress={() => setIsPasswordChangeVisible(!isPasswordChangeVisible)}>
+          <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>{isPasswordChangeVisible ? "Cancel" : "Change Password"}</Alata20>
+        </Pressable>
       </View>
     </>
   );
@@ -136,21 +166,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-  linkText: {
-    fontSize: 14,
-    color: '#2e78b7',
-  },
-  infoText: {
-    fontSize: 18,
-    margin: 5,
+  buttonContainer: {
+    flex: 1,
+    paddingHorizontal: 30,
+    justifyContent: 'flex-end',
+    gap: 15,
+    paddingBottom: 50,
   },
 });
