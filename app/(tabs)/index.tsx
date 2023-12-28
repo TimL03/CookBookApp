@@ -14,15 +14,20 @@ import { ItemListToCSVString, useCategories, useGetRandomMeal, useIngredients } 
 import { useFirebaseIngredients, useFirebaseCategories } from '../../api/cookBookRecipesFirebase/client';
 import { useSession } from '../../api/firebaseAuthentication/client';
 import { router } from 'expo-router';
+
 export default function TabOneScreen() {
+  // Themealdb categories and ingredients
   const apiIngredients: Item[] = useIngredients();
-  const apiCategories: Item[] = useCategories();
   const [selectedApiIngredients, setSelectedApiIngredients] = useState<Item[]>([]);
+  const apiCategories: Item[] = useCategories();
   const [selectedApiCategories, setSelectedApiCategories] = useState<Item[]>([]);
+
+  // CookBook categories and ingredients
   const firebaseIngredients: Item[] = useFirebaseIngredients();
   const [selectedFirebaseIngredients, setSelectedFirebaseIngredients] = useState<Item[]>([]);
   const firebaseCategories: Item[] = useFirebaseCategories();
   const [selectedFirebaseCategories, setSelectedFirebaseCategories] = useState<Item[]>([]);
+
   const [searchMode, setSearchMode] = useState<'database' | 'cookbook'>('database');
   const { selectedMeal, fetchMeal } = useGetRandomMeal(ItemListToCSVString(selectedApiIngredients), ItemListToCSVString(selectedApiCategories));
   const [selectedFirebaseRecipe, setSelectedFirebaseRecipe] = useState(null);
@@ -77,9 +82,6 @@ export default function TabOneScreen() {
 
 // Themealdb get a random meal
 const getMeal = async () => {
-  const selectedAPIIngredients = ItemListToCSVString(selectedApiIngredients);
-  const selectedAPICategories = ItemListToCSVString(selectedApiCategories);
-
   await fetchMeal();
   if (selectedMeal) {
     setModalVisible(true);

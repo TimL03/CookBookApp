@@ -4,7 +4,7 @@ import { View, StyleSheet, Pressable} from 'react-native';
 import { User2, Mail, KeyRound, Eye, EyeOff, AlignCenter } from 'lucide-react-native';
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
-import { Alata20, Alata22 } from '../../components/StyledText';
+import { Alata20, Alata22, Alata24 } from '../../components/StyledText';
 import { TextInput } from 'react-native-gesture-handler';
 import { useSession } from '../../api/firebaseAuthentication/client';
 import { router } from 'expo-router';
@@ -38,16 +38,19 @@ export default function LoginModalScreen() {
   };
 
   return (
-    <View style={gStyles.defaultContainer}>
-      <View style={gStyles.modalContentContainer}>
-        <Alata22 style={gStyles.alignCenter}>Welcome</Alata22>
+    <View style={[gStyles.defaultContainer, styles.center]}>
+      <View style={[gStyles.modalContentContainer, styles.contentBox]}>
+        
         {
           !loginMode ?
+            <>
+            <Alata24 style={[gStyles.alignCenter, styles.marginBottom]}>Welcome</Alata24>
             <View style={gStyles.cardInput}>
               <User2 color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
               <TextInput value={username} onChangeText={setUsername} placeholder="Name" placeholderTextColor={Colors.dark.text} style={gStyles.textInput} />
             </View>
-            : null
+            </>
+            : <Alata24 style={[gStyles.alignCenter, styles.marginBottom]}>Welcome back!</Alata24>
         }
 
         <View style={gStyles.cardInput}>
@@ -100,3 +103,20 @@ export default function LoginModalScreen() {
     </View>
   );
 };
+
+
+const styles = StyleSheet.create({
+  center: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  marginBottom: {
+    marginBottom: 30,
+  },
+  contentBox: {
+
+      paddingVertical: 40,
+      borderRadius: 20,
+  },
+});
