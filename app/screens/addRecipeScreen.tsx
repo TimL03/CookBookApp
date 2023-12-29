@@ -178,7 +178,7 @@ export default function AddRecipeScreen({ closeModal, userID, recipeToEdit }: Ad
               source={{ uri: imageUri }}
             />
             :
-            <View>
+            <View style={styles.addImage}>
               <PlusCircle color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
               <Alata20>Add Image</Alata20>
             </View>
