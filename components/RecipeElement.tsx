@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, Image, Modal, Pressable } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Carrot, Soup, Vegan } from 'lucide-react-native';
 import Colors from '../constants/Colors';
 import gStyles from '../constants/Global_Styles'
-import { DarkTheme } from '@react-navigation/native';
 import { View } from './Themed';
 import { Alata20, Alata12 } from './StyledText';
-import ViewRecipeScreen from '../app/screens/viewRecipeScreen';
 import { router } from 'expo-router';
 
 interface Ingredient {
@@ -19,7 +16,7 @@ interface Ingredient {
 interface RecipeProps {
     item: {
         id: string;
-        category: string;
+        categories: string[];
         name: string;
         cookHTime: string;
         cookMinTime: string;
@@ -32,21 +29,27 @@ interface RecipeProps {
 }
 
 interface CategoryIconProps {
-    category: string;
+    categories: string[];
 }
 
-const CategoryIcon: React.FC<CategoryIconProps> = ({ category }) => {
-    switch (category) {
-        case 'Soup':
-            return <Soup color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
-        case 'Vegetarian':
-            return <Carrot color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
-        case 'Vegan':
-            return <Vegan color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
-        default:
-            return null;
-    }
-};
+const CategoryIcon: React.FC<CategoryIconProps> = ({ categories }) => {
+    return (
+        <>
+          {categories.map((category, index) => {
+            switch (category) {
+              case 'Soup':
+                return <Soup key={index} color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+              case 'Vegetarian':
+                return <Carrot key={index} color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+              case 'Vegan':
+                return <Vegan key={index} color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+              default:
+                return null;
+            }
+          })}
+        </>
+      );
+    };
 
 
 export default function Recipe({ item }: RecipeProps) {
@@ -71,7 +74,7 @@ export default function Recipe({ item }: RecipeProps) {
 
             <View style={[styles.innerBox, styles.marginRight]}>
                 <View style={styles.icons}>
-                    <CategoryIcon category={item.category} />
+                    <CategoryIcon categories={item.categories} />
                 </View>
             </View>
             

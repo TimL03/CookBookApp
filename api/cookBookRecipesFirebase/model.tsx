@@ -13,7 +13,7 @@ export type IngredientView = {
 
 export type RecipeData = {
   id: string;
-  category: string;
+  categories: string[];
   name: string;
   cookHTime: string;
   cookMinTime: string;

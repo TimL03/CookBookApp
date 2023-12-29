@@ -32,7 +32,7 @@ interface FeedRecipeScreenProps {
     steps: string[];
     userID: string;
     ratings: string[];
-    category: string;
+    categories: string[];
   };
 }
 
@@ -140,7 +140,7 @@ export default function ViewFeedRecipeScreen({ closeModal, recipe }: FeedRecipeS
         ingredients: recipe.ingredients,
         steps: recipe.steps,
         userID: userID,
-        category: recipe.category,
+        categories: recipe.categories,
       });
 
       console.log('Recipe successfully saved!');
@@ -148,13 +148,6 @@ export default function ViewFeedRecipeScreen({ closeModal, recipe }: FeedRecipeS
       console.error('Error saving recipe:', error);
     }
   };
-
-  // Hardcoded current categories
-  const currentCategories = [
-    { key: '1', value: 'Breakfast', selected: null },
-    { key: '2', value: 'Snacks', selected: null },
-    { key: '3', value: 'Desert', selected: null },
-  ];
 
   // Return the JSX for the component
   return (
@@ -190,13 +183,11 @@ export default function ViewFeedRecipeScreen({ closeModal, recipe }: FeedRecipeS
           
           {/* Display current categories */}
           <View style={gStyles.mapHorizontal}>
-            {currentCategories?.map((item, index) => {
-              return (
-                <View key={item.key} style={gStyles.switchButton}>
-                  <Alata12>{item.value}</Alata12>
-                </View>
-              );
-            })}
+          {recipe.categories.map((category, index) => (
+              <View key={index} style={gStyles.switchButton}>
+                <Alata12>{category}</Alata12>
+              </View>
+            ))}
           </View>
 
           {/* Ingredients section */}

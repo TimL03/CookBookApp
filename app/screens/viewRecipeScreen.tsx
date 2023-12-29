@@ -52,7 +52,7 @@ export default function ViewRecipeScreen() {
 
       await setDoc(recipeRef, {
         name: recipe.name,
-        category: recipe.category,
+        categories: recipe.categories,
         cookHTime: recipe.cookHTime,
         cookMinTime: recipe.cookMinTime,
         imageUrl: recipe.imageUrl,
@@ -135,9 +135,9 @@ export default function ViewRecipeScreen() {
 
           {/* Categories */}
           <View style={gStyles.mapHorizontal}>
-            {currentCategories?.map((item, index) => (
-              <View key={item.key} style={gStyles.switchButton}>
-                <Alata12>{item.value}</Alata12>
+            {recipe.categories.map((category, index) => (
+              <View key={index} style={gStyles.switchButton}>
+                <Alata12>{category}</Alata12>
               </View>
             ))}
           </View>

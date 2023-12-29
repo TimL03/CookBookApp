@@ -1,14 +1,13 @@
-import { StatusBar } from 'expo-status-bar';
-import { Modal, Platform, Pressable, StyleSheet, Alert, TextInput, Button } from 'react-native';
-import { Text, View } from '../../components/Themed';
+import { Pressable, StyleSheet, Alert, TextInput } from 'react-native';
+import { View } from '../../components/Themed';
 import React, { useEffect, useState } from 'react';
 import { Link, Stack } from 'expo-router';
 import { ChevronLeft, Eye, EyeOff, KeyRound, UserCircle2Icon } from 'lucide-react-native'
 import Colors from '../../constants/Colors';
-import { getAuth, updateEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
+import { getAuth, updatePassword } from 'firebase/auth';
 import { useSession } from '../../api/firebaseAuthentication/client';
 import { db } from '../../FirebaseConfig';
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { Alata16, Alata20 } from '../../components/StyledText';
 import gStyles from '../../constants/Global_Styles';
 
@@ -22,7 +21,7 @@ interface AuthData {
 }
 
 export default function aboutScreen() {
-  const { session } = useSession();
+  const { session, signOut, deleteAccount } = useSession();
   const userID = session;
   const [userData, setUserData] = useState<UserData | null>(null);
   const [authData, setAuthData] = useState<AuthData | null>(null);
@@ -30,6 +29,28 @@ export default function aboutScreen() {
   const [newPasswordRepeat, setNewPasswordRepeat] = useState('');
   const [isPasswordChangeVisible, setIsPasswordChangeVisible] = useState(false);
   const [hidePassword, setHidePassword] = useState(true);
+
+  const handleSignOut = () => {
+    Alert.alert(
+      "Abmelden",
+      "Möchten Sie sich wirklich abmelden?",
+      [
+        { text: "Nein" },
+        { text: "Ja", onPress: () => signOut() },
+      ]
+    );
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Account löschen",
+      "Möchten Sie Ihren Account wirklich löschen?",
+      [
+        { text: "Nein" },
+        { text: "Ja", onPress: () => deleteAccount() },
+      ]
+    );
+  };
 
   useEffect(() => {
     const fetchFirestoreData = async () => {
@@ -79,7 +100,7 @@ export default function aboutScreen() {
     const user = auth.currentUser;
 
     if (user) {
-      if(newPassword === newPasswordRepeat) {
+      if (newPassword === newPasswordRepeat) {
         updatePassword(user, newPassword).then(() => {
           setIsPasswordChangeVisible(false);
           Alert.alert('Success', 'successfully changed password');
@@ -115,7 +136,7 @@ export default function aboutScreen() {
         <Alata16>UID: {authData ? authData.uid : 'Lädt...'}</Alata16>
       </View>
       <View style={styles.buttonContainer}>
-        
+
         {isPasswordChangeVisible && (
           <>
             <View style={gStyles.cardInput}>
@@ -128,7 +149,7 @@ export default function aboutScreen() {
                 </Pressable>
                 :
                 <Pressable onPress={() => setHidePassword(true)} style={gStyles.alignCenter}>
-                  <EyeOff color={Colors.dark.text} size={24} style={gStyles.alignCenter}/>
+                  <EyeOff color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
                 </Pressable>
               }
             </View>
@@ -142,7 +163,7 @@ export default function aboutScreen() {
                 </Pressable>
                 :
                 <Pressable onPress={() => setHidePassword(true)} style={gStyles.alignCenter}>
-                  <EyeOff color={Colors.dark.text} size={24} style={gStyles.alignCenter}/>
+                  <EyeOff color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
                 </Pressable>
               }
             </View>
@@ -151,10 +172,29 @@ export default function aboutScreen() {
             </Pressable>
           </>
         )}
-        <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, 
-          { backgroundColor:  isPasswordChangeVisible ? (pressed ? Colors.dark.alertPressed : Colors.dark.alert) : (pressed ? Colors.dark.mainColorLight : Colors.dark.tint) }]} onPress={() => setIsPasswordChangeVisible(!isPasswordChangeVisible)}>
-          <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>{isPasswordChangeVisible ? "Cancel" : "Change Password"}</Alata20>
-        </Pressable>
+        <View style={styles.buttonContainer}>
+          <Pressable
+            style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter,
+            { backgroundColor: isPasswordChangeVisible ? (pressed ? Colors.dark.alertPressed : Colors.dark.alert) : (pressed ? Colors.dark.mainColorLight : Colors.dark.tint) }]}
+            onPress={() => setIsPasswordChangeVisible(!isPasswordChangeVisible)}>
+            <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>{isPasswordChangeVisible ? "Cancel" : "Change Password"}</Alata20>
+          </Pressable>
+
+          <Pressable
+            style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter,
+            { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]}
+            onPress={handleSignOut}>
+            <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Abmelden</Alata20>
+          </Pressable>
+
+          <Pressable
+            style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter,
+            { backgroundColor: pressed ? Colors.dark.alert : Colors.dark.alertPressed }]}
+            onPress={handleDeleteAccount}>
+            <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Account löschen</Alata20>
+          </Pressable>
+        </View>
+
       </View>
     </>
   );

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, SectionList, Button, Pressable, Modal } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, SectionList, Button, Pressable, Modal, Alert } from 'react-native';
 import React from 'react';
 import { Plus } from 'lucide-react-native';
 import Recipe from '../../components/RecipeElement'
@@ -16,16 +16,24 @@ import { RecipeData } from '../../api/cookBookRecipesFirebase/model';
 import { useSession } from '../../api/firebaseAuthentication/client';
 import { useRecipes } from '../../api/cookBookRecipesFirebase/client';
 import { router } from 'expo-router';
+import SearchBarCookBook from '../../components/searchBarCookBook'
 
 export default function TabTwoScreen() {
   const [isModalVisible, setModalVisible] = useState(false);
   const [isInvitationModalVisible, setIsInvitationModalVisible] = useState(false);
   const [invitationData, setInvitationData] = useState<any>(null); 
   const { session } = useSession();
+  const [searchCriteria, setSearchCriteria] = useState('');
   const userID = session;
 
   const data = useRecipes(userID);
   
+  const filteredSections = data.map(section => ({
+    ...section,
+    data: section.data.filter(recipe => 
+      recipe.name.toLowerCase().includes(searchCriteria.toLowerCase())
+    ),
+  })).filter(section => section.data.length > 0);
 
   const openInvitationModal = (invitation: string) => {
     setInvitationData(invitation); 
@@ -51,14 +59,14 @@ export default function TabTwoScreen() {
     }
   }, [userID]);
 
-  
 
   return (
     <View style={gStyles.screenContainer}>
+      <SearchBarCookBook setSearchCriteria={setSearchCriteria}  />
       <SectionList
         showsVerticalScrollIndicator={false}
-        sections={data}
-        keyExtractor={(item, index) => item.category + index}
+        sections={filteredSections}
+        keyExtractor={(item, index) => item.categories[0] + index}
         renderItem={({ item }) => (
           <Recipe item={item} />
         )}

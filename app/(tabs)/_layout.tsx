@@ -1,10 +1,10 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Library, Utensils, Menu, FileSearch } from 'lucide-react-native'
 import { Tabs, router, Redirect } from 'expo-router';
-import { Pressable, useColorScheme, View, Text } from 'react-native';
+import { Pressable, View, Text } from 'react-native';
 import { useSession } from '../../api/firebaseAuthentication/client';
 import Colors from '../../constants/Colors';
-import React, { useState } from 'react';
+import React from 'react';
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof MaterialCommunityIcons>['name'];
   color: string;

@@ -1,21 +1,18 @@
-import { StyleSheet, Text, View, SafeAreaView, SectionList, Button, Pressable, Modal } from 'react-native';
+import { View, SectionList, Modal } from 'react-native';
 import React from 'react';
-import { Plus } from 'lucide-react-native';
 import Recipe from '../../components/RecipeFeedElement'
 import { Alata20 } from '../../components/StyledText'
-import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
 import { db } from '../../FirebaseConfig'
 import { User } from 'firebase/auth';
 import { useState, useEffect } from "react"
-import { collection, onSnapshot, query, where, getDocs, doc } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, getDocs } from 'firebase/firestore';
 import ShowSharedRecipeInvitationModalScreen from '../modals/showSharedRecipeInvitation';
-import LoginModalScreen from '../modals/logInModal';
 
 interface RecipeData {
   id: string;
   name: string;
-  category: string;
+  categories: string[];
   cookHTime: string;
   cookMinTime: string;
   description: string;
@@ -42,32 +39,36 @@ export default function TabThreeScreen() {
 
   useEffect(() => {
     const feedQuery = query(collection(db, "feed"));
-
+  
     const unsubscribe = onSnapshot(feedQuery, (querySnapshot) => {
       const feedRecipes: RecipeData[] = [];
       querySnapshot.forEach((doc) => {
         const recipeData = doc.data() as Omit<RecipeData, 'id'>;
         feedRecipes.push({ id: doc.id, ...recipeData });
       });
-
-      const groupedByCategory = feedRecipes.reduce((acc: GroupedByCategory, recipe) => {
-        const { category } = recipe;
-        acc[category] = acc[category] || [];
-        acc[category].push(recipe);
+  
+      // Gruppieren der Rezepte nach jeder Kategorie in ihren Kategorienarrays
+      const groupedByCategory = feedRecipes.reduce((acc, recipe) => {
+        recipe.categories.forEach((category) => {
+          if (!acc[category]) {
+            acc[category] = [];
+          }
+          acc[category].push(recipe);
+        });
         return acc;
-      }, {});
-
+      }, {} as GroupedByCategory);
+  
       const sections = Object.keys(groupedByCategory).map(key => ({
         title: key,
         data: groupedByCategory[key],
       }));
-
+  
       setData(sections);
     });
-
+  
     return () => unsubscribe();
   }, []);
-
+  
   const openInvitationModal = (invitation: string) => {
     setInvitationData(invitation);
     setIsInvitationModalVisible(true);
@@ -156,7 +157,7 @@ useEffect(() => {
       <SectionList
         showsVerticalScrollIndicator={false}
         sections={data}
-        keyExtractor={(item, index) => item.id + index}
+        keyExtractor={(item, index) => item.categories[0] + index}
         renderItem={({ item }) => (
           <Recipe item={item} averageRating={averageRatings[item.id] || { average: 0, totalRatings: 0 }} />
         )}
@@ -164,15 +165,6 @@ useEffect(() => {
           <Alata20>{title}</Alata20>
         )}
       />
-      <Modal
-          animationType="slide"
-          transparent={true}
-          visible={isLoginModalVisible}
-          onRequestClose={() => setIsLoginModalVisible(false)}
-        >
-          <LoginModalScreen onClose={() => setIsLoginModalVisible(false)} setUserID={setUserID}
-            setIsAuthenticated={setIsAuthenticated} onLoginSuccess={handleLoginSuccess} />
-        </Modal>
         <Modal
           animationType="slide"
           transparent={true}

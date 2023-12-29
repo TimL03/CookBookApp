@@ -62,6 +62,7 @@ function RootLayoutNav() {
         <Stack.Screen name="screens/aboutScreen" options={{ navigationBarColor: Colors.dark.background, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop'}} />
         <Stack.Screen name="screens/accountScreen" options={{ navigationBarColor: Colors.dark.background, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop'}} />
         <Stack.Screen name="screens/authentificationScreen" options={{ navigationBarColor: Colors.dark.background, headerShown: false, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop'}} />
+        <Stack.Screen name="modals/logInModal" options={{ navigationBarColor: Colors.dark.background, headerShown: false, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop'}} />
       </Stack>
     </ThemeProvider>
     </SessionProvider>

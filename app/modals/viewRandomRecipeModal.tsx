@@ -43,12 +43,12 @@ interface Recipe {
   strMeal: string;
   strMealThumb: string;
   strInstructions: string;
+  strCategory: string
 }
 
 // Main component function
 export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRecipe }: ViewRandomRecipeScreenProps) {
   // State variables
-  const [category, setCategory] = useState('');
   const [cookHTime, setCookHTime] = useState('');
   const [cookMinTime, setCookMinTime] = useState('');
   const [showInputs, setShowInputs] = useState(false);
@@ -83,32 +83,25 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
     const ingredient = recipeAny[ingredientKey];
     const measure = recipeAny[measureKey];
 
-    if (ingredient && measure) {
-      // Check if the measure contains numbers
-      const hasNumbers = /\d/.test(measure);
-
-      let amount, unit;
-
-      if (hasNumbers) {
-        // Extract amount and unit from measure
-        const match = measure.match(/(\d+)([^\d]+)/);
-        if (match) {
-          amount = match[1];
-          unit = match[2].trim();
-        } else {
-          amount = measure;
-          unit = ''; 
-        }
+    if (ingredient && measure && measure.trim() !== '' && measure !== '/') {
+      let [amount, unit] = measure.split(' ', 2);
+  
+      if (!isNaN(parseFloat(amount))) {
+        unit = measure.substring(amount.length).trim();
       } else {
-        // Set default amount and unit
-        amount = '1'; 
-        unit = 'x';
+        amount = '';
+        unit = measure;
       }
-
-      // Push ingredient details to the array
+  
       ingredients.push({ name: ingredient, amount, unit });
     }
   }
+
+  const ingredientNames = ingredients.map(ingredient => ingredient.name);
+
+  const categories = recipe.strCategory ? recipe.strCategory.split(',').map(cat => cat.trim()) : [];
+
+  const steps = recipe.strInstructions.split('\n').filter(step => step.trim() !== '');
 
   // Function to save recipe data to the database
   async function saveRecipeToDatabase(recipe: Recipe) {
@@ -118,9 +111,10 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
         name: recipe.strMeal,
         imageUrl: recipe.strMealThumb,
         ingredients, 
-        steps: recipe.strInstructions.split('\n'),
+        ingredientNames,
+        steps,
         userID,
-        category,
+        categories,
         cookHTime,
         cookMinTime,
       });
@@ -186,16 +180,6 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
           {/* Input fields for category and cooking times */}
           {showInputs && (
             <>
-            <View style={gStyles.cardInput}>
-              <TextInput
-                  placeholder="Category"
-                  placeholderTextColor={Colors.dark.text}
-                  style={gStyles.textInput}
-                  value={category}
-                  onChangeText={setCategory}
-                />
-            </View>
-
             <View style={gStyles.cardInput}>
               <TextInput
                   placeholder="Cook Time Hours"

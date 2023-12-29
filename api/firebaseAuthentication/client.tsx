@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import { collection, addDoc, query, where, getDocs, doc, getDoc } from "firebase/firestore";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, deleteUser } from "firebase/auth";
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { auth, db } from '../../FirebaseConfig';
+import { router } from 'expo-router';
 
 interface AuthContextType {
   session: any;
@@ -9,6 +10,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, username: string) => Promise<void>;
   signOut: () => void;
   isLoading: boolean;
+  deleteAccount: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -20,6 +22,7 @@ const AuthContext = createContext<AuthContextType>({
     return new Promise<void>((resolve) => resolve());
   },
   signOut: () => { },
+  deleteAccount: () => { },
   isLoading: false,
 });
 
@@ -81,14 +84,36 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     }
   };
 
-  const signOut = () => {
+  const signOut = async () => {
     setIsLoading(true);
-    setSession(null);
-    setIsLoading(false);
+    try {
+      await firebaseSignOut(auth);
+    } catch (error) {
+      alert("Error while sign out");
+    } finally {
+      setSession(null);
+      setIsLoading(false);
+      router.push("/screens/authentificationScreen");
+    }
   };
 
+  const deleteAccount = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      try {
+        await deleteUser(user);
+        setSession(null);
+        router.push("/screens/authentificationScreen");
+        alert("Account deleted");
+      } catch (error) {
+        alert("Fehler beim Löschen des Accounts");
+      }
+    } 
+  };
+
+
   return (
-    <AuthContext.Provider value={{ session, signIn, signUp, signOut, isLoading }}>
+    <AuthContext.Provider value={{ session, signIn, signUp, signOut, deleteAccount, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -75,18 +75,18 @@ export default function TabOneScreen() {
       setSelectedFirebaseRecipe(matchingRecipes[0]);
       router.push("/screens/viewRecipeScreen")
       } else {
-      alert('No meal found!. Please try again.');
+      alert('No meal found! Please try again.');
     }
   };
 
 
 // Themealdb get a random meal
 const getMeal = async () => {
-  await fetchMeal();
-  if (selectedMeal) {
+  const success = await fetchMeal();
+  if (success) {
     setModalVisible(true);
   } else {
-    alert('No meal found!. Please try again.');
+    alert('No meal found! Please try again.');
   }
 };
 

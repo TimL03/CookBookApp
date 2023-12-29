@@ -125,36 +125,39 @@ export function useRecipes(userID: string | null) {
   const [data, setData] = useState<Array<{ title: string, data: RecipeData[] }>>([]);
 
   useEffect(() => {
-    if (userID) {
-      const q = query(collection(db, "recipes"), where("userID", "==", userID));
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const recipes: RecipeData[] = [];
-        querySnapshot.forEach((doc) => {
-          const recipeData = doc.data() as Omit<RecipeData, 'id'>;
-          console.log("Fetched recipe data:", recipeData);
-          recipes.push({ id: doc.id, ...recipeData });
-        });
-
-        const groupedByCategory = recipes.reduce((acc: GroupedByCategory, recipe) => {
-          const { category } = recipe;
-          acc[category] = acc[category] || [];
-          acc[category].push(recipe);
-          return acc;
-        }, {});
-
-        const sections = Object.keys(groupedByCategory).map(key => ({
-          title: key,
-          data: groupedByCategory[key],
-        }));
-
-        setData(sections);
+  if (userID) {
+    const q = query(collection(db, "recipes"), where("userID", "==", userID));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const recipes: RecipeData[] = [];
+      querySnapshot.forEach((doc) => {
+        const recipeData = doc.data() as Omit<RecipeData, 'id'>;
+        console.log("Fetched recipe data:", recipeData);
+        recipes.push({ id: doc.id, ...recipeData });
       });
 
-      return () => unsubscribe();
-    }
-  }, [userID]);
+      const groupedByCategory = recipes.reduce((acc: GroupedByCategory, recipe) => {
+        recipe.categories.forEach((category) => {
+          if (!acc[category]) {
+            acc[category] = [];
+          }
+          acc[category].push(recipe);
+        });
+        return acc;
+      }, {});
 
-  return data;
+      const sections = Object.keys(groupedByCategory).map(key => ({
+        title: key,
+        data: groupedByCategory[key],
+      }));
+
+      setData(sections);
+    });
+
+    return () => unsubscribe();
+  }
+}, [userID]);
+
+return data;
 }
 
 //Returns a recipe by id from the database
