@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import Colors from '../constants/Colors';
 import { SessionProvider } from '../api/firebaseAuthentication/client';
+import { InvitationProvider } from '../api/firebaseRecipeInvitations/client';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -51,20 +52,23 @@ function RootLayoutNav() {
 
   return (
     <SessionProvider>
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false, navigationBarColor: Colors.dark.mainColorDark }} />
-        <Stack.Screen name="modals/actionModal" options={{ headerShown: false, presentation: 'transparentModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop'}}/>
-        <Stack.Screen name="screens/viewRecipeScreen" options={{ navigationBarColor: Colors.dark.mainColorDark, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop'}}/>
-        <Stack.Screen name="screens/addRecipeScreen" options={{ navigationBarColor: Colors.dark.background,headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop'}}/>
-        <Stack.Screen name="modals/shareRecipeModal" options={{ navigationBarColor: Colors.dark.background, headerShown: false, presentation: 'transparentModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop'}}/>
-        <Stack.Screen name="screens/settingsScreen" options={{ navigationBarColor: Colors.dark.background, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop'}} />
-        <Stack.Screen name="screens/aboutScreen" options={{ navigationBarColor: Colors.dark.background, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop'}} />
-        <Stack.Screen name="screens/accountScreen" options={{ navigationBarColor: Colors.dark.background, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop'}} />
-        <Stack.Screen name="screens/authentificationScreen" options={{ navigationBarColor: Colors.dark.background, headerShown: false, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop'}} />
-        <Stack.Screen name="modals/logInModal" options={{ navigationBarColor: Colors.dark.background, headerShown: false, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop'}} />
-      </Stack>
-    </ThemeProvider>
+      <InvitationProvider>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false, navigationBarColor: Colors.dark.mainColorDark }} />
+            <Stack.Screen name="modals/actionModal" options={{ headerShown: false, presentation: 'transparentModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
+            <Stack.Screen name="screens/viewRecipeScreen" options={{ navigationBarColor: Colors.dark.mainColorDark, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
+            <Stack.Screen name="screens/addRecipeScreen" options={{ navigationBarColor: Colors.dark.background, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
+            <Stack.Screen name="modals/shareRecipeModal" options={{ navigationBarColor: Colors.dark.background, headerShown: false, presentation: 'transparentModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
+            <Stack.Screen name="screens/settingsScreen" options={{ navigationBarColor: Colors.dark.background, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
+            <Stack.Screen name="screens/aboutScreen" options={{ navigationBarColor: Colors.dark.background, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
+            <Stack.Screen name="screens/accountScreen" options={{ navigationBarColor: Colors.dark.background, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
+            <Stack.Screen name="screens/authentificationScreen" options={{ navigationBarColor: Colors.dark.background, headerShown: false, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
+            <Stack.Screen name="modals/logInModal" options={{ navigationBarColor: Colors.dark.background, headerShown: false, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
+            <Stack.Screen name="modals/showSharedRecipeInvitation" options={{ navigationBarColor: Colors.dark.background, headerShown: false, presentation: 'transparentModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
+          </Stack>
+        </ThemeProvider>
+      </InvitationProvider>
     </SessionProvider>
   );
 }

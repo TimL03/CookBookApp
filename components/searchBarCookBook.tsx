@@ -1,14 +1,11 @@
-import React, { useState, useCallback } from "react";
-import { Pressable, TextInput, View, StyleSheet, Keyboard } from "react-native";
-import { Item } from "../api/externalRecipesLibrary/model";
-import { Search, X } from "lucide-react-native";
+import React from "react";
+import { TextInput, View, StyleSheet, Keyboard } from "react-native";
+import { Search } from "lucide-react-native";
 import gStyles from "../constants/Global_Styles";
 import Colors from "../constants/Colors";
-import { Alata12 } from "./StyledText";
-
 export default function SearchBarCookBook({ setSearchCriteria }) {
   return (
-    <View style={[gStyles.cardInput, { flex: 1 }]}>
+    <View style={[gStyles.cardInput]}>
       <TextInput
         onEndEditing={() => Keyboard.dismiss()}
         placeholder={`search...`}

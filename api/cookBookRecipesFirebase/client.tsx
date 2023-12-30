@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { db } from '../../FirebaseConfig';
 import { collection, getDocs, where, query, onSnapshot, doc, getDoc, addDoc } from 'firebase/firestore';
 import { GroupedByCategory, RecipeData } from './model';
-import Recipe from '../../components/RecipeFeedElement';
 import { getStorage, ref, uploadBytes, getDownloadURL } from '@firebase/storage';
 import { useSession } from '../../api/firebaseAuthentication/client';
 
@@ -136,12 +135,13 @@ export function useRecipes(userID: string | null) {
       });
 
       const groupedByCategory = recipes.reduce((acc: GroupedByCategory, recipe) => {
-        recipe.categories.forEach((category) => {
+        const category = recipe.categories[0];
+        if (category) {
           if (!acc[category]) {
             acc[category] = [];
           }
           acc[category].push(recipe);
-        });
+        }
         return acc;
       }, {});
 

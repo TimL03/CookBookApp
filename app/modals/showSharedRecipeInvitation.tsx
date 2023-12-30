@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, StyleSheet, Pressable, Image } from 'react-native';
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
@@ -6,6 +6,8 @@ import { db } from '../../FirebaseConfig'
 import { collection, addDoc, updateDoc, getDoc, doc, query, where, getDocs } from 'firebase/firestore';
 import { Alata20, } from '../../components/StyledText';
 import RecipeElement from '../../components/RecipeElement';
+import { InvitationContext } from '../../api/firebaseRecipeInvitations/client';
+import { router } from 'expo-router';
 
 const getUsernameByUserId = async (userId: string) => {
   const usersRef = collection(db, 'users');
@@ -17,20 +19,15 @@ const getUsernameByUserId = async (userId: string) => {
   } 
 };
 
-interface ShowSharedRecipeProps {
-  invitationData: any;
-  onClose: () => void;
-}
-
 interface RecipeData {
   imageUrl: string;
   name: string;
 }
 
-export default function ShowSharedRecipeInvitationModalScreen({ invitationData, onClose }: ShowSharedRecipeProps) {
+export default function ShowSharedRecipeInvitationModalScreen() {
   const [recipeData, setRecipeData] = useState<RecipeData | null>(null);
   const [senderUsername, setSenderUsername] = useState('');
-
+  const { invitationData } = useContext(InvitationContext);
 
   useEffect(() => {
     async function getRecipeAndSenderData() {
@@ -74,8 +71,8 @@ export default function ShowSharedRecipeInvitationModalScreen({ invitationData, 
             console.log('Neue Rezept-ID:', newRecipeRef.id);
         }
 
-        onClose();
-    } catch (error) {
+        router.back();
+          } catch (error) {
         console.error('Fehler beim Akzeptieren der Einladung:', error);
     }
 };
@@ -86,8 +83,8 @@ export default function ShowSharedRecipeInvitationModalScreen({ invitationData, 
         status: 'declined',
       });
 
-      onClose();
-    } catch (error) {
+      router.back();
+        } catch (error) {
       console.error('Error declining invitation:', error);
     }
   };
