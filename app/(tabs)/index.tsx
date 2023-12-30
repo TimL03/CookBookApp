@@ -1,13 +1,11 @@
 import { View, Pressable, ScrollView, Modal, StyleSheet } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import ItemSelectorSwitch from '../../components/ItemSelectorSwitch'
 import { Alata20 } from '../../components/StyledText'
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
 import ViewRandomRecipeScreen from '../modals/viewRandomRecipeModal';
 import SearchSwitch from '../../components/SearchSwitch';
 import { searchRecipesInFirebase } from '../../api/cookBookRecipesFirebase/client';
-import { ScreenContainer } from 'react-native-screens';
 import SearchBarSelector from '../../components/searchBarSelector';
 import { Item } from '../../api/externalRecipesLibrary/model';
 import { ItemListToCSVString, useCategories, useGetRandomMeal, useIngredients } from '../../api/externalRecipesLibrary/client';
@@ -16,6 +14,7 @@ import { useSession } from '../../api/firebaseAuthentication/client';
 import { router } from 'expo-router';
 
 export default function TabOneScreen() {
+
   // Themealdb categories and ingredients
   const apiIngredients: Item[] = useIngredients();
   const [selectedApiIngredients, setSelectedApiIngredients] = useState<Item[]>([]);
@@ -45,7 +44,7 @@ export default function TabOneScreen() {
   }, [apiIngredients, firebaseIngredients, searchMode]);
 
 
-  //add Selection Property to Categories
+  // add Selection Property to Categories
   useEffect(() => {
     if (searchMode === 'database') {
       setSelectedApiCategories(apiCategories.map(category => ({ ...category, selected: false })));

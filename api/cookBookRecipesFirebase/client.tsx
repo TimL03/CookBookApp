@@ -192,7 +192,60 @@ export const uploadImage = async (uri: string, recipeName: string) => {
   return await getDownloadURL(snapshot.ref);
 };
 
+export const fetchFeedRecipes = (callback: (sections: Array<{ title: string, data: RecipeData[] }>) => void) => {
+  const feedQuery = query(collection(db, "feed"));
 
+  const unsubscribe = onSnapshot(feedQuery, (querySnapshot) => {
+    const feedRecipes: RecipeData[] = [];
+    querySnapshot.forEach((doc) => {
+      const recipeData = doc.data() as Omit<RecipeData, 'id'>;
+      feedRecipes.push({ id: doc.id, ...recipeData });
+    });
 
+    const groupedByCategory = feedRecipes.reduce((acc, recipe) => {
+      const category = recipe.categories[0];
+      if (category) {
+        if (!acc[category]) {
+          acc[category] = [];
+        }
+        acc[category].push(recipe);
+      }
+      return acc;
+    }, {} as GroupedByCategory);
+
+    const sections = Object.keys(groupedByCategory).map(key => ({
+      title: key,
+      data: groupedByCategory[key],
+    }));
+
+    callback(sections);
+  });
+
+  return unsubscribe;
+};
+
+export const calculateAverageRating = async (recipe: RecipeData) => {
+  try {
+    const ratingsCollectionRef = collection(db, 'feed', recipe.id, 'ratings');
+    const ratingsSnapshot = await getDocs(ratingsCollectionRef);
+
+    if (ratingsSnapshot.empty) {
+      return { average: 0, totalRatings: 0 };
+    }
+
+    const ratingsData: number[] = [];
+    ratingsSnapshot.forEach((doc) => {
+      const rating = doc.data().rating || 0;
+      ratingsData.push(rating);
+    });
+
+    const sum = ratingsData.reduce((acc, rating) => acc + (parseFloat(rating) || 0), 0);
+    const average = sum / ratingsData.length;
+
+    return { average, totalRatings: ratingsData.length };
+  } catch (error) {
+    return { average: 0, totalRatings: 0 };
+  }
+};
 
 

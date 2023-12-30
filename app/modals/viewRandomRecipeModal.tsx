@@ -5,46 +5,11 @@ import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../../FirebaseConfig'
-import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { Share2, Save, ArrowDownToLine } from 'lucide-react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Alata12, Alata16, Alata20, Alata24 } from '../../components/StyledText';
-import LoginModalScreen from './logInModal';
-
-// Define the Ingredient interface
-interface Ingredient {
-  name: string;
-  amount: string;
-  unit: string;
-}
-
-// Define the props for the ViewRandomRecipeScreen component
-interface ViewRandomRecipeScreenProps {
-  closeModal: () => void;
-  onFindNewRecipe: () => void;
-  recipe: {
-    strMeal: string;
-    strMealThumb: string;
-    idMeal: string;
-    strInstructions: string;
-    strCategory?: string;
-    // Additional ingredients and measures for dynamic data
-    strIngredient1?: string;
-    strIngredient2?: string;
-    // ... (up to strIngredient20 and strMeasure20)
-    strMeasure1?: string;
-    strMeasure2?: string;
-    // ... (up to strMeasure20)
-  };
-}
-
-// Define the Recipe interface
-interface Recipe {
-  strMeal: string;
-  strMealThumb: string;
-  strInstructions: string;
-  strCategory: string
-}
+import { useSession } from '../../api/firebaseAuthentication/client';
+import { ViewRandomRecipeScreenProps, Ingredient, Recipe } from '../../api/externalRecipesLibrary/model';
 
 // Main component function
 export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRecipe }: ViewRandomRecipeScreenProps) {
@@ -52,26 +17,11 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
   const [cookHTime, setCookHTime] = useState('');
   const [cookMinTime, setCookMinTime] = useState('');
   const [showInputs, setShowInputs] = useState(false);
-  const [isLoginModalVisible, setIsLoginModalVisible] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userID, setUserID] = useState<string | null>(null);
   const [hasBeenSaved, setHasBeenSaved] = useState(false);
 
-  // Function to handle login success
-  const handleLoginSuccess = (user: User) => {
-    setIsAuthenticated(true);
-    setUserID(user.uid);
-  };
-
-  // Authentication instance
-  const auth = getAuth();
-
-  // Check authentication status on component mount
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      setUserID(user.uid);
-    }
-  });
+  // userID
+  const { session } = useSession();
+  const userID = session;
 
   // Extract ingredients and measures from recipe data
   const ingredients: Ingredient[] = [];
@@ -127,14 +77,9 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
 
   // Event handler for the "Save" button click
   const handleSaveButtonClick = () => {
-    if (!userID) {
-      // Show login modal if user is not authenticated
-      setIsLoginModalVisible(true);
-    } else {
-      // Show input fields for category and cooking times
       setShowInputs(true);
     }
-  };
+  
 
   // Event handler for the final save button click
   const handleFinalSaveClick = () => {
@@ -239,16 +184,6 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
         </Pressable>
       </ScrollView>
 
-      {/* Login modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isLoginModalVisible}
-        onRequestClose={() => setIsLoginModalVisible(false)}
-      >
-        <LoginModalScreen onClose={() => setIsLoginModalVisible(false)} setUserID={setUserID}
-          setIsAuthenticated={setIsAuthenticated} onLoginSuccess={handleLoginSuccess} />
-      </Modal>
     </View>
   );
 }

@@ -7,6 +7,7 @@ import { DarkTheme } from '@react-navigation/native';
 import { View } from './Themed';
 import { Alata20, Alata12 } from './StyledText';
 import ViewFeedRecipeScreen from '../app/modals/viewFeedRecipeModal';
+import { router } from 'expo-router';
 
 interface RecipeProps {
     item: {
@@ -58,7 +59,7 @@ export default function Recipe({ item, averageRating }: RecipeProps) {
     };
 
     return (
-        <TouchableOpacity onPress={toggleModal} style={styles.outerBox} activeOpacity={0.2}>
+        <TouchableOpacity onPress={() => router.push({pathname: "/screens/viewFeedRecipeModal", params: {recipeID: item.id}}  )} style={styles.outerBox} activeOpacity={0.2}>
             <Image
                 style={gStyles.imageSmall}
                 source={item.imageUrl == '' ? require("../assets/images/no-image.png") : { uri: item.imageUrl }}
@@ -81,14 +82,6 @@ export default function Recipe({ item, averageRating }: RecipeProps) {
                 </View>
             </View>
 
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={isModalVisible}
-                onRequestClose={toggleModal}
-            >
-                <ViewFeedRecipeScreen closeModal={toggleModal} recipe={item} />
-            </Modal>
         </TouchableOpacity>
     )
 }

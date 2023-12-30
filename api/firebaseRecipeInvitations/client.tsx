@@ -34,6 +34,8 @@ interface InvitationProviderProps {
         router.push("/modals/showSharedRecipeInvitation");
     };
 
+    
+
     useEffect(() => {
         console.log("useEffect in InvitationProvider ausgelöst, userID:", userID);
         if (userID) {
