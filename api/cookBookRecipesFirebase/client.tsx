@@ -120,17 +120,17 @@ export const searchRecipesInFirebase = async (selectedIngredients: string[], sel
 
 
 //Returns all recipes from the database that belong to the current user
-export function useRecipes(userID: string | null) {
+export function useCookBookRecipes() {
   const [data, setData] = useState<Array<{ title: string, data: RecipeData[] }>>([]);
+  const { session } = useSession();
+  const userID = session;
 
   useEffect(() => {
-  if (userID) {
     const q = query(collection(db, "recipes"), where("userID", "==", userID));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const recipes: RecipeData[] = [];
       querySnapshot.forEach((doc) => {
         const recipeData = doc.data() as Omit<RecipeData, 'id'>;
-        console.log("Fetched recipe data:", recipeData);
         recipes.push({ id: doc.id, ...recipeData });
       });
 
@@ -154,13 +154,12 @@ export function useRecipes(userID: string | null) {
     });
 
     return () => unsubscribe();
-  }
-}, [userID]);
+}, []);
 
 return data;
 }
 
-//Returns a recipe by id from the database
+//Returns a recipe by id from the database (CookBook)
 export async function getRecipeById(userId: string, recipeId: string): Promise<RecipeData | null> {
   const recipeRef = doc(db, 'recipes', recipeId);
   const recipeSnap = await getDoc(recipeRef);
@@ -179,6 +178,65 @@ export async function getRecipeById(userId: string, recipeId: string): Promise<R
   }
 }
 
+// Fetching feed recipes
+export const useFeedRecipes = () => {
+  const [data, setData] = useState<Array<{ title: string, data: RecipeData[] }>>([]);
+
+  useEffect(() => {
+      const feedQuery = query(collection(db, "feed"));
+      const unsubscribe = onSnapshot(feedQuery, (querySnapshot) => {
+          const feedRecipes: RecipeData[] = [];
+          querySnapshot.forEach((doc) => {
+              const recipeData = doc.data() as Omit<RecipeData, 'id'>;
+              feedRecipes.push({ id: doc.id, ...recipeData });
+          });
+
+          const groupedByCategory = feedRecipes.reduce((acc, recipe) => {
+              const category = recipe.categories[0];
+              if (category) {
+                  if (!acc[category]) {
+                      acc[category] = [];
+                  }
+                  acc[category].push(recipe);
+              }
+              return acc;
+          }, {} as GroupedByCategory);
+
+          const sections = Object.keys(groupedByCategory).map(key => ({
+              title: key,
+              data: groupedByCategory[key],
+          }));
+
+          setData(sections);
+      });
+
+      return () => unsubscribe();
+  }, []);
+
+  return data;
+};
+
+
+// Fetching recipe by ID for feed
+export const getRecipeByIdForFeed = async (recipeID: string) => {
+  try {
+      const docRef = doc(db, "feed", recipeID);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+          return docSnap.data() as RecipeData;
+      } else {
+          console.log("No such document!");
+          return null;
+      }
+  } catch (error) {
+      console.error("Error fetching recipe:", error);
+      return null;
+  }
+};
+
+
+
 //function to upload an image
 export const uploadImage = async (uri: string, recipeName: string) => {
   const response = await fetch(uri);
@@ -192,38 +250,7 @@ export const uploadImage = async (uri: string, recipeName: string) => {
   return await getDownloadURL(snapshot.ref);
 };
 
-export const fetchFeedRecipes = (callback: (sections: Array<{ title: string, data: RecipeData[] }>) => void) => {
-  const feedQuery = query(collection(db, "feed"));
-
-  const unsubscribe = onSnapshot(feedQuery, (querySnapshot) => {
-    const feedRecipes: RecipeData[] = [];
-    querySnapshot.forEach((doc) => {
-      const recipeData = doc.data() as Omit<RecipeData, 'id'>;
-      feedRecipes.push({ id: doc.id, ...recipeData });
-    });
-
-    const groupedByCategory = feedRecipes.reduce((acc, recipe) => {
-      const category = recipe.categories[0];
-      if (category) {
-        if (!acc[category]) {
-          acc[category] = [];
-        }
-        acc[category].push(recipe);
-      }
-      return acc;
-    }, {} as GroupedByCategory);
-
-    const sections = Object.keys(groupedByCategory).map(key => ({
-      title: key,
-      data: groupedByCategory[key],
-    }));
-
-    callback(sections);
-  });
-
-  return unsubscribe;
-};
-
+//Calculates average rating from each feed recipe 
 export const calculateAverageRating = async (recipe: RecipeData) => {
   try {
     const ratingsCollectionRef = collection(db, 'feed', recipe.id, 'ratings');

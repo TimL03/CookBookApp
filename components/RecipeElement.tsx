@@ -1,72 +1,37 @@
 import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { Carrot, EggOff, Fish, MilkOff, Soup, Vegan } from 'lucide-react-native';
+import { StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
+import { Carrot, Soup, Vegan } from 'lucide-react-native';
 import Colors from '../constants/Colors';
 import gStyles from '../constants/Global_Styles'
 import { View } from './Themed';
 import { Alata20, Alata12 } from './StyledText';
 import { router } from 'expo-router';
+import { RecipeProps, CategoryIconProps } from '../api/cookBookRecipesFirebase/model';
 
-interface Ingredient {
-    name: string;
-    amount: string;
-    unit: string;
-}
-
-interface RecipeProps {
-    item: {
-        id: string;
-        categories: string[];
-        name: string;
-        cookHTime: string;
-        cookMinTime: string;
-        description: string;
-        ingredients: Ingredient[];
-        steps: string[];
-        imageUrl: string;
-        userID: string;
-    };
-}
-
-interface CategoryIconProps {
-    categories: string[];
-}
 
 const CategoryIcon: React.FC<CategoryIconProps> = ({ categories }) => {
     return (
-        <>
-          {categories.map((category, index) => {
-            switch (category) {
-                case 'Soup':
-                    return <Soup color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
-                case 'Vegetarian':
-                    return <Carrot color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
-                case 'Vegan':
-                    return <Vegan color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
-                case 'Fish':
-                    return <Fish color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
-                case 'No-Egg':
-                    return <EggOff color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
-                case 'No-Milk':
-                    return <MilkOff color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
-                default:
-                    return null;
-            }
-          })}
-        </>
-      );
-    };
-
+        <View style={{ flexDirection: 'row' }}>
+            {categories.map((category, index) => {
+                switch (category) {
+                    case 'Soup':
+                        return <Soup key={index} color={Colors.dark.text} size={20} style={{ marginBottom: 5, marginRight: 5 }} />;
+                    case 'Vegetarian':
+                        return <Carrot key={index} color={Colors.dark.text} size={20} style={{ marginBottom: 5, marginRight: 5 }} />;
+                    case 'Vegan':
+                        return <Vegan key={index} color={Colors.dark.text} size={20} style={{ marginBottom: 5, marginRight: 5 }} />;
+                    default:
+                        return null;
+                }
+            })}
+        </View>
+    );
+};
 
 export default function Recipe({ item }: RecipeProps) {
-    const [isModalVisible, setModalVisible] = useState(false);
-
-    const toggleModal = () => {
-        setModalVisible(!isModalVisible);
-    };
 
     return (
-        <TouchableOpacity onPress={() => router.push({pathname: "/screens/viewRecipeScreen", params: {recipeID: item.id}}  )} style={styles.outerBox} activeOpacity={0.2}>
+        <TouchableOpacity onPress={() => router.push({ pathname: "/screens/viewRecipeScreen", params: { recipeID: item.id } })} style={styles.outerBox} activeOpacity={0.2}>
             <Image
                 style={gStyles.imageSmall}
                 source={item.imageUrl == '' ? require("../assets/images/no-image.png") : { uri: item.imageUrl }}
@@ -83,7 +48,7 @@ export default function Recipe({ item }: RecipeProps) {
                     <CategoryIcon categories={item.categories} />
                 </View>
             </View>
-            
+
         </TouchableOpacity>
     )
 }

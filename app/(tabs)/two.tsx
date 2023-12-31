@@ -6,18 +6,15 @@ import { Alata20 } from '../../components/StyledText'
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
 import { useState } from "react"
-import { useSession } from '../../api/firebaseAuthentication/client';
-import { useRecipes } from '../../api/cookBookRecipesFirebase/client';
+import { useCookBookRecipes } from '../../api/cookBookRecipesFirebase/client';
 import { router } from 'expo-router';
 import SearchBarCookBook from '../../components/searchBarCookBook'
 import CategoryFilter from '../../components/CategoryFilter';
 
 export default function TabTwoScreen() {
-  const { session } = useSession();
   const [searchCriteria, setSearchCriteria] = useState('');
-  const userID = session;
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const data = useRecipes(userID);
+  const data = useCookBookRecipes();
 
   const toggleCategory = (category: string) => {
     if (selectedCategories.includes(category)) {

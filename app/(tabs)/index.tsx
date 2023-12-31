@@ -8,7 +8,7 @@ import SearchSwitch from '../../components/SearchSwitch';
 import { searchRecipesInFirebase } from '../../api/cookBookRecipesFirebase/client';
 import SearchBarSelector from '../../components/searchBarSelector';
 import { Item } from '../../api/externalRecipesLibrary/model';
-import { ItemListToCSVString, useCategories, useGetRandomMeal, useIngredients } from '../../api/externalRecipesLibrary/client';
+import { ItemListToCSVString, useCategories, useGetRandomMealId, useIngredients } from '../../api/externalRecipesLibrary/client';
 import { useFirebaseIngredients, useFirebaseCategories } from '../../api/cookBookRecipesFirebase/client';
 import { useSession } from '../../api/firebaseAuthentication/client';
 import { router } from 'expo-router';
@@ -29,7 +29,7 @@ export default function TabOneScreen() {
   const [selectedFirebaseCategories, setSelectedFirebaseCategories] = useState<Item[]>([]);
 
   const [searchMode, setSearchMode] = useState<'database' | 'cookbook'>('database');
-  const { selectedMeal, fetchMeal } = useGetRandomMeal(ItemListToCSVString(selectedApiIngredients), ItemListToCSVString(selectedApiCategories));
+  const { selectedMeal, fetchMeal } = useGetRandomMealId(ItemListToCSVString(selectedApiIngredients), ItemListToCSVString(selectedApiCategories));
   const [selectedFirebaseRecipe, setSelectedFirebaseRecipe] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const { session } = useSession();
@@ -82,16 +82,15 @@ export default function TabOneScreen() {
     }
   };
 
-
-// Themealdb get a random meal
-const getMeal = async () => {
-  const success = await fetchMeal();
-  if (success) {
-    setModalVisible(true);
-  } else {
-    setAlertModalVisible(true);
-  }
-};
+  const getMeal = async () => {
+    const mealId = await fetchMeal(ItemListToCSVString(selectedApiIngredients), ItemListToCSVString(selectedApiCategories));
+    if (mealId) {
+      router.push({ pathname: "/modals/viewRandomRecipeModal", params: { recipeID: mealId }});
+    } else {
+      alert('No meal found! Please try again.');
+    }
+  };
+  
 
 const findNewRecipe = () => {
   if (searchMode === 'database') {
@@ -138,14 +137,6 @@ return (
     <Pressable onPress={() => searchMode === 'cookbook' ? handleSearchInFirebase() : getMeal()} style={({ pressed }) => [gStyles.squareButtonText, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
       <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Get a Recipe</Alata20>
     </Pressable>
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={isModalVisible}
-      onRequestClose={() => setModalVisible(false)}
-    >
-    <ViewRandomRecipeScreen closeModal={() => setModalVisible(false)} recipe={selectedMeal} onFindNewRecipe={findNewRecipe} />
-    </Modal>
     <AlertModal 
       title='No Recipes found'
       message='Please select other ingredients or categories'

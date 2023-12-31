@@ -18,7 +18,6 @@ const ActionsModal = ({ visible, onClose}: ActionsModalProps) => {
       <Pressable style={gStyles.modalBackgroundContainer} onPress={router.back}>
         <View style={gStyles.modalContentContainer}>
           <Alata22 style={gStyles.alignCenter}>Aktionen</Alata22>     
-
             <Pressable style={({ pressed }) => [gStyles.cardHorizontal, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.background }]} onPress={() => router.replace('/screens/accountScreen')}>
               <User2 color={Colors.dark.text} size={22} style={gStyles.alignCenter} />
               <Alata20 style={gStyles.marginBottom}>Account</Alata20>

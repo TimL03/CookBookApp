@@ -6,16 +6,11 @@ import gStyles from '../../constants/Global_Styles';
 import { db } from '../../FirebaseConfig'
 import { useState, useEffect } from "react"
 import { RecipeData } from '../../api/cookBookRecipesFirebase/model';
-import { fetchFeedRecipes, calculateAverageRating } from '../../api/cookBookRecipesFirebase/client';
+import { useFeedRecipes, calculateAverageRating } from '../../api/cookBookRecipesFirebase/client';
 
 export default function TabThreeScreen() {
-  const [data, setData] = useState<Array<{ title: string, data: RecipeData[] }>>([]);
+  const data = useFeedRecipes();
   const [averageRatings, setAverageRatings] = useState<Record<string, { average: number; totalRatings: number }>>({});
-
-  useEffect(() => {
-    const unsubscribe = fetchFeedRecipes(setData);
-    return () => unsubscribe();
-  }, []);
 
   useEffect(() => {
     data.forEach(section => {
@@ -25,23 +20,6 @@ export default function TabThreeScreen() {
           ...prevState,
           [recipe.id]: result,
         }));
-      });
-    });
-  }, [data]);
-
-
-  useEffect(() => {
-    const calculateAndSetAverageRating = async (recipe: RecipeData) => {
-      const result = await calculateAverageRating(db, recipe);
-      setAverageRatings(prevState => ({
-        ...prevState,
-        [recipe.id]: result,
-      }));
-    };
-
-    data.forEach(section => {
-      section.data.forEach(recipe => {
-        calculateAndSetAverageRating(recipe);
       });
     });
   }, [data]);

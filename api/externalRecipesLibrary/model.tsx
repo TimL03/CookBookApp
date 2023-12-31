@@ -13,10 +13,7 @@ export interface Ingredient {
 }
 
 // Define the props for the ViewRandomRecipeScreen component
-export interface ViewRandomRecipeScreenProps {
-  closeModal: () => void;
-  onFindNewRecipe: () => void;
-  recipe: {
+export interface RecipeProps {
     strMeal: string;
     strMealThumb: string;
     idMeal: string;
@@ -29,7 +26,6 @@ export interface ViewRandomRecipeScreenProps {
     strMeasure1?: string;
     strMeasure2?: string;
     // ... (up to strMeasure20)
-  };
 }
 
 // Define the Recipe interface

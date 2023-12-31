@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Image, Pressable, Modal } from "react-native";
-import TopModalBar from "../../components/topModalBar";
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
 import { Share2, PenSquare, Trash2, ArrowUpToLine, ChevronLeft, X } from 'lucide-react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Alata20, Alata12, Alata24, Alata14, Alata16 } from '../../components/StyledText';
-import ShareRecipeScreen from '../modals/shareRecipeModal';
 import { db } from '../../FirebaseConfig'
 import { doc, setDoc, Timestamp } from 'firebase/firestore';
 import { getRecipeById } from '../../api/cookBookRecipesFirebase/client';
@@ -15,7 +13,6 @@ import { Link, Stack, router, useLocalSearchParams } from 'expo-router';
 import { RecipeData } from '../../api/cookBookRecipesFirebase/model';
 
 export default function ViewRecipeScreen() {
-  const [isShareRecipeModalVisible, setIsShareRecipeModalVisible] = useState(false);
   const [recipe, setRecipe] = useState<RecipeData | null>(null);
 
   // Get recipe id from router params
@@ -57,6 +54,7 @@ export default function ViewRecipeScreen() {
         cookMinTime: recipe.cookMinTime,
         imageUrl: recipe.imageUrl,
         ingredients: recipe.ingredients,
+        ingredientNames: recipe.ingredientNames,
         steps: recipe.steps,
         userID: recipe.userID,
         timestamp: Timestamp.now(),
@@ -67,12 +65,6 @@ export default function ViewRecipeScreen() {
       console.error('Fehler beim Speichern des Rezepts:', error);
     }
   };
-
-  const currentCategories = [
-    { key: '1', value: 'Breakfast', selected: null },
-    { key: '2', value: 'Snacks', selected: null },
-    { key: '3', value: 'Desert', selected: null },
-  ];
 
   return (
     <>
