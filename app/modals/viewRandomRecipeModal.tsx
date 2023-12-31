@@ -182,7 +182,7 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
         </View>
 
       </ScrollView>
-
+    
     </View>
   );
 }

@@ -154,6 +154,8 @@ export default StyleSheet.create({
         borderTopRightRadius: 20,
         gap: 15,
         width: '100%',
+        shadowColor: 'black',
+        elevation: 15,
     },
 
 

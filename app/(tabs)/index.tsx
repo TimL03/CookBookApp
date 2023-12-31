@@ -12,6 +12,7 @@ import { ItemListToCSVString, useCategories, useGetRandomMeal, useIngredients } 
 import { useFirebaseIngredients, useFirebaseCategories } from '../../api/cookBookRecipesFirebase/client';
 import { useSession } from '../../api/firebaseAuthentication/client';
 import { router } from 'expo-router';
+import AlertModal from '../modals/alerts/infoAlert';
 
 export default function TabOneScreen() {
 
@@ -33,6 +34,9 @@ export default function TabOneScreen() {
   const [isModalVisible, setModalVisible] = useState(false);
   const { session } = useSession();
   const userID = session;
+
+  // Alert Modal
+  const [alertModalVisible, setAlertModalVisible] = useState(false);
 
   //add Selection Property to Ingredients
   useEffect(() => {
@@ -74,7 +78,7 @@ export default function TabOneScreen() {
       setSelectedFirebaseRecipe(matchingRecipes[0]);
       router.push("/screens/viewRecipeScreen")
       } else {
-      alert('No meal found! Please try again.');
+        setAlertModalVisible(true);
     }
   };
 
@@ -85,7 +89,7 @@ const getMeal = async () => {
   if (success) {
     setModalVisible(true);
   } else {
-    alert('No meal found! Please try again.');
+    setAlertModalVisible(true);
   }
 };
 
@@ -142,6 +146,13 @@ return (
     >
     <ViewRandomRecipeScreen closeModal={() => setModalVisible(false)} recipe={selectedMeal} onFindNewRecipe={findNewRecipe} />
     </Modal>
+    <AlertModal 
+      title='No Recipes found'
+      message='Please select other ingredients or categories'
+      buttonText='ok'
+      alertModalVisible={alertModalVisible} 
+      setAlertModalVisible={setAlertModalVisible} 
+    />
   </View>
 )
 }
@@ -150,5 +161,14 @@ const styles = StyleSheet.create({
   margin: {
     marginBottom: 10,
     marginTop: 10,
+  },
+  alert: {
+    backgroundColor: Colors.dark.mainColorDark,
+    borderColor: Colors.dark.mainColorDark,
+    borderRadius: 10,
+    borderWidth: 1,
+    elevation: 1,
+    margin: 10,
+    padding: 10,
   }
 });

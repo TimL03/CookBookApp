@@ -11,6 +11,8 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { Alata16, Alata20 } from '../../components/StyledText';
 import gStyles from '../../constants/Global_Styles';
 
+import AlertModal from '../modals/alerts/infoAlert';
+
 interface UserData {
   username: string;
 }
@@ -29,6 +31,10 @@ export default function aboutScreen() {
   const [newPasswordRepeat, setNewPasswordRepeat] = useState('');
   const [isPasswordChangeVisible, setIsPasswordChangeVisible] = useState(false);
   const [hidePassword, setHidePassword] = useState(true);
+
+  
+  // Alert Modal
+  const [alertPasswordChangedModalVisible, setAlertPasswordChangedModalVisible] = useState(false);
 
   const handleSignOut = () => {
     Alert.alert(
@@ -103,7 +109,7 @@ export default function aboutScreen() {
       if (newPassword === newPasswordRepeat) {
         updatePassword(user, newPassword).then(() => {
           setIsPasswordChangeVisible(false);
-          Alert.alert('Success', 'successfully changed password');
+          setAlertPasswordChangedModalVisible(true);
         }).catch((error) => {
           Alert.alert('Fehler', error.message);
         });
@@ -196,6 +202,13 @@ export default function aboutScreen() {
         </View>
 
       </View>
+      <AlertModal 
+        title='Success!'
+        message='successfully changed password'
+        buttonText='proceed'
+        alertModalVisible={alertPasswordChangedModalVisible} 
+        setAlertModalVisible={setAlertPasswordChangedModalVisible} 
+      />
     </>
   );
 }
