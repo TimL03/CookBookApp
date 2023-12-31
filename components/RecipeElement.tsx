@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { Carrot, Soup, Vegan } from 'lucide-react-native';
+import { Carrot, EggOff, Fish, MilkOff, Soup, Vegan } from 'lucide-react-native';
 import Colors from '../constants/Colors';
 import gStyles from '../constants/Global_Styles'
 import { View } from './Themed';
@@ -37,14 +37,20 @@ const CategoryIcon: React.FC<CategoryIconProps> = ({ categories }) => {
         <>
           {categories.map((category, index) => {
             switch (category) {
-              case 'Soup':
-                return <Soup key={index} color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
-              case 'Vegetarian':
-                return <Carrot key={index} color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
-              case 'Vegan':
-                return <Vegan key={index} color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
-              default:
-                return null;
+                case 'Soup':
+                    return <Soup color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                case 'Vegetarian':
+                    return <Carrot color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                case 'Vegan':
+                    return <Vegan color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                case 'Fish':
+                    return <Fish color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                case 'No-Egg':
+                    return <EggOff color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                case 'No-Milk':
+                    return <MilkOff color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                default:
+                    return null;
             }
           })}
         </>

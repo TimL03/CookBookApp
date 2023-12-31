@@ -6,8 +6,7 @@ import { Alata12 } from "./StyledText";
 
 export default function CategoryFilter({ categories, selectedCategories, onSelectCategory }) {
   return (
-    <View>
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={[gStyles.mapHorizontal, styles.paddingVertical]}>
+    <View style={gStyles.mapHorizontal}>
       {categories.map((category) => (
         <Pressable
           key={category}
@@ -20,7 +19,6 @@ export default function CategoryFilter({ categories, selectedCategories, onSelec
           <Alata12 style={[gStyles.alignCenter, gStyles.marginBottom]}>{category}</Alata12>
         </Pressable>
       ))}
-    </ScrollView>
     </View>
   );
 }
@@ -31,9 +29,5 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingHorizontal: 20,
     elevation: 2,
-  },
-  paddingVertical: {
-    paddingTop: 10,
-    paddingBottom: 10,
   },
 });

@@ -5,7 +5,7 @@ import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../../FirebaseConfig'
-import { Share2, Save, ArrowDownToLine } from 'lucide-react-native';
+import { Share2, Save, ArrowDownToLine, Repeat, RefreshCcw } from 'lucide-react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Alata12, Alata16, Alata20, Alata24 } from '../../components/StyledText';
 import { useSession } from '../../api/firebaseAuthentication/client';
@@ -108,18 +108,21 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
           <View style={gStyles.HorizontalLayout}>
             <Alata24 style={gStyles.flex}>{recipe.strMeal}</Alata24>
             {/* Action buttons */}
-              <Pressable style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
-                <Share2 color={Colors.dark.text} />
+            <Pressable onPress={onFindNewRecipe} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
+                <RefreshCcw color={Colors.dark.text} />
               </Pressable>
-              {showInputs ? (
-                <Pressable onPress={handleFinalSaveClick} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
-                  <Save color={hasBeenSaved ? Colors.dark.tint : Colors.dark.text} size={24}/>
-                </Pressable>
-              ) : (
-                <Pressable onPress={handleSaveButtonClick} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
-                  <ArrowDownToLine color={Colors.dark.text} size={24}/>
-                </Pressable>
-              )}
+            <Pressable style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
+              <Share2 color={Colors.dark.text} />
+            </Pressable>
+            {showInputs ? (
+              <Pressable onPress={handleFinalSaveClick} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
+                <Save color={hasBeenSaved ? Colors.dark.tint : Colors.dark.text} size={24}/>
+              </Pressable>
+            ) : (
+              <Pressable onPress={handleSaveButtonClick} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
+                <ArrowDownToLine color={Colors.dark.text} size={24}/>
+              </Pressable>
+            )}
           </View>
 
           {/* Input fields for category and cooking times */}
@@ -178,10 +181,6 @@ export default function ViewRandomRecipeScreen({ closeModal, recipe, onFindNewRe
           </View>
         </View>
 
-        {/* Button to find a new recipe */}
-        <Pressable onPress={onFindNewRecipe} style={({ pressed }) => [gStyles.squareButtonText, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-          <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Get new recipe!</Alata20>
-        </Pressable>
       </ScrollView>
 
     </View>

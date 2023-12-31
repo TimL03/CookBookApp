@@ -140,7 +140,7 @@ return (
       visible={isModalVisible}
       onRequestClose={() => setModalVisible(false)}
     >
-      <ViewRandomRecipeScreen closeModal={() => setModalVisible(false)} recipe={selectedMeal} onFindNewRecipe={findNewRecipe} />
+    <ViewRandomRecipeScreen closeModal={() => setModalVisible(false)} recipe={selectedMeal} onFindNewRecipe={findNewRecipe} />
     </Modal>
   </View>
 )

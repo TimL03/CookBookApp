@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import { View, StyleSheet, Pressable} from 'react-native';
-import { User2, Mail, KeyRound, Eye, EyeOff, AlignCenter } from 'lucide-react-native';
+import { View, StyleSheet, Pressable, Image} from 'react-native';
+import { User2, Mail, KeyRound, Eye, EyeOff } from 'lucide-react-native';
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
 import { Alata20, Alata22, Alata24 } from '../../components/StyledText';
@@ -39,29 +39,56 @@ export default function LoginModalScreen() {
 
   return (
     <View style={[gStyles.defaultContainer, styles.center]}>
-      <View style={[gStyles.modalContentContainer, styles.contentBox]}>
+      <View>
+        { loginMode ? 
+          <Alata24 style={[gStyles.alignCenter, styles.marginBottom]}>Welcome back!</Alata24>
+          : <Alata24 style={[gStyles.alignCenter, styles.marginBottom]}>Welcome to the{"\n"}CookBook App!</Alata24>
+        }
+        <Image source={require('../../assets/images/login_image.png')}  style={styles.image}/>
+      </View>
+      <View style={[gStyles.modalContentContainer, styles.contentBox, {paddingVertical: loginMode ? 105 : 40,}]}>
         
         {
           !loginMode ?
             <>
-            <Alata24 style={[gStyles.alignCenter, styles.marginBottom]}>Welcome</Alata24>
             <View style={gStyles.cardInput}>
               <User2 color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
-              <TextInput value={username} onChangeText={setUsername} placeholder="Name" placeholderTextColor={Colors.dark.text} style={gStyles.textInput} />
+              <TextInput 
+                value={username} 
+                returnKeyType="next"
+                onSubmitEditing={() => { this.emailInput.focus(); }}
+                blurOnSubmit={false}
+                onChangeText={setUsername} 
+                placeholder="Name" 
+                placeholderTextColor={Colors.dark.text} style={gStyles.textInput} />
             </View>
             </>
-            : <Alata24 style={[gStyles.alignCenter, styles.marginBottom]}>Welcome back!</Alata24>
+            : null
         }
 
         <View style={gStyles.cardInput}>
           <Mail color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
-          <TextInput placeholder="Email" onChangeText={setEmail} value={email}
+          <TextInput 
+            placeholder="Email" 
+            returnKeyType="next"
+            blurOnSubmit={false}
+            onSubmitEditing={() => { this.passwordInput.focus(); }}
+            ref={(input) => { this.emailInput = input; }}
+            onChangeText={setEmail} 
+            value={email}
             placeholderTextColor={Colors.dark.text} style={gStyles.textInput} />
         </View>
 
         <View style={gStyles.cardInput}>
           <KeyRound color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
-          <TextInput placeholder="Password" onChangeText={setPassword} value={password}
+          <TextInput 
+            placeholder="Password"
+            returnKeyType= {loginMode ? "done" : "next"}
+            onSubmitEditing={() => { loginMode ? logIn() : this.passwordRepeatInput.focus() }}
+            blurOnSubmit={false}
+            ref={(input) => { this.passwordInput = input; }}
+            onChangeText={setPassword} 
+            value={password}
             placeholderTextColor={Colors.dark.text} style={gStyles.textInput} secureTextEntry={hidePassword} />
           {hidePassword ?
             <Pressable onPress={() => setHidePassword(false)} style={gStyles.alignCenter}>
@@ -78,7 +105,13 @@ export default function LoginModalScreen() {
           !loginMode ?
             <View style={gStyles.cardInput}>
               <KeyRound color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
-              <TextInput placeholder="Repeat Password" placeholderTextColor={Colors.dark.text} style={gStyles.textInput} secureTextEntry={hidePassword} />
+              <TextInput 
+                placeholder="Repeat Password" 
+                onSubmitEditing={handleSignUp}
+                ref={(input) => { this.passwordRepeatInput = input; }}
+                placeholderTextColor={Colors.dark.text} 
+                style={gStyles.textInput} 
+                secureTextEntry={hidePassword} />
               {hidePassword ?
                 <Pressable onPress={() => setHidePassword(false)} style={gStyles.alignCenter}>
                   <Eye color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
@@ -92,11 +125,11 @@ export default function LoginModalScreen() {
             : null
         }
 
-        <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: !loginMode ? Colors.dark.background : pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]} onPress={logIn} disabled={isLoading}>
+        <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: !loginMode ? Colors.dark.mainColorDark : pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]} onPress={logIn} disabled={isLoading}>
           <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>{loginMode ? 'Log in' : 'already have a acount'}</Alata20>
         </Pressable>
 
-        <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: loginMode ? Colors.dark.background : pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]} onPress={handleSignUp} disabled={isLoading}>
+        <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: loginMode ? Colors.dark.mainColorDark : pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]} onPress={handleSignUp} disabled={isLoading}>
           <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>{!loginMode ? 'create Account' : 'Sign up'}</Alata20>
         </Pressable>
       </View>
@@ -108,15 +141,23 @@ export default function LoginModalScreen() {
 const styles = StyleSheet.create({
   center: {
     flexDirection: 'column',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
+    backgroundColor: Colors.dark.mainColorDark,
   },
   marginBottom: {
     marginBottom: 30,
   },
   contentBox: {
-
-      paddingVertical: 40,
       borderRadius: 20,
+      backgroundColor: Colors.dark.background,
+  },
+  image: {
+    width: 300,
+    height: 300,
+    marginRight: 20,
+    marginBottom: -30,
+    zIndex: 1,
+    resizeMode: 'contain',
   },
 });
