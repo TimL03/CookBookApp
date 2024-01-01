@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { View, StyleSheet, Pressable, Image} from 'react-native';
+import { View, StyleSheet, Pressable, Image, KeyboardAvoidingView, Platform} from 'react-native';
 import { User2, Mail, KeyRound, Eye, EyeOff } from 'lucide-react-native';
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
@@ -38,7 +38,7 @@ export default function LoginModalScreen() {
   };
 
   return (
-    <View style={[gStyles.defaultContainer, styles.center]}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : null} style={[gStyles.defaultContainer, styles.center]}>
       <View>
         { loginMode ? 
           <Alata24 style={[gStyles.alignCenter, styles.marginBottom]}>Welcome back!</Alata24>
@@ -133,7 +133,7 @@ export default function LoginModalScreen() {
           <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>{!loginMode ? 'create Account' : 'Sign up'}</Alata20>
         </Pressable>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -143,6 +143,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'flex-end',
     alignItems: 'center',
+    borderRadiusBottomLeft: 0,
+    borderRadiusBottomRight: 0,
     backgroundColor: Colors.dark.mainColorDark,
   },
   marginBottom: {

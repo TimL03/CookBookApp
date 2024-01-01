@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Alert, TextInput } from 'react-native';
+import { Pressable, StyleSheet, Alert, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { View } from '../../components/Themed';
 import React, { useEffect, useState } from 'react';
 import { Link, Stack } from 'expo-router';
@@ -129,7 +129,7 @@ export default function aboutScreen() {
         <Alata16>E-Mail: {authData ? authData.email : 'Lädt...'}</Alata16>
         <Alata16>UID: {authData ? authData.uid : 'Lädt...'}</Alata16>
       </View>
-      <View style={styles.buttonContainer}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : null} contentContainerStyle={styles.buttonContainer} style={styles.buttonContainer}>
 
         {isPasswordChangeVisible ?
           <>
@@ -183,7 +183,7 @@ export default function aboutScreen() {
           : null }
           <Pressable
             style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter,
-            { backgroundColor: isPasswordChangeVisible ? (pressed ? Colors.dark.alertPressed : Colors.dark.alert) : (pressed ? Colors.dark.mainColorLight : Colors.dark.tint) }]}
+            { backgroundColor: isPasswordChangeVisible ? (pressed ? Colors.dark.alertPressed : Colors.dark.alert) : (pressed ? Colors.dark.mainColorLight : Colors.dark.tint) }, {marginBottom: Platform.OS === 'ios' && isPasswordChangeVisible? 50 : 0}]}
             onPress={() => setIsPasswordChangeVisible(!isPasswordChangeVisible)}>
             <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>{isPasswordChangeVisible ? "Cancel" : "Change Password"}</Alata20>
           </Pressable>
@@ -198,13 +198,13 @@ export default function aboutScreen() {
 
           <Pressable
             style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter,
-            { backgroundColor: pressed ? Colors.dark.alertPressed : Colors.dark.alert }]}
+            { backgroundColor: pressed ? Colors.dark.alertPressed : Colors.dark.alert }, {marginBottom: Platform.OS === 'ios' ? 50 : 0}]}
             onPress={() => setAlertDeleteAccountModalVisible(true)}>
             <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Account löschen</Alata20>
           </Pressable>
           </>
         }
-      </View>
+      </KeyboardAvoidingView>
 
 
       <AlertModal 
@@ -257,6 +257,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonContainer: {
+    backgroundColor: Colors.dark.background,
     flex: 1,
     paddingHorizontal: 30,
     justifyContent: 'flex-end',
