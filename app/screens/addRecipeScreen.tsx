@@ -13,6 +13,8 @@ import DropDown from '../../components/DropDown';
 import { useSession } from '../../api/firebaseAuthentication/client';
 import { uploadImage } from '../../api/cookBookRecipesFirebase/client';
 import { Stack, useRouter } from 'expo-router';
+import ChooseImageAlert from '../modals/alerts/chooseImageAlert';
+import InfoAlert from '../modals/alerts/infoAlert';
 
 export default function AddRecipeScreen() {
   const router = useRouter();
@@ -28,6 +30,10 @@ export default function AddRecipeScreen() {
   const [steps, setSteps] = useState(['']);
   const [imageUri, setImageUri] = useState<string | null>(null);
 
+  const [chooseImageAlertVisible, setChooseImageAlertVisible] = useState(false);
+  const [galeriePermissionAlertVisible, setGaleriePermissionAlertVisible] = useState(false);
+  const [cameraPermissionAlertVisible, setCameraPermissionAlertVisible] = useState(false);
+
   const units = [
     { key: '1', value: 'tbsp' },
     { key: '2', value: 'tsp' },
@@ -42,7 +48,7 @@ export default function AddRecipeScreen() {
   const addImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      alert('Sorry, we need camera roll permissions to make this work!');
+      setGaleriePermissionAlertVisible(true);
       return;
     }
 
@@ -62,7 +68,7 @@ export default function AddRecipeScreen() {
   const takePhoto = async () => {
     const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
     if (cameraPermission.status !== 'granted') {
-      alert('Camera permission is required to take a photo.');
+      setCameraPermissionAlertVisible(true);
       return;
     }
   
@@ -76,27 +82,6 @@ export default function AddRecipeScreen() {
       const uri = result.assets[0].uri;
       setImageUri(uri);
     }
-  };
-
-  const showImagePickerOptions = () => {
-    Alert.alert(
-      "Foto hinzufügen",
-      "Wählen Sie eine Option",
-      [
-        {
-          text: "Foto aufnehmen",
-          onPress: () => takePhoto()
-        },
-        {
-          text: "Bild aus Galerie wählen",
-          onPress: () => addImage()
-        },
-        {
-          text: "Abbrechen",
-          style: "cancel"
-        }
-      ]
-    );
   };
 
   const handleSave = async () => {
@@ -170,7 +155,7 @@ export default function AddRecipeScreen() {
             source={{ uri: imageUri }}
           />
           :
-          <Pressable onPress={showImagePickerOptions} style={({ pressed }) => [styles.addImage, { backgroundColor: pressed ? Colors.dark.background : Colors.dark.mainColorLight },]}>
+          <Pressable onPress={() => setChooseImageAlertVisible(true)} style={({ pressed }) => [styles.addImage, { backgroundColor: pressed ? Colors.dark.background : Colors.dark.mainColorLight },]}>
             <PlusCircle color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
             <Alata20>Add Image</Alata20>
           </Pressable>
@@ -284,6 +269,33 @@ export default function AddRecipeScreen() {
         </View>
       </ScrollView>
     </View>
+
+    {/* Alerts */}
+    <InfoAlert
+      title='Error'
+      message='You need to allow access to your galerie to take a photo'
+      buttonText='ok'
+      alertModalVisible={galeriePermissionAlertVisible} 
+      setAlertModalVisible={setGaleriePermissionAlertVisible}
+    />
+    <InfoAlert
+      title='Error'
+      message='You need to allow access to your camera to take a photo'
+      buttonText='ok'
+      alertModalVisible={cameraPermissionAlertVisible} 
+      setAlertModalVisible={setCameraPermissionAlertVisible}
+    />
+    <ChooseImageAlert 
+      title='Choose Image'
+      message='Please select an option'
+      optionOneText='Open Gallery'
+      optionTwoText='Take Photo'
+      cancelText='Cancel'
+      alertModalVisible={chooseImageAlertVisible} 
+      setAlertModalVisible={setChooseImageAlertVisible} 
+      optionOneConfirm={addImage}
+      optionTwoConfirm={takePhoto}
+    />
     </>
   );
 }

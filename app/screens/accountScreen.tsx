@@ -12,6 +12,7 @@ import { Alata16, Alata20 } from '../../components/StyledText';
 import gStyles from '../../constants/Global_Styles';
 
 import AlertModal from '../modals/alerts/infoAlert';
+import ConfirmationAlert from '../modals/alerts/confirmationAlert';
 
 interface UserData {
   username: string;
@@ -35,28 +36,10 @@ export default function aboutScreen() {
   
   // Alert Modal
   const [alertPasswordChangedModalVisible, setAlertPasswordChangedModalVisible] = useState(false);
-
-  const handleSignOut = () => {
-    Alert.alert(
-      "Abmelden",
-      "Möchten Sie sich wirklich abmelden?",
-      [
-        { text: "Nein" },
-        { text: "Ja", onPress: () => signOut() },
-      ]
-    );
-  };
-
-  const handleDeleteAccount = () => {
-    Alert.alert(
-      "Account löschen",
-      "Möchten Sie Ihren Account wirklich löschen?",
-      [
-        { text: "Nein" },
-        { text: "Ja", onPress: () => deleteAccount() },
-      ]
-    );
-  };
+  const [alertLogOutModalVisible, setAlertLogOutModalVisible] = useState(false);
+  const [alertDeleteAccountModalVisible, setAlertDeleteAccountModalVisible] = useState(false);
+  const [alertPasswordsDoNotMatchModalVisible, setAlertPasswordsDoNotMatchModalVisible] = useState(false);
+  const [alertPasswordTooShortModalVisible, setAlertPasswordTooShortModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchFirestoreData = async () => {
@@ -106,18 +89,23 @@ export default function aboutScreen() {
     const user = auth.currentUser;
 
     if (user) {
-      if (newPassword === newPasswordRepeat) {
-        updatePassword(user, newPassword).then(() => {
-          setIsPasswordChangeVisible(false);
-          setAlertPasswordChangedModalVisible(true);
-        }).catch((error) => {
-          Alert.alert('Fehler', error.message);
-        });
+      if (newPassword === newPasswordRepeat && newPassword.length >= 6) {
+        if(newPassword.length >= 6) {
+          updatePassword(user, newPassword).then(() => {
+            setIsPasswordChangeVisible(false);
+            setAlertPasswordChangedModalVisible(true);
+          }).catch((error) => {
+            Alert.alert('Error while updating password', error.message);
+          });
+        } else {
+
+          setAlertPasswordTooShortModalVisible(true);
+        }
       } else {
-        Alert.alert('Fehler', 'passwords do not match');
+        setAlertPasswordsDoNotMatchModalVisible(true);
       }
     } else {
-      Alert.alert('Fehler', 'no user found');
+      Alert.alert('Error', 'no user found');
     }
   };
 
@@ -143,12 +131,20 @@ export default function aboutScreen() {
       </View>
       <View style={styles.buttonContainer}>
 
-        {isPasswordChangeVisible && (
+        {isPasswordChangeVisible ?
           <>
             <View style={gStyles.cardInput}>
               <KeyRound color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
-              <TextInput placeholder="new password" onChangeText={setNewPassword} value={newPassword}
-                placeholderTextColor={Colors.dark.text} style={gStyles.textInput} secureTextEntry={hidePassword} />
+              <TextInput 
+                placeholder="new password" 
+                onChangeText={setNewPassword} 
+                returnKeyType='next'
+                ref={(input) => { this.passwordInput = input; }}
+                onSubmitEditing={() => { this.passwordRepeatInput.focus() }}
+                value={newPassword}
+                placeholderTextColor={Colors.dark.text} 
+                style={gStyles.textInput} 
+                secureTextEntry={hidePassword} />
               {hidePassword ?
                 <Pressable onPress={() => setHidePassword(false)} style={gStyles.alignCenter}>
                   <Eye color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
@@ -161,8 +157,15 @@ export default function aboutScreen() {
             </View>
             <View style={gStyles.cardInput}>
               <KeyRound color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
-              <TextInput placeholder="repeat new password" onChangeText={setNewPasswordRepeat} value={newPasswordRepeat}
-                placeholderTextColor={Colors.dark.text} style={gStyles.textInput} secureTextEntry={hidePassword} />
+              <TextInput 
+                placeholder="repeat new password" 
+                onChangeText={setNewPasswordRepeat} 
+                ref={(input) => { this.passwordRepeatInput = input; }}
+                onSubmitEditing={() => { handleChangePassword(), this.passwordRepeatInput.clear(), this.passwordInput.clear() }}
+                value={newPasswordRepeat}
+                placeholderTextColor={Colors.dark.text} 
+                style={gStyles.textInput} 
+                secureTextEntry={hidePassword} />
               {hidePassword ?
                 <Pressable onPress={() => setHidePassword(false)} style={gStyles.alignCenter}>
                   <Eye color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
@@ -175,39 +178,73 @@ export default function aboutScreen() {
             </View>
             <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]} onPress={handleChangePassword}>
               <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Update Password</Alata20>
-            </Pressable>
+            </Pressable>    
           </>
-        )}
-        <View style={styles.buttonContainer}>
+          : null }
           <Pressable
             style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter,
             { backgroundColor: isPasswordChangeVisible ? (pressed ? Colors.dark.alertPressed : Colors.dark.alert) : (pressed ? Colors.dark.mainColorLight : Colors.dark.tint) }]}
             onPress={() => setIsPasswordChangeVisible(!isPasswordChangeVisible)}>
             <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>{isPasswordChangeVisible ? "Cancel" : "Change Password"}</Alata20>
           </Pressable>
-
-          <Pressable
+          {isPasswordChangeVisible ? null :
+          <>
+            <Pressable
             style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter,
             { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]}
-            onPress={handleSignOut}>
+            onPress={() => setAlertLogOutModalVisible(true)}>
             <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Abmelden</Alata20>
           </Pressable>
 
           <Pressable
             style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter,
-            { backgroundColor: pressed ? Colors.dark.alert : Colors.dark.alertPressed }]}
-            onPress={handleDeleteAccount}>
+            { backgroundColor: pressed ? Colors.dark.alertPressed : Colors.dark.alert }]}
+            onPress={() => setAlertDeleteAccountModalVisible(true)}>
             <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Account löschen</Alata20>
           </Pressable>
-        </View>
-
+          </>
+        }
       </View>
+
+
       <AlertModal 
         title='Success!'
         message='successfully changed password'
         buttonText='proceed'
         alertModalVisible={alertPasswordChangedModalVisible} 
         setAlertModalVisible={setAlertPasswordChangedModalVisible} 
+      />
+      <AlertModal 
+        title='Error!'
+        message='Passwords do not match'
+        buttonText='retry'
+        alertModalVisible={alertPasswordsDoNotMatchModalVisible} 
+        setAlertModalVisible={setAlertPasswordsDoNotMatchModalVisible} 
+      />
+      <AlertModal 
+        title='Error!'
+        message='Password must be at least 6 characters long'
+        buttonText='retry'
+        alertModalVisible={alertPasswordTooShortModalVisible}
+        setAlertModalVisible={setAlertPasswordTooShortModalVisible} 
+      />
+      <ConfirmationAlert 
+        title='Logout'
+        message='Do you really want to logout?'
+        cancelText='cancel'
+        confirmText='proceed'
+        alertModalVisible={alertLogOutModalVisible} 
+        setAlertModalVisible={setAlertLogOutModalVisible} 
+        onConfirm={signOut}
+      />
+      <ConfirmationAlert 
+        title='Delete Account'
+        message='Are you sure you want to delete your account? This will permanently erase your account.'
+        cancelText='cancel'
+        confirmText='proceed'
+        alertModalVisible={alertDeleteAccountModalVisible} 
+        setAlertModalVisible={setAlertDeleteAccountModalVisible} 
+        onConfirm={deleteAccount}
       />
     </>
   );
