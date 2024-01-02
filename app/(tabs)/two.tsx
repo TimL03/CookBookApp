@@ -39,16 +39,19 @@ export default function TabTwoScreen() {
 
   return (
     <View style={gStyles.screenContainer}>
-      <SearchBarCookBook setSearchCriteria={setSearchCriteria} />
-      <CategoryFilter
-        categories={data.slice(0,4).map((section) => section.title)}
-        selectedCategories={selectedCategories}
-        onSelectCategory={toggleCategory}
-      />
+      <View style={{ flexDirection: 'column', justifyContent: 'center', gap: 15 }}>
+        <SearchBarCookBook setSearchCriteria={setSearchCriteria} />
+        <CategoryFilter
+          categories={data.map((section) => section.title)}
+          selectedCategories={selectedCategories}
+          onSelectCategory={toggleCategory}
+        />
+      </View>
       <SectionList
+        style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
         sections={filteredSections}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.id.toString() + item.name}
         renderItem={({ item }) => (
           <Recipe item={item} />
         )}
