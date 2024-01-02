@@ -164,27 +164,34 @@ export default function ViewRandomRecipeScreen() {
             )}
           </View>
 
-          {/* Input fields for category and cooking times */}
+          {/* Input fields for cooking times */}
           {showInputs && (
             <>
-              <View style={gStyles.cardInput}>
-                <TextInput
-                  placeholder="Cook Time Hours"
-                  placeholderTextColor={Colors.dark.text}
-                  style={gStyles.textInput}
-                  value={cookHTime}
-                  onChangeText={setCookHTime}
-                />
-              </View>
+            {/* adding Recipe preparation time */}
+              <Alata20>Preperation Time:</Alata20>
+              <View style={[gStyles.HorizontalLayout,{gap: 12}]}>
+                <View style={[gStyles.cardInput, gStyles.flex]}>
+                  <TextInput 
+                    inputMode="numeric" 
+                    maxLength={2} 
+                    placeholder="00" 
+                    value={cookHTime} 
+                    onChangeText={setCookHTime} 
+                    style={gStyles.textInput} 
+                    placeholderTextColor={Colors.dark.text} />
+                  <Alata16 style={gStyles.alignCenter}>hours</Alata16>
+                </View>
 
-              <View style={gStyles.cardInput}>
-                <TextInput
-                  placeholder="Cook Time Min"
-                  placeholderTextColor={Colors.dark.text}
-                  style={gStyles.textInput}
-                  value={cookMinTime}
-                  onChangeText={setCookMinTime}
-                />
+                <View style={[gStyles.cardInput, gStyles.flex]}>
+                  <TextInput 
+                    inputMode="numeric" 
+                    maxLength={2} 
+                    placeholder="00" 
+                    value={cookMinTime} 
+                    onChangeText={setCookMinTime} 
+                    style={gStyles.textInput} placeholderTextColor={Colors.dark.text} />
+                  <Alata16 style={gStyles.alignCenter}>minutes</Alata16>
+                </View>
               </View>
             </>
           )}
