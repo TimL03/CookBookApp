@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TextInput, StyleSheet, ScrollView, View, Pressable, Text, Image, Alert } from 'react-native';
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
 import { db } from '../../FirebaseConfig'
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, setDoc, doc } from 'firebase/firestore';
 import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Alata16, Alata20, Alata12, AlataText } from '../../components/StyledText';
@@ -11,24 +11,55 @@ import { X, PlusCircle, Plus, Save, ChevronDown } from 'lucide-react-native';
 import TopModalBar from '../../components/topModalBar';
 import DropDown from '../../components/DropDown';
 import { useSession } from '../../api/firebaseAuthentication/client';
-import { uploadImage } from '../../api/cookBookRecipesFirebase/client';
-import { Stack, useRouter } from 'expo-router';
+import { getRecipeById, uploadImage } from '../../api/cookBookRecipesFirebase/client';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import ChooseImageAlert from '../modals/alerts/chooseImageAlert';
 import InfoAlert from '../modals/alerts/infoAlert';
+import { RecipeData } from '../../api/cookBookRecipesFirebase/model';
 
 export default function AddRecipeScreen() {
   const router = useRouter();
-   // Get user id from session
-   const { session } = useSession();
-   const userID = session;
+
+  // Get user id from session
+  const { session } = useSession();
+  const userID = session;
+
+  // Get recipe id from router params
+  const params = useLocalSearchParams();
+  const [recipe, setRecipe] = useState<RecipeData | null>(null);
+
+  // Fetch recipe from database
+  useEffect(() => {
+    const fetchRecipe = async () => {
+      const fetchedRecipe = await getRecipeById(userID.toString(), params.recipeID.toString());
+      setRecipe(fetchedRecipe);
+    };
+
+    fetchRecipe();
+  }, [userID, params.recipeID]);
+
+  const [editMode, setEditMode] = useState(false);
    
   const [name, setName] = useState('');
   const [cookHTime, setCookHTime] = useState('');
   const [cookMinTime, setCookMinTime] = useState('');
-  const [category, setCategory] = useState('');
+  const [categories, setCategories] = useState(['']);
   const [ingredients, setIngredients] = useState([{ name: '', unit: 'x', amount: '' },]);
   const [steps, setSteps] = useState(['']);
   const [imageUri, setImageUri] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (recipe != null) {
+      setEditMode(true);
+      setName(recipe.name);
+      setCookHTime(recipe.cookHTime);
+      setCookMinTime(recipe.cookMinTime);
+      setCategories(recipe.categories);
+      setIngredients(recipe.ingredients);
+      setSteps(recipe.steps);
+      setImageUri(recipe.imageUrl);
+    }
+  }, [recipe]);
 
   const [chooseImageAlertVisible, setChooseImageAlertVisible] = useState(false);
   const [galeriePermissionAlertVisible, setGaleriePermissionAlertVisible] = useState(false);
@@ -86,28 +117,46 @@ export default function AddRecipeScreen() {
 
   const handleSave = async () => {
     try {
-      let imageUrl = '';
-      if (imageUri) {
+      let imageUrl = imageUri;
+      // Bild nur hochladen, wenn ein neues Bild ausgewählt wurde
+      if (imageUri && !recipe?.imageUrl) {
         imageUrl = await uploadImage(imageUri, name);
       }
 
-      const docRef = await addDoc(collection(db, 'recipes'), {
+      const recipeData = {
         name,
         cookHTime,
         cookMinTime,
-        category,
+        categories,
         ingredients,
         steps,
         imageUrl,
         userID
-      });
-      console.log('Dokument geschrieben mit ID: ', docRef.id);
-      router.back();
+      };
+
+      // Bestehendes Rezept aktualisieren, falls eine ID vorhanden ist
+      if (recipe && recipe.id) {
+        const recipeRef = doc(db, 'recipes', recipe.id);
+        await setDoc(recipeRef, recipeData);
+        console.log('Rezept aktualisiert mit ID: ', recipe.id);
+      } else {
+        // Neues Rezept hinzufügen
+        const docRef = await addDoc(collection(db, 'recipes'), recipeData);
+        console.log('Dokument geschrieben mit ID: ', docRef.id);
+      }
+      router.push('/(tabs)/two');
     } catch (e) {
-      console.error('Fehler beim Hinzufügen des Dokuments: ', e);
+      console.error('Fehler beim Speichern des Rezepts: ', e);
     }
   };
 
+  const addCategory = () => {
+    setCategories([...categories, '']);
+  };
+
+  const removeCategory = (indexToRemove: number) => {
+    setCategories(categories.filter((_, index) => index !== indexToRemove));
+  };
 
   const addIngredient = () => {
     setIngredients([...ingredients, { name: '', amount: '', unit: '' }]);
@@ -131,7 +180,7 @@ export default function AddRecipeScreen() {
     <>
     <Stack.Screen options={{ 
       headerShown: true,
-      title: 'Add a Recipe',
+      title: editMode ? 'Edit Recipe' : 'Add a Recipe',
       headerStyle: {
         backgroundColor: Colors.dark.mainColorDark,
       },
@@ -150,10 +199,12 @@ export default function AddRecipeScreen() {
 
         {/* Recipe image selection */}
         {imageUri != null ?
-          <Image
-            style={gStyles.image}
-            source={{ uri: imageUri }}
-          />
+          <Pressable onPress={() => setChooseImageAlertVisible(true)}>
+            <Image
+              style={gStyles.image}
+              source={{ uri: imageUri }}
+            />
+          </Pressable>
           :
           <Pressable onPress={() => setChooseImageAlertVisible(true)} style={({ pressed }) => [styles.addImage, { backgroundColor: pressed ? Colors.dark.background : Colors.dark.mainColorLight },]}>
             <PlusCircle color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
@@ -171,10 +222,31 @@ export default function AddRecipeScreen() {
           
           
           {/* adding Recipe category */}
-          <Alata20>Category:</Alata20>
-          <View style={gStyles.cardInput}>
-            <TextInput placeholder="Kategory" value={category} onChangeText={setCategory} style={gStyles.textInput} placeholderTextColor={Colors.dark.text} />
+          <Alata20>Categories:</Alata20>
+          <View style={styles.gap}>
+          {categories.map((category, index) => (
+            <View key={index} style={gStyles.cardInput}>
+              <TextInput
+                placeholder={`Category ${index + 1}`}
+                value={category}
+                placeholderTextColor={Colors.dark.text}
+                onChangeText={(text) => {
+                  const newCategories = [...categories];
+                  newCategories[index] = text;
+                  setCategories(newCategories);
+                }}
+                style={gStyles.textInput}
+              />
+              <Pressable onPress={() => removeCategory(index)} style={[gStyles.iconButton, styles.marginRight]}>
+                <X color={Colors.dark.text} size={22} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
+              </Pressable>
+            </View>
+          ))}
+          <Pressable onPress={addCategory} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]}>
+            <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
+          </Pressable>
           </View>
+          
           
           
           {/* adding Recipe preparation time */}
@@ -264,7 +336,7 @@ export default function AddRecipeScreen() {
           {/* Save button */}
           <Pressable onPress={handleSave} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { marginTop: 30, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
             <Save color={Colors.dark.text} size={28} style={gStyles.alignCenter} />
-            <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Save Recipe</Alata20>
+            <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>{editMode ? 'Save Changes' : 'Save Recipe'}</Alata20>
           </Pressable>
         </View>
       </ScrollView>

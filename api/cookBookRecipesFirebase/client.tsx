@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { db } from '../../FirebaseConfig';
-import { collection, getDocs, where, query, onSnapshot, doc, getDoc, addDoc } from 'firebase/firestore';
+import { collection, getDocs, where, query, onSnapshot, doc, getDoc, addDoc, deleteDoc } from 'firebase/firestore';
 import { GroupedByCategory, RecipeData } from './model';
 import { getStorage, ref, uploadBytes, getDownloadURL } from '@firebase/storage';
 import { useSession } from '../../api/firebaseAuthentication/client';
@@ -235,6 +235,16 @@ export const getRecipeByIdForFeed = async (recipeID: string) => {
   }
 };
 
+// Delete a recipe from the database
+export const deleteRecipe = async (recipeID: string) => {
+  try {
+    const docRef = doc(db, "recipes", recipeID);
+    await deleteDoc(docRef);
+    console.log("Document successfully deleted!");
+  } catch (error) {
+    console.error("Error removing document: ", error);
+  }
+}
 
 
 //function to upload an image
