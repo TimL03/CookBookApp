@@ -18,12 +18,10 @@ export default function LoginModalScreen() {
   const { signIn, signUp, isLoading } = useSession();
 
   const logIn = async () => {
-    console.log('Log In button clicked'); 
     if (loginMode) {
       await signIn(email, password);
-      router.replace('/');
-      console.log('Sign In successful'); 
-    } else {
+      router.replace("/")
+        } else {
       setLoginMode(true);
     }
   };

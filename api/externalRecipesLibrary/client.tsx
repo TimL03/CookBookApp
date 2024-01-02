@@ -107,6 +107,7 @@ export const useGetRandomMealId = () => {
         if (matchedMeals.length > 0) {
           const randomMealId = matchedMeals[Math.floor(Math.random() * matchedMeals.length)].idMeal;
           setSelectedMealId(randomMealId);
+          console.log("Selected Meal:", randomMealId)
           return randomMealId;
         } else {
           console.log("No matching meals found");

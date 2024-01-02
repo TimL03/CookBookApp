@@ -93,7 +93,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     } finally {
       setSession(null);
       setIsLoading(false);
-      router.push("/screens/authentificationScreen");
+      router.push("/");
     }
   };
 
@@ -103,7 +103,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
       try {
         await deleteUser(user);
         setSession(null);
-        router.push("/screens/authentificationScreen");
+        router.push("/");
         alert("Account deleted");
       } catch (error) {
         alert("Fehler beim Löschen des Accounts");

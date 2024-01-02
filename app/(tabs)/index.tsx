@@ -29,7 +29,7 @@ export default function TabOneScreen() {
   const [selectedFirebaseCategories, setSelectedFirebaseCategories] = useState<Item[]>([]);
 
   const [searchMode, setSearchMode] = useState<'database' | 'cookbook'>('database');
-  const { selectedMeal, fetchMeal } = useGetRandomMealId(ItemListToCSVString(selectedApiIngredients), ItemListToCSVString(selectedApiCategories));
+  const { fetchMeal } = useGetRandomMealId();
   const [selectedFirebaseRecipe, setSelectedFirebaseRecipe] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const { session } = useSession();
@@ -85,22 +85,20 @@ export default function TabOneScreen() {
   const getMeal = async () => {
     const mealId = await fetchMeal(ItemListToCSVString(selectedApiIngredients), ItemListToCSVString(selectedApiCategories));
     if (mealId) {
-      router.push({ pathname: "/modals/viewRandomRecipeModal", params: { recipeID: mealId }});
+      router.push({
+        pathname: "/modals/viewRandomRecipeModal",
+        params: {
+          recipeID: mealId,
+          selectedIngredients: ItemListToCSVString(selectedApiIngredients),
+          selectedCategories: ItemListToCSVString(selectedApiCategories)
+        }
+      });
     } else {
       alert('No meal found! Please try again.');
     }
   };
   
-
-const findNewRecipe = () => {
-  if (searchMode === 'database') {
-    getMeal();
-  } else if (searchMode === 'cookbook') {
-    handleSearchInFirebase();
-  }
-};
-
-
+  
 return (
   <View style={gStyles.screenContainer}>
     <SearchSwitch onToggle={(isDatabaseSearch) => setSearchMode(isDatabaseSearch ? 'database' : 'cookbook')} />

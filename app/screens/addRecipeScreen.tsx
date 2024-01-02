@@ -29,24 +29,25 @@ export default function AddRecipeScreen() {
   const [recipe, setRecipe] = useState<RecipeData | null>(null);
 
   // Fetch recipe from database
-  if(params.recipeID) {
+  if (params.recipeID) {
     useEffect(() => {
       const fetchRecipe = async () => {
         const fetchedRecipe = await getRecipeById(userID.toString(), params.recipeID.toString());
         setRecipe(fetchedRecipe);
       };
-  
+
       fetchRecipe();
     }, [userID, params.recipeID]);
   }
 
   const [editMode, setEditMode] = useState(false);
-   
+
   const [name, setName] = useState('');
   const [cookHTime, setCookHTime] = useState('');
   const [cookMinTime, setCookMinTime] = useState('');
   const [categories, setCategories] = useState(['']);
   const [ingredients, setIngredients] = useState([{ name: '', unit: 'x', amount: '' },]);
+  const [ingredientNames, setIngredientNames] = useState(['']);
   const [steps, setSteps] = useState(['']);
   const [imageUri, setImageUri] = useState<string | null>(null);
 
@@ -58,6 +59,7 @@ export default function AddRecipeScreen() {
       setCookMinTime(recipe.cookMinTime);
       setCategories(recipe.categories);
       setIngredients(recipe.ingredients);
+      setIngredientNames(recipe.ingredientNames);
       setSteps(recipe.steps);
       setImageUri(recipe.imageUrl);
     }
@@ -66,6 +68,7 @@ export default function AddRecipeScreen() {
   const [chooseImageAlertVisible, setChooseImageAlertVisible] = useState(false);
   const [galeriePermissionAlertVisible, setGaleriePermissionAlertVisible] = useState(false);
   const [cameraPermissionAlertVisible, setCameraPermissionAlertVisible] = useState(false);
+
 
   const units = [
     { key: '1', value: 'tbsp' },
@@ -104,13 +107,13 @@ export default function AddRecipeScreen() {
       setCameraPermissionAlertVisible(true);
       return;
     }
-  
+
     let result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
-  
+
     if (result && !result.canceled && result.assets) {
       const uri = result.assets[0].uri;
       setImageUri(uri);
@@ -118,6 +121,10 @@ export default function AddRecipeScreen() {
   };
 
   const handleSave = async () => {
+    if (categories.length === 0 || categories.some(category => !category)) {
+      alert('Please add at least one category.');
+      return;
+    }
     try {
       let imageUrl = imageUri;
       // Bild nur hochladen, wenn ein neues Bild ausgewählt wurde
@@ -131,6 +138,7 @@ export default function AddRecipeScreen() {
         cookMinTime,
         categories,
         ingredients,
+        ingredientNames,
         steps,
         imageUrl,
         userID
@@ -152,6 +160,25 @@ export default function AddRecipeScreen() {
     }
   };
 
+  useEffect(() => {
+    const newIngredientNames = ingredients.map(ingredient => ingredient.name);
+  
+    if (!arraysEqual(newIngredientNames, ingredientNames)) {
+      setIngredientNames(newIngredientNames);
+    }
+  }, [ingredients]);
+  
+  function arraysEqual(arr1, arr2) {
+    if (arr1.length !== arr2.length) return false;
+    for (let i = 0; i < arr1.length; i++) {
+      if (arr1[i] !== arr2[i]) return false;
+    }
+    return true;
+  }
+  
+  
+  const names = ingredients.map(ingredient => ingredient.name);
+
   const addCategory = () => {
     setCategories([...categories, '']);
   };
@@ -162,10 +189,12 @@ export default function AddRecipeScreen() {
 
   const addIngredient = () => {
     setIngredients([...ingredients, { name: '', amount: '', unit: '' }]);
+    setIngredientNames(names);
   };
 
   const removeIngredient = (indexToRemove: number) => {
     setIngredients(ingredients.filter((_, index) => index !== indexToRemove));
+    setIngredientNames(names.filter((_, index) => index !== indexToRemove));
   };
 
   const addStep = () => {
@@ -180,206 +209,207 @@ export default function AddRecipeScreen() {
   if (params.recipeID && !recipe) {
     return (
       <>
-      <Stack.Screen options={{
-        headerShown: false, }} />
-      <View style={{flex: 1, backgroundColor: Colors.dark.mainColorDark}} />
+        <Stack.Screen options={{
+          headerShown: false,
+        }} />
+        <View style={{ flex: 1, backgroundColor: Colors.dark.mainColorDark }} />
       </>
     );
   }
 
   return (
     <>
-    <Stack.Screen options={{ 
-      headerShown: true,
-      headerShadowVisible: false,
-      title: editMode ? 'Edit Recipe' : 'Add a Recipe',
-      headerStyle: {
-        backgroundColor: Colors.dark.mainColorDark,
-      },
-      headerRight: () => 
-      <Pressable onPress={router.back} style={({ pressed }) => [ {padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}> 
-        <X color={Colors.dark.text} size={28}/>
-      </Pressable>,
-      headerLeft: () =>
-      <></>
-    }} 
-    />
-    
-    <View style={[gStyles.defaultContainer, {backgroundColor: Colors.dark.mainColorDark}]}>
-      {/* Main content */}
-      <ScrollView style={[gStyles.fullScreenBackgroundContainer, {backgroundColor: Colors.dark.background}]} keyboardShouldPersistTaps='handled' showsVerticalScrollIndicator={false}>
+      <Stack.Screen options={{
+        headerShown: true,
+        headerShadowVisible: false,
+        title: editMode ? 'Edit Recipe' : 'Add a Recipe',
+        headerStyle: {
+          backgroundColor: Colors.dark.mainColorDark,
+        },
+        headerRight: () =>
+          <Pressable onPress={router.back} style={({ pressed }) => [{ padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+            <X color={Colors.dark.text} size={28} />
+          </Pressable>,
+        headerLeft: () =>
+          <></>
+      }}
+      />
 
-        {/* Recipe image selection */}
-        {imageUri != null ?
-          <Pressable onPress={() => setChooseImageAlertVisible(true)}>
-            <Image
-              style={gStyles.image}
-              source={{ uri: imageUri }}
-            />
-          </Pressable>
-          :
-          <Pressable onPress={() => setChooseImageAlertVisible(true)} style={({ pressed }) => [styles.addImage, { backgroundColor: pressed ? Colors.dark.background : Colors.dark.mainColorLight },]}>
-            <PlusCircle color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
-            <Alata20>Add Image</Alata20>
-          </Pressable>
-        }
+      <View style={[gStyles.defaultContainer, { backgroundColor: Colors.dark.mainColorDark }]}>
+        {/* Main content */}
+        <ScrollView style={[gStyles.fullScreenBackgroundContainer, { backgroundColor: Colors.dark.background }]} keyboardShouldPersistTaps='handled' showsVerticalScrollIndicator={false}>
 
-
-        <View style={[gStyles.fullScreenContentContainerLessGap]}>
-          {/* adding Recipe name */}
-          <Alata20>Name:</Alata20>
-          <View style={gStyles.cardInput}>
-            <TextInput placeholder="Name" value={name} onChangeText={setName} style={gStyles.textInput} placeholderTextColor={Colors.dark.text} />
-          </View>
-          
-          
-          {/* adding Recipe category */}
-          <Alata20>Categories:</Alata20>
-          <View style={styles.gap}>
-          {categories.map((category, index) => (
-            <View key={index} style={gStyles.cardInput}>
-              <TextInput
-                placeholder={`Category ${index + 1}`}
-                value={category}
-                placeholderTextColor={Colors.dark.text}
-                onChangeText={(text) => {
-                  const newCategories = [...categories];
-                  newCategories[index] = text;
-                  setCategories(newCategories);
-                }}
-                style={gStyles.textInput}
+          {/* Recipe image selection */}
+          {imageUri != null ?
+            <Pressable onPress={() => setChooseImageAlertVisible(true)}>
+              <Image
+                style={gStyles.image}
+                source={{ uri: imageUri }}
               />
-              <Pressable onPress={() => removeCategory(index)} style={[gStyles.iconButton, styles.marginRight]}>
-                <X color={Colors.dark.text} size={22} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
+            </Pressable>
+            :
+            <Pressable onPress={() => setChooseImageAlertVisible(true)} style={({ pressed }) => [styles.addImage, { backgroundColor: pressed ? Colors.dark.background : Colors.dark.mainColorLight },]}>
+              <PlusCircle color={Colors.dark.text} size={24} style={gStyles.alignCenter} />
+              <Alata20>Add Image</Alata20>
+            </Pressable>
+          }
+
+
+          <View style={[gStyles.fullScreenContentContainerLessGap]}>
+            {/* adding Recipe name */}
+            <Alata20>Name:</Alata20>
+            <View style={gStyles.cardInput}>
+              <TextInput placeholder="Name" value={name} onChangeText={setName} style={gStyles.textInput} placeholderTextColor={Colors.dark.text} />
+            </View>
+
+
+            {/* adding Recipe category */}
+            <Alata20>Categories:</Alata20>
+            <View style={styles.gap}>
+              {categories.map((category, index) => (
+                <View key={index} style={gStyles.cardInput}>
+                  <TextInput
+                    placeholder={`Category ${index + 1}`}
+                    value={category}
+                    placeholderTextColor={Colors.dark.text}
+                    onChangeText={(text) => {
+                      const newCategories = [...categories];
+                      newCategories[index] = text;
+                      setCategories(newCategories);
+                    }}
+                    style={gStyles.textInput}
+                  />
+                  <Pressable onPress={() => removeCategory(index)} style={[gStyles.iconButton, styles.marginRight]}>
+                    <X color={Colors.dark.text} size={22} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
+                  </Pressable>
+                </View>
+              ))}
+              <Pressable onPress={addCategory} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]}>
+                <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
               </Pressable>
             </View>
-          ))}
-          <Pressable onPress={addCategory} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]}>
-            <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={{ alignSelf: 'center' }} />
-          </Pressable>
-          </View>
-          
-          
-          
-          {/* adding Recipe preparation time */}
-          <Alata20>Preperation Time:</Alata20>
-          <View style={[gStyles.HorizontalLayout,{gap: 12}]}>
-            <View style={[gStyles.cardInput, gStyles.flex]}>
-              <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookHTime} onChangeText={setCookHTime} style={gStyles.textInput} placeholderTextColor={Colors.dark.text} />
-              <Alata16 style={gStyles.alignCenter}>hours</Alata16>
-            </View>
 
-            <View style={[gStyles.cardInput, gStyles.flex]}>
-              <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookMinTime} onChangeText={setCookMinTime} style={gStyles.textInput} placeholderTextColor={Colors.dark.text} />
-              <Alata16 style={gStyles.alignCenter}>minutes</Alata16>
-            </View>
-          </View>
 
-          {/* adding Recipe ingredients */}
-          <Alata20>Ingredients:</Alata20>
-          <View style={styles.gap}>
-          {ingredients.map((ingredient, index) => (
-            <View key={index} style={[gStyles.HorizontalLayout, {gap: 12, zIndex: 1}]}>
-              <View style={[gStyles.cardInput, {flex: 3}]}>
-                <TextInput
-                  placeholder={`Ingredient ${index + 1}`}
-                  placeholderTextColor={Colors.dark.text}
-                  value={ingredient.name}
-                  onChangeText={(text) => {
-                    const newIngredients = [...ingredients];
-                    newIngredients[index].name = text;
-                    setIngredients(newIngredients);
-                  }}
-                  style={gStyles.textInput}
-                />
-                <Pressable onPress={() => removeIngredient(index)} style={[gStyles.iconButton, styles.marginRight]}>
-                  <X color={Colors.dark.text} size={22} strokeWidth='2.5' />
-                </Pressable>
+
+            {/* adding Recipe preparation time */}
+            <Alata20>Preperation Time:</Alata20>
+            <View style={[gStyles.HorizontalLayout, { gap: 12 }]}>
+              <View style={[gStyles.cardInput, gStyles.flex]}>
+                <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookHTime} onChangeText={setCookHTime} style={gStyles.textInput} placeholderTextColor={Colors.dark.text} />
+                <Alata16 style={gStyles.alignCenter}>hours</Alata16>
               </View>
-              <View style={styles.flex2}>
-                <DropDown
-                  item={units}
-                  selectedUnit={ingredient.unit}
-                  selectedAmount={ingredient.amount}
-                  onSelect={(unit, amount) => {
-                    const newIngredients = [...ingredients];
-                    newIngredients[index] = { ...newIngredients[index], unit, amount };
-                    setIngredients(newIngredients);
-                  }}
-                />
+
+              <View style={[gStyles.cardInput, gStyles.flex]}>
+                <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookMinTime} onChangeText={setCookMinTime} style={gStyles.textInput} placeholderTextColor={Colors.dark.text} />
+                <Alata16 style={gStyles.alignCenter}>minutes</Alata16>
               </View>
             </View>
-          ))}
 
-          <Pressable onPress={addIngredient} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]}>
-            <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={gStyles.alignCenter} />
-          </Pressable>
-          </View>
+            {/* adding Recipe ingredients */}
+            <Alata20>Ingredients:</Alata20>
+            <View style={styles.gap}>
+              {ingredients.map((ingredient, index) => (
+                <View key={index} style={[gStyles.HorizontalLayout, { gap: 12, zIndex: 1 }]}>
+                  <View style={[gStyles.cardInput, { flex: 3 }]}>
+                    <TextInput
+                      placeholder={`Ingredient ${index + 1}`}
+                      placeholderTextColor={Colors.dark.text}
+                      value={ingredient.name}
+                      onChangeText={(text) => {
+                        const newIngredients = [...ingredients];
+                        newIngredients[index].name = text;
+                        setIngredients(newIngredients);
+                      }}
+                      style={gStyles.textInput}
+                    />
+                    <Pressable onPress={() => removeIngredient(index)} style={[gStyles.iconButton, styles.marginRight]}>
+                      <X color={Colors.dark.text} size={22} strokeWidth='2.5' />
+                    </Pressable>
+                  </View>
+                  <View style={styles.flex2}>
+                    <DropDown
+                      item={units}
+                      selectedUnit={ingredient.unit}
+                      selectedAmount={ingredient.amount}
+                      onSelect={(unit, amount) => {
+                        const newIngredients = [...ingredients];
+                        newIngredients[index] = { ...newIngredients[index], unit, amount };
+                        setIngredients(newIngredients);
+                      }}
+                    />
+                  </View>
+                </View>
+              ))}
 
-          {/* adding Recipe steps */}
-          <Alata20>Instructions:</Alata20>
-          <View style={styles.gap}>
-          {steps.map((step, index) => (
-            <View key={index} style={[gStyles.cardInput, gStyles.cardInputMultiline]}>
-              <TextInput
-                multiline
-                numberOfLines={3}
-                placeholder={`Step ${index + 1}`}
-                value={step}
-                placeholderTextColor={Colors.dark.text}
-                onChangeText={(text) => {
-                  const newSteps = [...steps];
-                  newSteps[index] = text;
-                  setSteps(newSteps);
-                }}
-                style={[gStyles.textInput, gStyles.textAlignVerticalTop]}
-              />
-              <Pressable onPress={() => removeStep(index)} style={gStyles.iconButton}>
-              <X color={Colors.dark.text} size={22} strokeWidth='2.5' style={gStyles.alignCenter} />
+              <Pressable onPress={addIngredient} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]}>
+                <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={gStyles.alignCenter} />
               </Pressable>
-          </View>  
+            </View>
 
-          ))}
-          <Pressable onPress={addStep} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-            <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={gStyles.alignCenter} />
-          </Pressable>
+            {/* adding Recipe steps */}
+            <Alata20>Instructions:</Alata20>
+            <View style={styles.gap}>
+              {steps.map((step, index) => (
+                <View key={index} style={[gStyles.cardInput, gStyles.cardInputMultiline]}>
+                  <TextInput
+                    multiline
+                    numberOfLines={3}
+                    placeholder={`Step ${index + 1}`}
+                    value={step}
+                    placeholderTextColor={Colors.dark.text}
+                    onChangeText={(text) => {
+                      const newSteps = [...steps];
+                      newSteps[index] = text;
+                      setSteps(newSteps);
+                    }}
+                    style={[gStyles.textInput, gStyles.textAlignVerticalTop]}
+                  />
+                  <Pressable onPress={() => removeStep(index)} style={gStyles.iconButton}>
+                    <X color={Colors.dark.text} size={22} strokeWidth='2.5' style={gStyles.alignCenter} />
+                  </Pressable>
+                </View>
+
+              ))}
+              <Pressable onPress={addStep} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+                <Plus color={Colors.dark.text} size={28} strokeWidth='2.5' style={gStyles.alignCenter} />
+              </Pressable>
+            </View>
+
+            {/* Save button */}
+            <Pressable onPress={handleSave} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { marginTop: 30, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+              <Save color={Colors.dark.text} size={28} style={gStyles.alignCenter} />
+              <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>{editMode ? 'Save Changes' : 'Save Recipe'}</Alata20>
+            </Pressable>
           </View>
+        </ScrollView>
+      </View>
 
-          {/* Save button */}
-          <Pressable onPress={handleSave} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { marginTop: 30, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-            <Save color={Colors.dark.text} size={28} style={gStyles.alignCenter} />
-            <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>{editMode ? 'Save Changes' : 'Save Recipe'}</Alata20>
-          </Pressable>
-        </View>
-      </ScrollView>
-    </View>
-
-    {/* Alerts */}
-    <InfoAlert
-      title='Error'
-      message='You need to allow access to your galerie to take a photo'
-      buttonText='ok'
-      alertModalVisible={galeriePermissionAlertVisible} 
-      setAlertModalVisible={setGaleriePermissionAlertVisible}
-    />
-    <InfoAlert
-      title='Error'
-      message='You need to allow access to your camera to take a photo'
-      buttonText='ok'
-      alertModalVisible={cameraPermissionAlertVisible} 
-      setAlertModalVisible={setCameraPermissionAlertVisible}
-    />
-    <ChooseImageAlert 
-      title='Choose Image'
-      message='Please select an option'
-      optionOneText='Open Gallery'
-      optionTwoText='Take Photo'
-      cancelText='Cancel'
-      alertModalVisible={chooseImageAlertVisible} 
-      setAlertModalVisible={setChooseImageAlertVisible} 
-      optionOneConfirm={addImage}
-      optionTwoConfirm={takePhoto}
-    />
+      {/* Alerts */}
+      <InfoAlert
+        title='Error'
+        message='You need to allow access to your galerie to take a photo'
+        buttonText='ok'
+        alertModalVisible={galeriePermissionAlertVisible}
+        setAlertModalVisible={setGaleriePermissionAlertVisible}
+      />
+      <InfoAlert
+        title='Error'
+        message='You need to allow access to your camera to take a photo'
+        buttonText='ok'
+        alertModalVisible={cameraPermissionAlertVisible}
+        setAlertModalVisible={setCameraPermissionAlertVisible}
+      />
+      <ChooseImageAlert
+        title='Choose Image'
+        message='Please select an option'
+        optionOneText='Open Gallery'
+        optionTwoText='Take Photo'
+        cancelText='Cancel'
+        alertModalVisible={chooseImageAlertVisible}
+        setAlertModalVisible={setChooseImageAlertVisible}
+        optionOneConfirm={addImage}
+        optionTwoConfirm={takePhoto}
+      />
     </>
   );
 }
