@@ -19,6 +19,7 @@ export default {
     tabIconSelected: '#DDE5E8',
     alert: '#DC544B',
     alertPressed: '#C1342B',
+    rating: '#E6CB6B',
     seeThrough: 'rgba(0,0,0,0)',
   },
   dark: {
@@ -31,6 +32,7 @@ export default {
     tabIconSelected: '#DDE5E8',
     alert: '#DC544B',
     alertPressed: '#C1342B',
+    rating: '#E6CB6B',
     seeThrough: 'rgba(0,0,0,0)',
   },
 };

@@ -11,7 +11,7 @@ import { router } from 'expo-router';
 
 const CategoryIcon: React.FC<CategoryIconProps> = ({ categories }) => {
     return (
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row', backgroundColor: 'transparent' }}>
             {categories.map((category, index) => {
                 switch (category) {
                     case 'Soup':
@@ -22,9 +22,9 @@ const CategoryIcon: React.FC<CategoryIconProps> = ({ categories }) => {
                         return <Vegan color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
                     case 'Fish':
                         return <Fish color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
-                    case 'No Egg':
+                    case 'No-Egg':
                         return <EggOff color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
-                    case 'No Milk':
+                    case 'No-Milk':
                         return <MilkOff color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
                     default:
                         return null;

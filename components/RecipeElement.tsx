@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
-import { Carrot, Soup, Vegan } from 'lucide-react-native';
+import { Carrot, EggOff, Fish, MilkOff, Soup, Vegan } from 'lucide-react-native';
 import Colors from '../constants/Colors';
 import gStyles from '../constants/Global_Styles'
 import { View } from './Themed';
@@ -11,15 +11,21 @@ import { RecipeProps, CategoryIconProps } from '../api/cookBookRecipesFirebase/m
 
 const CategoryIcon: React.FC<CategoryIconProps> = ({ categories }) => {
     return (
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row', backgroundColor: 'transparent' }}>
             {categories.map((category, index) => {
                 switch (category) {
                     case 'Soup':
-                        return <Soup key={index} color={Colors.dark.text} size={20} style={{ marginBottom: 5, marginRight: 5 }} />;
+                        return <Soup color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
                     case 'Vegetarian':
-                        return <Carrot key={index} color={Colors.dark.text} size={20} style={{ marginBottom: 5, marginRight: 5 }} />;
+                        return <Carrot color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
                     case 'Vegan':
-                        return <Vegan key={index} color={Colors.dark.text} size={20} style={{ marginBottom: 5, marginRight: 5 }} />;
+                        return <Vegan color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                    case 'Fish':
+                        return <Fish color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                    case 'No-Egg':
+                        return <EggOff color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                    case 'No-Milk':
+                        return <MilkOff color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
                     default:
                         return null;
                 }

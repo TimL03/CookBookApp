@@ -41,7 +41,7 @@ export default function TabTwoScreen() {
     <View style={gStyles.screenContainer}>
       <SearchBarCookBook setSearchCriteria={setSearchCriteria} />
       <CategoryFilter
-        categories={data.map((section) => section.title)}
+        categories={data.slice(0,4).map((section) => section.title)}
         selectedCategories={selectedCategories}
         onSelectCategory={toggleCategory}
       />

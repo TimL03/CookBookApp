@@ -71,7 +71,7 @@ export default function ViewRecipeScreen() {
     <Stack.Screen options={{ 
       headerShown: true,
       title: 'From your Cookbook',
-
+      headerShadowVisible: false,
       headerStyle: {
         backgroundColor: Colors.dark.mainColorDark,
       },
@@ -86,7 +86,7 @@ export default function ViewRecipeScreen() {
     <View style={[gStyles.defaultContainer, {backgroundColor: Colors.dark.mainColorDark}]}>
 
       {/* Main content */}
-      <ScrollView style={gStyles.fullScreenBackgroundContainer}>
+      <ScrollView style={gStyles.fullScreenBackgroundContainer} showsVerticalScrollIndicator={false}>
         {/* Recipe image */}
         <Image
           style={gStyles.image}

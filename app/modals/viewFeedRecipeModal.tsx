@@ -3,7 +3,7 @@ import { View, Image, Pressable, Modal } from "react-native";
 import TopModalBar from "../../components/topModalBar";
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
-import { Share2, ArrowDownToLine, X } from 'lucide-react-native';
+import { Share2, ArrowDownToLine, X, MessageSquareIcon } from 'lucide-react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Alata20, Alata12, Alata16, Alata14, Alata24 } from '../../components/StyledText';
 import ShareRecipeScreen from './shareRecipeModal';
@@ -84,9 +84,14 @@ export default function ViewFeedRecipeScreen() {
     fetchRatings();
   }, [params.recipeID]);
 
+  // If recipe is null (data is still loading), return a View with the same background color
   if (!recipe) {
     return (
-      <View style={{ flex: 1, backgroundColor: Colors.dark.mainColorDark }} />
+      <>
+      <Stack.Screen options={{
+        headerShown: false, }} />
+      <View style={{flex: 1, backgroundColor: Colors.dark.mainColorDark}} />
+      </>
     );
   }
 
@@ -155,7 +160,7 @@ export default function ViewFeedRecipeScreen() {
       <Stack.Screen options={{
         headerShown: true,
         title: 'From your Cookbook',
-
+        headerShadowVisible: false,
         headerStyle: {
           backgroundColor: Colors.dark.mainColorDark,
         },
@@ -170,7 +175,7 @@ export default function ViewFeedRecipeScreen() {
       <View style={[gStyles.defaultContainer, { backgroundColor: Colors.dark.mainColorDark }]}>
 
         {/* Main content */}
-        <ScrollView style={gStyles.fullScreenBackgroundContainer}>
+        <ScrollView style={gStyles.fullScreenBackgroundContainer} showsVerticalScrollIndicator={false}>
           {/* Recipe image */}
           <Image
             style={gStyles.image}
@@ -183,6 +188,10 @@ export default function ViewFeedRecipeScreen() {
               <View style={gStyles.HorizontalLayout}>
                 <Alata24 style={gStyles.flex}>{recipe.name}</Alata24>
                 <View style={[gStyles.mapHorizontal, gStyles.alignCenter]}>
+                  {/* Rate recipe button */}
+                  <Pressable onPress={() => setIsRatingModalVisible(true)} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                    <MessageSquareIcon color={Colors.dark.text} size={24} />
+                  </Pressable>
                   {/* Share recipe button */}
                   <Pressable onPress={toggleModal} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
                     <Share2 color={Colors.dark.text} size={24} />
@@ -244,9 +253,6 @@ export default function ViewFeedRecipeScreen() {
 
           {/* Add your opinion button */}
           <View>
-            <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]} onPress={() => setIsRatingModalVisible(true)}>
-              <Alata20>Your opinion counts!</Alata20>
-            </Pressable>
             {/* Rating modal */}
             <RatingModal
               isVisible={isRatingModalVisible}

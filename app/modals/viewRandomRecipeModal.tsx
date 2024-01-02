@@ -5,7 +5,7 @@ import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../../FirebaseConfig'
-import { Share2, Save, ArrowDownToLine } from 'lucide-react-native';
+import { Share2, Save, ArrowDownToLine, RefreshCcw, X } from 'lucide-react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Alata12, Alata16, Alata20, Alata24 } from '../../components/StyledText';
 import { useSession } from '../../api/firebaseAuthentication/client';
@@ -117,11 +117,25 @@ export default function ViewRandomRecipeScreen() {
 
   // JSX rendering
   return (
+    <>
+    <Stack.Screen options={{ 
+      headerShown: true,
+      title: 'From your Cookbook',
+      headerShadowVisible	: false,
+      headerStyle: {
+        backgroundColor: Colors.dark.mainColorDark,
+      },
+      headerRight: () => 
+      <Pressable onPress={router.back} style={({ pressed }) => [ {padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}> 
+        <X color={Colors.dark.text} size={28}/>
+      </Pressable>,
+      headerLeft: () =>
+      <></>
+    }} 
+    />
     <View style={[gStyles.defaultContainer, { backgroundColor: Colors.dark.mainColorDark }]}>
-      {/* Top modal bar component */}
-      <TopModalBar title="From your Cookbook" />
       {/* Main content */}
-      <ScrollView style={gStyles.fullScreenBackgroundContainer}>
+      <ScrollView style={gStyles.fullScreenBackgroundContainer} showsVerticalScrollIndicator={false}>
         {/* Recipe image */}
         <Image
           style={gStyles.image}
@@ -133,6 +147,9 @@ export default function ViewRandomRecipeScreen() {
           <View style={gStyles.HorizontalLayout}>
             <Alata24 style={gStyles.flex}>{selectedMeal.strMeal}</Alata24>
             {/* Action buttons */}
+            <Pressable style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough}]}>
+                <RefreshCcw color={Colors.dark.text} />
+              </Pressable>
             <Pressable style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
               <Share2 color={Colors.dark.text} />
             </Pressable>
@@ -202,13 +219,9 @@ export default function ViewRandomRecipeScreen() {
             </View>
           </View>
         </View>
-
-        {/* Button to find a new recipe */}
-        <Pressable style={({ pressed }) => [gStyles.squareButtonText, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
-          <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Get new recipe!</Alata20>
-        </Pressable>
       </ScrollView>
     
     </View>
+    </>
   );
 }
