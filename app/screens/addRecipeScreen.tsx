@@ -29,14 +29,16 @@ export default function AddRecipeScreen() {
   const [recipe, setRecipe] = useState<RecipeData | null>(null);
 
   // Fetch recipe from database
-  useEffect(() => {
-    const fetchRecipe = async () => {
-      const fetchedRecipe = await getRecipeById(userID.toString(), params.recipeID.toString());
-      setRecipe(fetchedRecipe);
-    };
-
-    fetchRecipe();
-  }, [userID, params.recipeID]);
+  if(params.recipeID) {
+    useEffect(() => {
+      const fetchRecipe = async () => {
+        const fetchedRecipe = await getRecipeById(userID.toString(), params.recipeID.toString());
+        setRecipe(fetchedRecipe);
+      };
+  
+      fetchRecipe();
+    }, [userID, params.recipeID]);
+  }
 
   const [editMode, setEditMode] = useState(false);
    
@@ -174,12 +176,22 @@ export default function AddRecipeScreen() {
     setSteps(steps.filter((_, index) => index !== indexToRemove));
   };
 
-
+  // If recipe is null (data is still loading), return a View with the same background color
+  if (params.recipeID && !recipe) {
+    return (
+      <>
+      <Stack.Screen options={{
+        headerShown: false, }} />
+      <View style={{flex: 1, backgroundColor: Colors.dark.mainColorDark}} />
+      </>
+    );
+  }
 
   return (
     <>
     <Stack.Screen options={{ 
       headerShown: true,
+      headerShadowVisible: false,
       title: editMode ? 'Edit Recipe' : 'Add a Recipe',
       headerStyle: {
         backgroundColor: Colors.dark.mainColorDark,
@@ -195,7 +207,7 @@ export default function AddRecipeScreen() {
     
     <View style={[gStyles.defaultContainer, {backgroundColor: Colors.dark.mainColorDark}]}>
       {/* Main content */}
-      <ScrollView style={[gStyles.fullScreenBackgroundContainer, {backgroundColor: Colors.dark.background}]} keyboardShouldPersistTaps='handled'>
+      <ScrollView style={[gStyles.fullScreenBackgroundContainer, {backgroundColor: Colors.dark.background}]} keyboardShouldPersistTaps='handled' showsVerticalScrollIndicator={false}>
 
         {/* Recipe image selection */}
         {imageUri != null ?

@@ -159,7 +159,7 @@ export default function ViewFeedRecipeScreen() {
     <>
       <Stack.Screen options={{
         headerShown: true,
-        title: 'From your Cookbook',
+        title: 'From the Feed',
         headerShadowVisible: false,
         headerStyle: {
           backgroundColor: Colors.dark.mainColorDark,

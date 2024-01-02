@@ -120,7 +120,7 @@ export default function ViewRandomRecipeScreen() {
     <>
     <Stack.Screen options={{ 
       headerShown: true,
-      title: 'From your Cookbook',
+      title: 'What\'s for dinner?',
       headerShadowVisible	: false,
       headerStyle: {
         backgroundColor: Colors.dark.mainColorDark,

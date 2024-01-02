@@ -10,12 +10,14 @@ interface AlertModalProps {
   cancelText: string;
   confirmText: string;
   alertModalVisible: boolean;
+  cardColor: string;
+  buttonColor: string;
   onConfirm: () => void;
   setAlertModalVisible: (visible: boolean) => void;
 }
 
 export default function AlertModal(props: AlertModalProps) {
-  const { title, message, cancelText, confirmText, alertModalVisible, setAlertModalVisible, onConfirm} = props;
+  const { title, message, cancelText, confirmText, cardColor, buttonColor, alertModalVisible, setAlertModalVisible, onConfirm} = props;
 
   return (
     <Modal
@@ -24,14 +26,14 @@ export default function AlertModal(props: AlertModalProps) {
       onRequestClose={() => setAlertModalVisible(false)}
     >
       <View style={styles.background}>
-        <View style={styles.alertCard}>
+        <View style={[styles.alertCard, {backgroundColor: cardColor}]}>
           <Alata22>{title}</Alata22>
           <Alata16>{message}</Alata16>
           <View style={styles.horizontal}>
             <Pressable style={styles.button} onPress={() => {setAlertModalVisible(false)}}>
               <Alata14>{cancelText}</Alata14>
             </Pressable>
-            <Pressable style={[styles.button, {backgroundColor: Colors.dark.alert}] } onPress={() => {setAlertModalVisible(false), onConfirm()}}>
+            <Pressable style={[styles.button, {backgroundColor: buttonColor}] } onPress={() => {setAlertModalVisible(false), onConfirm()}}>
               <Alata14>{confirmText}</Alata14>
             </Pressable>
           </View>
@@ -55,7 +57,6 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   alertCard: {
-    backgroundColor: Colors.dark.mainColorDark,
     gap: 10,
     borderRadius: 15,
     padding: 20,
@@ -63,7 +64,7 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   button: {
-    backgroundColor: Colors.dark.tint,
+    backgroundColor: Colors.dark.mainColorLight,
     padding: 10,
     alignSelf: 'flex-end',
     borderRadius: 30,

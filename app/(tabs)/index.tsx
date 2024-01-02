@@ -76,7 +76,7 @@ export default function TabOneScreen() {
     console.log('Gefundene Rezepte in Firebase:', matchingRecipes);
     if (matchingRecipes.length > 0) {
       setSelectedFirebaseRecipe(matchingRecipes[0]);
-      router.push("/screens/viewRecipeScreen")
+      router.push({pathname: "/screens/viewRecipeScreen", params: {  }});
       } else {
         setAlertModalVisible(true);
     }

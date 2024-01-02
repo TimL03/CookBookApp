@@ -16,7 +16,8 @@ import ConfirmationAlert from '../modals/alerts/confirmationAlert';
 
 export default function ViewRecipeScreen() {
   const [recipe, setRecipe] = useState<RecipeData | null>(null);
-  const [alertAlertDeleteModalVisible, setAlertDeleteModalVisible] = useState(false);
+  const [alertDeleteModalVisible, setAlertDeleteModalVisible] = useState(false);
+  const [alertPublishModalVisible, setAlertPublishModalVisible] = useState(false);
 
   // Get recipe id from router params
   const params = useLocalSearchParams();
@@ -114,8 +115,8 @@ export default function ViewRecipeScreen() {
                   <Share2 color={Colors.dark.text} size={24} />
                 </Pressable>
               
-                {/* Push to discover button */}
-                <Pressable onPress={handleDatabaseSave} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                {/* publish recipe to feed button */}
+                <Pressable onPress={() => setAlertPublishModalVisible(true)} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
                   <ArrowUpToLine color={Colors.dark.text} size={24} />
                 </Pressable>
 
@@ -176,10 +177,25 @@ export default function ViewRecipeScreen() {
         message={'Do you really want to delete the ' + recipe.name + ' Recipe?'}
         cancelText='cancel'
         confirmText='proceed'
-        alertModalVisible={alertAlertDeleteModalVisible} 
+        cardColor={Colors.dark.background}
+        buttonColor={Colors.dark.alert}
+        alertModalVisible={alertDeleteModalVisible} 
         setAlertModalVisible={setAlertDeleteModalVisible} 
         onConfirm={handleDelete}
       />
+
+      <ConfirmationAlert
+      title='Info'
+      message={'You are about to Publish ' + recipe.name + ' to the Feed where everyone can see it. Do you want to proceed?'}
+      cancelText='cancel'
+      confirmText='proceed'
+      cardColor={Colors.dark.background}
+      buttonColor={Colors.dark.tint}
+      alertModalVisible={alertPublishModalVisible} 
+      setAlertModalVisible={setAlertPublishModalVisible} 
+      onConfirm={handleDatabaseSave}
+      />
+
     </View>
     </>
   );

@@ -233,6 +233,8 @@ export default function aboutScreen() {
         message='Do you really want to logout?'
         cancelText='cancel'
         confirmText='proceed'
+        cardColor={Colors.dark.mainColorDark}
+        buttonColor={Colors.dark.alert}
         alertModalVisible={alertLogOutModalVisible} 
         setAlertModalVisible={setAlertLogOutModalVisible} 
         onConfirm={signOut}
@@ -242,6 +244,8 @@ export default function aboutScreen() {
         message='Are you sure you want to delete your account? This will permanently erase your account.'
         cancelText='cancel'
         confirmText='proceed'
+        cardColor={Colors.dark.mainColorDark}
+        buttonColor={Colors.dark.alert}
         alertModalVisible={alertDeleteAccountModalVisible} 
         setAlertModalVisible={setAlertDeleteAccountModalVisible} 
         onConfirm={deleteAccount}
