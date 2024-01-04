@@ -4,7 +4,7 @@ import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
 import { db } from '../../FirebaseConfig'
 import { collection, addDoc, updateDoc, getDoc, doc, query, where, getDocs } from 'firebase/firestore';
-import { Alata20, } from '../../components/StyledText';
+import { Alata16, Alata20, } from '../../components/StyledText';
 import RecipeElement from '../../components/RecipeElement';
 import { InvitationContext } from '../../api/firebaseRecipeInvitations/client';
 import { router } from 'expo-router';
@@ -96,6 +96,9 @@ export default function ShowSharedRecipeInvitationModalScreen() {
         {recipeData && (
           <RecipeElement item={recipeData} />
         )}
+        <View style={[gStyles.cardHorizontal, {backgroundColor: Colors.dark.mainColorDark}]}>
+          <Alata16>message: {invitationData.message}</Alata16>
+        </View>
         <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]} onPress={handleAccept}>
           <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Accept Shared Recipe</Alata20>
         </Pressable>

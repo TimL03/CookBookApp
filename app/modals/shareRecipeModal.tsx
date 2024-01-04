@@ -67,7 +67,7 @@ export default function ShareRecipeScreen() {
         senderId: recipe.userID,
         status: 'pending',
       };
-
+      router.back();
       await addDoc(invitationsCollection, invitationData);
     } catch (error) {
       alert('Error by sending the recipe!');

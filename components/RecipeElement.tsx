@@ -77,12 +77,12 @@ const styles = StyleSheet.create({
     },
     innerBox: {
         backgroundColor: Colors.dark.seeThrough,
-        margin: 8,
     },
     icons: {
         backgroundColor: Colors.dark.seeThrough,
         flex: 2,
         margin: 8,
+        alignSelf: 'flex-end',
         justifyContent: 'flex-end',
         flexDirection: 'row',
         alignItems: 'flex-end',

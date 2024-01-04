@@ -3,9 +3,9 @@ import { View, Image, Pressable, Modal } from "react-native";
 import TopModalBar from "../../components/topModalBar";
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
-import { Share2, ArrowDownToLine, X, MessageSquareIcon } from 'lucide-react-native';
+import { Share2, ArrowDownToLine, X, MessageSquareIcon, Star } from 'lucide-react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { Alata20, Alata12, Alata16, Alata14, Alata24 } from '../../components/StyledText';
+import { Alata20, Alata12, Alata16, Alata14, Alata24, Alata18 } from '../../components/StyledText';
 import ShareRecipeScreen from './shareRecipeModal';
 import { db, auth } from '../../FirebaseConfig'
 import { doc, setDoc, Timestamp, collection, getDocs } from 'firebase/firestore';
@@ -210,6 +210,23 @@ const saveRecipeToDatabase = async () => {
               ))}
             </View>
 
+            {/* Display latest ratings */}
+            <View style={[gStyles.card, {gap: 8}]}>
+              <Alata20>Latest Ratings:</Alata20>
+              {sortedRatings.map((rating, index) => (
+                <View style={[gStyles.cardHorizontal, {flexDirection: 'column', backgroundColor: Colors.dark.mainColorLight}]} key={index}>
+                  <View style={{justifyContent: 'space-between', flexDirection: 'row'}}> 
+                    <Alata18>{`${rating.username} (${rating.timestamp.toDate().toLocaleDateString()})`}</Alata18>
+                    <View style={{flexDirection: 'row', gap: 3, alignItems: 'center'}}>
+                      <Alata18>{rating.rating}</Alata18>
+                      <Star name="star" style={{ alignSelf: 'center', marginBottom: -3 }} strokeWidth={2.5} size={18} color={Colors.dark.text} />
+                    </View>
+                  </View>
+                  {rating.comment !== '' && <Alata16>{rating.comment}</Alata16>}
+                </View>
+              ))}
+            </View>
+
             {/* Ingredients section */}
             <View style={gStyles.card}>
               <Alata20>Ingredients:</Alata20>
@@ -235,15 +252,6 @@ const saveRecipeToDatabase = async () => {
               </View>
             </View>
 
-            {/* Display latest ratings */}
-            <View style={gStyles.card}>
-              <Alata20>Latest Ratings:</Alata20>
-              {sortedRatings.map((rating, index) => (
-                <View key={index}>
-                  <Alata16>{`${rating.username} rated ${rating.rating} stars: ${rating.comment} ${rating.timestamp.toDate().toLocaleString()}`} </Alata16>
-                </View>
-              ))}
-            </View>
           </View>
 
           {/* Add your opinion button */}

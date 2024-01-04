@@ -52,6 +52,7 @@ interface RatingModalProps {
           type='custom'
           ratingImage={starImage}
           ratingColor={Colors.dark.rating}
+          startingValue={0}
           ratingBackgroundColor={Colors.dark.background}
           style={{ paddingVertical: 10}}
           showRating

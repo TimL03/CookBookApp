@@ -11,7 +11,7 @@ import { router } from 'expo-router';
 
 const CategoryIcon: React.FC<CategoryIconProps> = ({ categories }) => {
     return (
-        <View style={{ flexDirection: 'row', backgroundColor: 'transparent' }}>
+        <View style={{ flexDirection: 'row', backgroundColor: 'transparent', gap: 2 }}>
             {categories.map((category, index) => {
                 switch (category) {
                     case 'Soup':
@@ -49,20 +49,25 @@ export default function Recipe({ item, averageRating }: RecipeProps) {
                 <Alata12>{(item.cookHTime == '0' || item.cookHTime == '') ? '' : item.cookHTime + ' h '}{(item.cookMinTime == '0' || item.cookMinTime == '') ? '' : (item.cookMinTime + ' min ')}</Alata12>
             </View>
 
-            <View style={[styles.innerBox, { marginRight: 5 }]}>
-                <View style={{ flexDirection: 'row', gap: 5, justifyContent: 'flex-end', backgroundColor: Colors.dark.seeThrough }}>
-                    <Alata12 style={{ textAlign: 'right' }}>{averageRating.average !== undefined ? `${averageRating.average}/5` : '-'}</Alata12>
-                    <Star name="star" style={{ alignSelf: 'center' }} size={16} color={Colors.dark.text} />
+            <View style={[styles.innerBox, { justifyContent: 'space-between', paddingTop: 8, paddingBottom: 8, paddingLeft: 8}]}>
+                <View style={{backgroundColor: 'transparent', marginRight: 10}}>
+                    <View style={{ flexDirection: 'row', gap: 5, justifyContent: 'flex-end', backgroundColor: Colors.dark.seeThrough }}>
+                        <Alata12 style={{ textAlign: 'right' }}>{averageRating.average !== undefined ? `${averageRating.average}/5` : '-'}</Alata12>
+                        <Star name="star" style={{ alignSelf: 'center' }} size={16} color={Colors.dark.text} />
+                    </View>
+                    <Alata12 style={{textAlign: 'right'}}>{averageRating.totalRatings !== undefined ? `(${averageRating.totalRatings} ratings)` : ''}</Alata12>
                 </View>
-                <Alata12>{averageRating.totalRatings !== undefined ? `(${averageRating.totalRatings} ratings)` : ''}</Alata12>
                 
+            
                 <View style={[styles.innerBox, styles.marginRight]}>
-                <View style={styles.icons}>
-                    <CategoryIcon categories={item.categories} />
+                    <View style={styles.icons}>
+                        <CategoryIcon categories={item.categories} />
+                    </View>
                 </View>
             </View>
 
-            </View>
+            
+
         </TouchableOpacity>
     )
 }
@@ -79,7 +84,7 @@ const styles = StyleSheet.create({
     },
     innerBox: {
         backgroundColor: Colors.dark.seeThrough,
-        padding: 8,
+        flex: 1,
         gap: 0,
     },
     innerBox2: {
@@ -89,8 +94,8 @@ const styles = StyleSheet.create({
     },
     icons: {
         backgroundColor: Colors.dark.seeThrough,
-        flex: 2,
-        margin: 8,
+        flex: 1,
+        gap: 10,
         justifyContent: 'flex-end',
         flexDirection: 'row',
         alignItems: 'flex-end',
@@ -98,6 +103,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     marginRight: {
-        marginRight: 5,
+        marginRight: 10,
     },
 });
