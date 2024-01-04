@@ -72,13 +72,12 @@ export default function TabOneScreen() {
     console.log('Selected Ingredients for Firebase Search:', selectedCookBookIngredients);
     console.log('Selected Categories for Firebase Search:', selectedCookBookCategories);
 
-    const matchingRecipes = await searchRecipesInFirebase(selectedCookBookIngredients, selectedCookBookCategories, userID);
-    console.log('Gefundene Rezepte in Firebase:', matchingRecipes);
-    if (matchingRecipes.length > 0) {
-      setSelectedFirebaseRecipe(matchingRecipes[0]);
-      router.push({pathname: "/screens/viewRecipeScreen", params: {  }});
-      } else {
-        setAlertModalVisible(true);
+    const matchingRecipeId = await searchRecipesInFirebase(selectedCookBookIngredients, selectedCookBookCategories, userID);
+    console.log('Gefundene Rezepte in Firebase:', matchingRecipeId);
+    if (matchingRecipeId) {
+      router.push({ pathname: "/screens/viewRecipeScreen", params: { recipeID: matchingRecipeId.toString(), originScreen: 'index' }});
+    } else {
+      setAlertModalVisible(true);
     }
   };
 
@@ -98,7 +97,7 @@ export default function TabOneScreen() {
     }
   };
   
-  
+
 return (
   <View style={gStyles.screenContainer}>
     <SearchSwitch onToggle={(isDatabaseSearch) => setSearchMode(isDatabaseSearch ? 'database' : 'cookbook')} />

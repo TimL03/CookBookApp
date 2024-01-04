@@ -99,24 +99,25 @@ export const searchRecipesInFirebase = async (selectedIngredients: string[], sel
     }
 
     const querySnapshots = await Promise.all(queries.map(q => getDocs(q)));
-    const combinedRecipes = new Map();
+    const recipeIds = [];
     querySnapshots.forEach(snapshot => {
       snapshot.docs.forEach(doc => {
-        combinedRecipes.set(doc.id, doc.data());
+        recipeIds.push(doc.id);
       });
     });
 
-    const allRecipes = Array.from(combinedRecipes.values());
-    if (allRecipes.length === 0) {
-      return null; 
+    if (recipeIds.length === 0) {
+      return null;
     }
-    const randomIndex = Math.floor(Math.random() * allRecipes.length);
-    return allRecipes[randomIndex];
+
+    const randomIndex = Math.floor(Math.random() * recipeIds.length);
+    return recipeIds[randomIndex];
   } catch (error) {
     console.error('Fehler bei der Suche nach Rezepten in Firebase:', error);
     return null;
   }
 };
+
 
 
 //Returns all recipes from the database that belong to the current user
@@ -174,6 +175,28 @@ export async function getRecipeById(userId: string, recipeId: string): Promise<R
     return { id: recipeSnap.id, ...recipeData };
   } else {
     console.log('No such recipe!');
+    return null;
+  }
+}
+
+export async function getRandomRecipeById(recipeId: string): Promise<RecipeData | null> {
+  console.log("Versuch, Rezept abzurufen, ID: ", recipeId);
+  try {
+    const recipeRef = doc(db, 'recipes', recipeId);
+    const recipeSnap = await getDoc(recipeRef);
+
+    console.log("RecipeSnap existiert: ", recipeSnap.exists());
+    console.log("RecipeSnap Daten: ", recipeSnap.data());
+
+    if (recipeSnap.exists()) {
+      const recipeData = recipeSnap.data() as Omit<RecipeData, 'id'>;
+      return { id: recipeSnap.id, ...recipeData };
+    } else {
+      console.log('Kein Rezept gefunden mit ID:', recipeId);
+      return null;
+    }
+  } catch (error) {
+    console.error("Fehler beim Abrufen des Rezepts: ", error);
     return null;
   }
 }
@@ -260,7 +283,7 @@ export const uploadImage = async (uri: string, recipeName: string) => {
   return await getDownloadURL(snapshot.ref);
 };
 
-//Calculates average rating from each feed recipe 
+// Calculates average rating from each feed recipe 
 export const calculateAverageRating = async (recipe: RecipeData) => {
   try {
     const ratingsCollectionRef = collection(db, 'feed', recipe.id, 'ratings');
@@ -279,10 +302,14 @@ export const calculateAverageRating = async (recipe: RecipeData) => {
     const sum = ratingsData.reduce((acc, rating) => acc + (parseFloat(rating) || 0), 0);
     const average = sum / ratingsData.length;
 
-    return { average, totalRatings: ratingsData.length };
+    // Runden auf zwei Nachkommastellen
+    const roundedAverage = parseFloat(average.toFixed(2));
+
+    return { average: roundedAverage, totalRatings: ratingsData.length };
   } catch (error) {
     return { average: 0, totalRatings: 0 };
   }
 };
+
 
 

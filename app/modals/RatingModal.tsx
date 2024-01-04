@@ -37,6 +37,7 @@ interface RatingModalProps {
     
   };
 
+
   return (
     <Modal
       visible={isVisible}

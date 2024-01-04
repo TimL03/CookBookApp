@@ -11,8 +11,10 @@ export default function SearchBarSelector({ selectedItems, setSelectedItems, sin
   const [searchCriteria, setSearchCriteria] = useState('');
 
 
-  const filteredItems = selectedItems.filter((item: Item) => item != undefined && item.value.includes(searchCriteria));
-
+  const filteredItems = selectedItems.filter((item: Item) => 
+  item != undefined && 
+  item.value.toLowerCase().includes(searchCriteria.toLowerCase())
+);
   const searchFinished = () => {
     setSearch(false);
     setSearchCriteria('');

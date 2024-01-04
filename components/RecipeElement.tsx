@@ -37,7 +37,7 @@ const CategoryIcon: React.FC<CategoryIconProps> = ({ categories }) => {
 export default function Recipe({ item }: RecipeProps) {
 
     return (
-        <TouchableOpacity onPress={() => router.push({ pathname: "/screens/viewRecipeScreen", params: { recipeID: item.id } })} style={styles.outerBox} activeOpacity={0.2}>
+        <TouchableOpacity onPress={() => router.push({ pathname: "/screens/viewRecipeScreen", params: { recipeID: item.id, originScreen: 'two' } })} style={styles.outerBox} activeOpacity={0.2}>
             <Image
                 style={gStyles.imageSmall}
                 source={item.imageUrl == '' ? require("../assets/images/no-image.png") : { uri: item.imageUrl }}

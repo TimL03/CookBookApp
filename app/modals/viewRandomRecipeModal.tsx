@@ -159,7 +159,7 @@ export default function ViewRandomRecipeScreen() {
             <View style={gStyles.HorizontalLayout}>
               <Alata24 style={gStyles.flex}>{selectedMeal.strMeal}</Alata24>
               {/* Action buttons */}
-              <Pressable style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+              <Pressable onPress={handleFindNewRecipe} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
                 <RefreshCcw color={Colors.dark.text} />
               </Pressable>
               <Pressable style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
@@ -239,10 +239,6 @@ export default function ViewRandomRecipeScreen() {
             </View>
           </View>
         </ScrollView>
-
-        <Pressable onPress={handleFindNewRecipe} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-          <RefreshCcw color={Colors.dark.text} />
-        </Pressable>
 
       </View>
     </>

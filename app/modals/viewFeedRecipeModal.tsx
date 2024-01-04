@@ -13,6 +13,7 @@ import RatingModal from './RatingModal';
 import { RecipeData } from '../../api/cookBookRecipesFirebase/model';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { getRecipeByIdForFeed } from '../../api/cookBookRecipesFirebase/client';
+import { useSession } from '../../api/firebaseAuthentication/client';
 
 
 // Define the main component
@@ -22,7 +23,8 @@ export default function ViewFeedRecipeScreen() {
   const [isShareRecipeModalVisible, setIsShareRecipeModalVisible] = useState(false);
   const [isRatingModalVisible, setIsRatingModalVisible] = useState(false);
   const [sortedRatings, setSortedRatings] = useState<Array<{ id: string; username: string; rating: number; comment: string; timestamp: Timestamp }>>([]);
-
+  const { session } = useSession();
+  const userID = session;
   const [recipe, setRecipe] = useState<RecipeData | null>(null);
 
   // Get recipe id from router params
@@ -45,7 +47,6 @@ export default function ViewFeedRecipeScreen() {
   };
 
   // Effect hook to fetch ratings on component mount
-  useEffect(() => {
     const fetchRatings = async () => {
       try {
         const usersSnapshot = await getDocs(collection(db, 'users'));
@@ -81,78 +82,72 @@ export default function ViewFeedRecipeScreen() {
       }
     };
   
+    useEffect(() => {
     fetchRatings();
   }, [params.recipeID]);
 
-  // If recipe is null (data is still loading), return a View with the same background color
-  if (!recipe) {
-    return (
-      <>
-      <Stack.Screen options={{
-        headerShown: false, }} />
-      <View style={{flex: 1, backgroundColor: Colors.dark.mainColorDark}} />
-      </>
-    );
-  }
-
+  
   // Function to handle rating submission
-  const handleRatingSubmit = async (ratingData: { rating: number; comment: string }) => {
-    try {
-      // Get current user
-      const user = auth.currentUser;
-      const userID = user ? user.uid : null;
-
-      // Prepare data for rating submission
-      const recipeRef = doc(db, 'feed', recipe.id);
+const handleRatingSubmit = async (ratingData: { rating: number; comment: string }) => {
+  try {
+    if (params.recipeID) {
+      const recipeRef = doc(db, 'feed', params.recipeID.toString());
       const ratingsCollectionRef = collection(recipeRef, 'ratings');
       const ratingsSnapshot = await getDocs(ratingsCollectionRef);
       const ratingCount = ratingsSnapshot.size;
       const ratingID = `rating${ratingCount + 1}`;
       const ratingDocRef = doc(ratingsCollectionRef, ratingID);
 
-      // Submit rating to Firebase
       await setDoc(ratingDocRef, {
         userID,
         timestamp: Timestamp.now(),
         ...ratingData,
       });
 
+      await fetchRatings();
       console.log('Rating successfully added!');
-    } catch (error) {
-      console.error('Error adding rating:', error);
+    } else {
+      console.error('No recipe ID found');
     }
-  };
+  } catch (error) {
+    console.error('Error adding rating:', error);
+  }
+};
+
+// If recipe is null (data is still loading), return a View with the same background color
+if (!recipe) {
+  return (
+    <>
+    <Stack.Screen options={{
+      headerShown: false, }} />
+    <View style={{flex: 1, backgroundColor: Colors.dark.mainColorDark}} />
+    </>
+  );
+}
+
+// Function to save recipe to the database
+const saveRecipeToDatabase = async () => {
+  try {
+    if (params.recipeID && recipe) {
+      const recipeRef = doc(db, 'recipes', params.recipeID.toString());
+      await setDoc(recipeRef, {
+        //... rest of your recipe data
+      });
+
+      console.log('Recipe successfully saved!');
+    } else {
+      console.error('No recipe ID or recipe data found');
+    }
+  } catch (error) {
+    console.error('Error saving recipe:', error);
+  }
+};
 
   // Function to toggle the Share Recipe modal
   const toggleModal = () => {
     setIsShareRecipeModalVisible(!isShareRecipeModalVisible);
   };
 
-  // Function to save recipe to the database
-  const saveRecipeToDatabase = async () => {
-    try {
-      // Get current user
-      const user = auth.currentUser;
-      const userID = user ? user.uid : null;
-
-      // Save recipe data to Firebase
-      const recipeRef = doc(db, 'recipes', recipe.id);
-      await setDoc(recipeRef, {
-        name: recipe.name,
-        cookHTime: recipe.cookHTime,
-        cookMinTime: recipe.cookMinTime,
-        imageUrl: recipe.imageUrl,
-        ingredients: recipe.ingredients,
-        steps: recipe.steps,
-        userID: userID,
-        categories: recipe.categories,
-      });
-
-      console.log('Recipe successfully saved!');
-    } catch (error) {
-      console.error('Error saving recipe:', error);
-    }
-  };
 
   // Return the JSX for the component
   return (
