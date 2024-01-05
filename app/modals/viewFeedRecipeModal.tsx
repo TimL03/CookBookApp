@@ -86,7 +86,6 @@ export default function ViewFeedRecipeScreen() {
     fetchRatings();
   }, [params.recipeID]);
 
-  
   // Function to handle rating submission
 const handleRatingSubmit = async (ratingData: { rating: number; comment: string }) => {
   try {
@@ -143,10 +142,7 @@ const saveRecipeToDatabase = async () => {
   }
 };
 
-  // Function to toggle the Share Recipe modal
-  const toggleModal = () => {
-    setIsShareRecipeModalVisible(!isShareRecipeModalVisible);
-  };
+
 
 
   // Return the JSX for the component
@@ -188,7 +184,7 @@ const saveRecipeToDatabase = async () => {
                     <MessageSquareIcon color={Colors.dark.text} size={24} />
                   </Pressable>
                   {/* Share recipe button */}
-                  <Pressable onPress={toggleModal} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                  <Pressable onPress={() => router.push({ pathname: "/modals/shareRecipeModal", params: { recipeID: params.recipeID } })} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
                     <Share2 color={Colors.dark.text} size={24} />
                   </Pressable>
                   {/* Save recipe button */}
@@ -211,7 +207,8 @@ const saveRecipeToDatabase = async () => {
             </View>
 
             {/* Display latest ratings */}
-            <View style={[gStyles.card, {gap: 8}]}>
+            {sortedRatings.length > 0 ?
+              <View style={[gStyles.card, {gap: 8}]}>
               <Alata20>Latest Ratings:</Alata20>
               {sortedRatings.map((rating, index) => (
                 <View style={[gStyles.cardHorizontal, {flexDirection: 'column', backgroundColor: Colors.dark.mainColorLight}]} key={index}>
@@ -225,7 +222,8 @@ const saveRecipeToDatabase = async () => {
                   {rating.comment !== '' && <Alata16>{rating.comment}</Alata16>}
                 </View>
               ))}
-            </View>
+            </View> : null
+            }
 
             {/* Ingredients section */}
             <View style={gStyles.card}>
@@ -264,18 +262,6 @@ const saveRecipeToDatabase = async () => {
             />
           </View>
         </ScrollView>
-
-        {/* Share Recipe modal */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={isShareRecipeModalVisible}
-          onRequestClose={() => setIsShareRecipeModalVisible(false)}
-        >
-          <ShareRecipeScreen closeModal={() => setIsShareRecipeModalVisible(false)}
-            recipe={recipe} />
-        </Modal>
-
       </View>
     </>
   )

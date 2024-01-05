@@ -66,6 +66,7 @@ function RootLayoutNav() {
             <Stack.Screen name="screens/authentificationScreen" options={{ navigationBarColor: Colors.dark.background, headerShown: false, presentation: 'fullScreenModal', }} />
             <Stack.Screen name="modals/logInModal" options={{ navigationBarColor: Colors.dark.background, headerShown: false, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
             <Stack.Screen name="modals/showSharedRecipeInvitation" options={{ navigationBarColor: Colors.dark.background, headerShown: false, presentation: 'transparentModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
+            <Stack.Screen name="modals/RatingModal" options={{ navigationBarColor: Colors.dark.background, headerShown: false, presentation: 'transparentModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
             <Stack.Screen name="modals/viewRandomRecipeModal" options={{ navigationBarColor: Colors.dark.mainColorDark, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
             <Stack.Screen name="modals/viewFeedRecipeModal" options={{ navigationBarColor: Colors.dark.mainColorDark, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
           </Stack>

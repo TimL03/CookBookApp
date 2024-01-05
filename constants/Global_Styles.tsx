@@ -82,6 +82,7 @@ export default StyleSheet.create({
     },
     cardInputMultiline: {
         textAlignVertical: 'top',
+        height: 100,
     },
     image: {
         width: '100%',
