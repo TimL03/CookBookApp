@@ -19,12 +19,10 @@ import { useSession } from '../../api/firebaseAuthentication/client';
 // Define the main component
 export default function ViewFeedRecipeScreen() {
   // State variables
-  const [isShareRecipeModalVisible, setIsShareRecipeModalVisible] = useState(false);
-  const [isRatingModalVisible, setIsRatingModalVisible] = useState(false);
   const [sortedRatings, setSortedRatings] = useState<Array<{ id: string; username: string; rating: number; comment: string; timestamp: Timestamp }>>([]);
-  const { session } = useSession();
-  const userID = session;
+
   const [recipe, setRecipe] = useState<RecipeData | null>(null);
+  const [recipeSaved, setRecipeSaved] = useState(false);
 
   // Get recipe id from router params
   const params = useLocalSearchParams();
@@ -62,6 +60,7 @@ if (!recipe) {
 
 // Function to save recipe to the database
 const saveRecipeToDatabase = async () => {
+  console.log('Saving recipe to database')
   try {
     if (params.recipeID && recipe) {
       const recipeRef = doc(db, 'recipes', params.recipeID.toString());
@@ -70,6 +69,7 @@ const saveRecipeToDatabase = async () => {
       });
 
       console.log('Recipe successfully saved!');
+      setRecipeSaved(true);
     } else {
       console.error('No recipe ID or recipe data found');
     }
@@ -77,8 +77,6 @@ const saveRecipeToDatabase = async () => {
     console.error('Error saving recipe:', error);
   }
 };
-
-
 
 
   // Return the JSX for the component
@@ -125,8 +123,8 @@ const saveRecipeToDatabase = async () => {
                     <Share2 color={Colors.dark.text} size={24} />
                   </Pressable>
                   {/* Save recipe button */}
-                  <Pressable onPress={saveRecipeToDatabase} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                    <ArrowDownToLine color={Colors.dark.text} size={24} />
+                  <Pressable onPress={saveRecipeToDatabase} style={({ pressed }) => [gStyles.iconButton, { backgroundColor:pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]} disabled={recipeSaved}>
+                    <ArrowDownToLine color={recipeSaved ? Colors.dark.tint : Colors.dark.text} size={24} />
                   </Pressable>
                 </View>
               </View>

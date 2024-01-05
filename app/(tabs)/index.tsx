@@ -11,8 +11,9 @@ import { Item } from '../../api/externalRecipesLibrary/model';
 import { ItemListToCSVString, useCategories, useGetRandomMealId, useIngredients } from '../../api/externalRecipesLibrary/client';
 import { useFirebaseIngredients, useFirebaseCategories } from '../../api/cookBookRecipesFirebase/client';
 import { useSession } from '../../api/firebaseAuthentication/client';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import AlertModal from '../modals/alerts/infoAlert';
+import { useIsFocused } from '@react-navigation/native';
 
 export default function TabOneScreen() {
 
@@ -21,6 +22,8 @@ export default function TabOneScreen() {
   const [selectedApiIngredients, setSelectedApiIngredients] = useState<Item[]>([]);
   const apiCategories: Item[] = useCategories();
   const [selectedApiCategories, setSelectedApiCategories] = useState<Item[]>([]);
+
+  const params = useLocalSearchParams();
 
   // CookBook categories and ingredients
   const firebaseIngredients: Item[] = useFirebaseIngredients();
@@ -58,6 +61,17 @@ export default function TabOneScreen() {
   }, [apiCategories, firebaseCategories, searchMode]);
 
 
+  
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    if (isFocused && params.newRecipeFlag == '1') {
+      router.replace({ pathname: '/(tabs)/', params: { newRecipeFlag: '0' } });
+      findNewRecipe();
+    }
+  }, [isFocused, params.newRecipeFlag]);
+
+
   // CookBookSearch
   const handleSearchInFirebase = async () => {
     console.log('handleSearchInFirebase aufgerufen');
@@ -89,11 +103,20 @@ export default function TabOneScreen() {
         params: {
           recipeID: mealId,
           selectedIngredients: ItemListToCSVString(selectedApiIngredients),
-          selectedCategories: ItemListToCSVString(selectedApiCategories)
+          selectedCategories: ItemListToCSVString(selectedApiCategories),
+          refresh: params.newRecipeFlag,
         }
       });
     } else {
-      alert('No meal found! Please try again.');
+      setAlertModalVisible(true);
+    }
+  };
+
+  const findNewRecipe = () => {
+    if (searchMode === 'database') {
+      getMeal();
+    } else if (searchMode === 'cookbook') {
+      handleSearchInFirebase();
     }
   };
   

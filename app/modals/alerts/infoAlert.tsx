@@ -21,7 +21,7 @@ export default function AlertModal(props: AlertModalProps) {
       transparent={true}
       onRequestClose={() => setAlertModalVisible(false)}
     >
-      <View style={styles.background}>
+      <Pressable onPress={() => setAlertModalVisible(false)} style={styles.background}>
         <View style={styles.alertCard}>
           <Alata22>{title}</Alata22>
           <Alata16>{message}</Alata16>
@@ -31,7 +31,7 @@ export default function AlertModal(props: AlertModalProps) {
             </Pressable>
           </View>
         </View>
-      </View>
+      </Pressable>
     </Modal>
   );
 }

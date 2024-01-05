@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Image, Pressable, Modal } from "react-native";
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
-import { Share2, PenSquare, Trash2, ArrowUpToLine, ChevronLeft, X } from 'lucide-react-native';
+import { Share2, PenSquare, Trash2, ArrowUpToLine, ChevronLeft, X, RefreshCcw } from 'lucide-react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Alata20, Alata12, Alata24, Alata14, Alata16 } from '../../components/StyledText';
 import { db } from '../../FirebaseConfig'
@@ -126,15 +126,21 @@ export default function ViewRecipeScreen() {
               {/* Recipe name and action buttons */}
               <View style={gStyles.HorizontalLayout}>
                 <Alata24 style={gStyles.flex}>{recipe.name}</Alata24>
-                {/* Share button */}
-                <Pressable onPress={() => router.push({ pathname: "/modals/shareRecipeModal", params: { recipeID: recipe.id } })} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                  <Share2 color={Colors.dark.text} size={24} />
-                </Pressable>
+                { params.originScreen === 'index' ?
+                <Pressable onPress={() => router.push({ pathname: "/(tabs)/", params: { newRecipeFlag: '1' } })} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                  <RefreshCcw color={Colors.dark.text} />
+                </Pressable> :
+                <>
+                  <Pressable onPress={() => router.push({ pathname: "/modals/shareRecipeModal", params: { recipeID: recipe.id } })} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                    <Share2 color={Colors.dark.text} size={24} />
+                  </Pressable>
 
-                {/* publish recipe to feed button */}
-                <Pressable onPress={() => setAlertPublishModalVisible(true)} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                  <ArrowUpToLine color={Colors.dark.text} size={24} />
-                </Pressable>
+                  {/* publish recipe to feed button */}
+                  <Pressable onPress={() => setAlertPublishModalVisible(true)} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                    <ArrowUpToLine color={Colors.dark.text} size={24} />
+                  </Pressable>
+                </>
+                }
 
                 {/* Delete button */}
                 <Pressable onPress={() => setAlertDeleteModalVisible(true)} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>

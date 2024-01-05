@@ -12,6 +12,8 @@ import { useSession } from '../../api/firebaseAuthentication/client';
 import { Ingredient, RecipeProps } from '../../api/externalRecipesLibrary/model';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { useGetMealById, useGetRandomMealId } from '../../api/externalRecipesLibrary/client';
+import SaveWithCooktimeAlert from '../modals/alerts/saveWithCooktimeAlert';
+
 
 // Main component function
 export default function ViewRandomRecipeScreen() {
@@ -29,18 +31,8 @@ export default function ViewRandomRecipeScreen() {
   const params = useLocalSearchParams();
   const recipeID = Array.isArray(params.recipeID) ? params.recipeID[0] : params.recipeID;
   const { selectedMeal, fetchMeal: fetchMealById } = useGetMealById(recipeID);
-  const { fetchMeal: fetchRandomMeal } = useGetRandomMealId();
-  const selectedIngredients = params.selectedIngredients;
-  const selectedCategories = params.selectedCategories;
 
-  const handleFindNewRecipe = async () => {
-    const newMealId = await fetchRandomMeal(selectedIngredients, selectedCategories);
-    if (newMealId) {
-      fetchMealById(newMealId);
-      } else {
-      alert('No new recipe found! Please try again.');
-    }
-  };
+  const [alertSaveVisible, setAlertSaveVisible] = useState(false);
 
   useEffect(() => {
     if (params.recipeID) {
@@ -159,54 +151,14 @@ export default function ViewRandomRecipeScreen() {
             <View style={gStyles.HorizontalLayout}>
               <Alata24 style={gStyles.flex}>{selectedMeal.strMeal}</Alata24>
               {/* Action buttons */}
-              <Pressable onPress={handleFindNewRecipe} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+              <Pressable onPress={() => router.push({ pathname: "/(tabs)/", params: { newRecipeFlag: '1' } })} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
                 <RefreshCcw color={Colors.dark.text} />
               </Pressable>
-              <Pressable style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                <Share2 color={Colors.dark.text} />
-              </Pressable>
-              {showInputs ? (
-                <Pressable onPress={handleFinalSaveClick} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                  <Save color={hasBeenSaved ? Colors.dark.tint : Colors.dark.text} size={24} />
+
+              <Pressable disabled={hasBeenSaved} onPress={() => setAlertSaveVisible(true)} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                  <ArrowDownToLine color={hasBeenSaved ? Colors.dark.tint : Colors.dark.text} size={24} />
                 </Pressable>
-              ) : (
-                <Pressable onPress={handleSaveButtonClick} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                  <ArrowDownToLine color={Colors.dark.text} size={24} />
-                </Pressable>
-              )}
             </View>
-
-            {/* Input fields for cooking times */}
-            {showInputs && (
-              <>
-                {/* adding Recipe preparation time */}
-                <Alata20>Preperation Time:</Alata20>
-                <View style={[gStyles.HorizontalLayout, { gap: 12 }]}>
-                  <View style={[gStyles.cardInput, gStyles.flex]}>
-                    <TextInput
-                      inputMode="numeric"
-                      maxLength={2}
-                      placeholder="00"
-                      value={cookHTime}
-                      onChangeText={setCookHTime}
-                      style={gStyles.textInput}
-                      placeholderTextColor={Colors.dark.text} />
-                    <Alata16 style={gStyles.alignCenter}>hours</Alata16>
-                  </View>
-
-                  <View style={[gStyles.cardInput, gStyles.flex]}>
-                    <TextInput
-                      inputMode="numeric"
-                      maxLength={2}
-                      placeholder="00"
-                      value={cookMinTime}
-                      onChangeText={setCookMinTime}
-                      style={gStyles.textInput} placeholderTextColor={Colors.dark.text} />
-                    <Alata16 style={gStyles.alignCenter}>minutes</Alata16>
-                  </View>
-                </View>
-              </>
-            )}
 
             {/* Categories */}
             <View style={gStyles.mapHorizontal}>
@@ -239,8 +191,16 @@ export default function ViewRandomRecipeScreen() {
             </View>
           </View>
         </ScrollView>
-
       </View>
+      <SaveWithCooktimeAlert
+        alertModalVisible={alertSaveVisible}
+        setAlertModalVisible={setAlertSaveVisible}
+        onConfirm={handleFinalSaveClick}
+        minutes={cookMinTime}
+        setMinutes={setCookMinTime}
+        hours={cookHTime}
+        setHours={setCookHTime}
+      />
     </>
   );
 }
