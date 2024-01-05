@@ -258,6 +258,47 @@ export const getRecipeByIdForFeed = async (recipeID: string) => {
   }
 };
 
+// Function to sort ratings by timestamp
+const sortRatingsByTimestamp = (ratings: Array<{ id: string, username: string, rating: number, comment: string, timestamp: Timestamp }>) => {
+  return ratings.sort((a, b) => b.timestamp - a.timestamp);
+};
+
+
+export const fetchRatings = async (recipeID: { toString: () => string; }, setSortedRatings: (arg0: any) => void) => {
+  try {
+    const usersSnapshot = await getDocs(collection(db, 'users'));
+    const usersMap = new Map();
+    usersSnapshot.forEach(doc => {
+      const userData = doc.data();
+      usersMap.set(userData.uid, userData.username);
+    });
+
+    if (recipeID) {
+      const recipeRef = doc(db, 'feed', recipeID.toString());
+      const ratingsCollectionRef = collection(recipeRef, 'ratings');
+      const ratingsSnapshot = await getDocs(ratingsCollectionRef);
+
+      let ratingsData: { id: string; username: any; rating: any; comment: any; timestamp: any; }[] = [];
+      ratingsSnapshot.forEach(ratingDoc => {
+        const ratingData = ratingDoc.data();
+        const username = usersMap.get(ratingData.userID) || 'Unknown';
+        ratingsData.push({
+          id: ratingDoc.id,
+          username,
+          rating: ratingData.rating,
+          comment: ratingData.comment,
+          timestamp: ratingData.timestamp
+        });
+      });
+
+      ratingsData = sortRatingsByTimestamp(ratingsData);
+      setSortedRatings(ratingsData);
+    }
+  } catch (error) {
+    console.error('Error fetching ratings:', error);
+  }
+};
+
 // Delete a recipe from the database
 export const deleteRecipe = async (recipeID: string) => {
   try {

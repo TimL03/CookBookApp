@@ -11,14 +11,13 @@ import { db, auth } from '../../FirebaseConfig'
 import { doc, setDoc, Timestamp, collection, getDocs } from 'firebase/firestore';
 import RatingModal from './RatingModal';
 import { RecipeData } from '../../api/cookBookRecipesFirebase/model';
-import { Stack, router, useLocalSearchParams } from 'expo-router';
-import { getRecipeByIdForFeed } from '../../api/cookBookRecipesFirebase/client';
+import { Stack, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { fetchRatings, getRecipeByIdForFeed } from '../../api/cookBookRecipesFirebase/client';
 import { useSession } from '../../api/firebaseAuthentication/client';
 
 
 // Define the main component
 export default function ViewFeedRecipeScreen() {
-
   // State variables
   const [isShareRecipeModalVisible, setIsShareRecipeModalVisible] = useState(false);
   const [isRatingModalVisible, setIsRatingModalVisible] = useState(false);
@@ -41,77 +40,13 @@ export default function ViewFeedRecipeScreen() {
     }
   }, [params.recipeID]);
 
-  // Function to sort ratings by timestamp
-  const sortRatingsByTimestamp = (ratings: Array<{ id: string, username: string, rating: number, comment: string, timestamp: Timestamp }>) => {
-    return ratings.sort((a, b) => b.timestamp - a.timestamp);
-  };
-
   // Effect hook to fetch ratings on component mount
-    const fetchRatings = async () => {
-      try {
-        const usersSnapshot = await getDocs(collection(db, 'users'));
-        const usersMap = new Map();
-        usersSnapshot.forEach(doc => {
-          const userData = doc.data();
-          usersMap.set(userData.uid, userData.username);
-        });
-  
-        if (params.recipeID) {
-          const recipeRef = doc(db, 'feed', params.recipeID.toString());
-          const ratingsCollectionRef = collection(recipeRef, 'ratings');
-          const ratingsSnapshot = await getDocs(ratingsCollectionRef);
-  
-          let ratingsData = [];
-          ratingsSnapshot.forEach(ratingDoc => {
-            const ratingData = ratingDoc.data();
-            const username = usersMap.get(ratingData.userID) || 'Unknown';
-            ratingsData.push({
-              id: ratingDoc.id,
-              username,
-              rating: ratingData.rating,
-              comment: ratingData.comment,
-              timestamp: ratingData.timestamp
-            });
-          });
-  
-          ratingsData = sortRatingsByTimestamp(ratingsData);
-          setSortedRatings(ratingsData);
-        }
-      } catch (error) {
-        console.error('Error fetching ratings:', error);
-      }
-    };
-  
-    useEffect(() => {
-    fetchRatings();
-  }, [params.recipeID]);
-
-  // Function to handle rating submission
-const handleRatingSubmit = async (ratingData: { rating: number; comment: string }) => {
-  try {
-    if (params.recipeID) {
-      const recipeRef = doc(db, 'feed', params.recipeID.toString());
-      const ratingsCollectionRef = collection(recipeRef, 'ratings');
-      const ratingsSnapshot = await getDocs(ratingsCollectionRef);
-      const ratingCount = ratingsSnapshot.size;
-      const ratingID = `rating${ratingCount + 1}`;
-      const ratingDocRef = doc(ratingsCollectionRef, ratingID);
-
-      await setDoc(ratingDocRef, {
-        userID,
-        timestamp: Timestamp.now(),
-        ...ratingData,
-      });
-
-      await fetchRatings();
-      console.log('Rating successfully added!');
-    } else {
-      console.error('No recipe ID found');
-    }
-  } catch (error) {
-    console.error('Error adding rating:', error);
-  }
-};
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchRatings(params.recipeID, setSortedRatings);
+      return () => {}; // This is the cleanup function, it's not needed in this case but it's required by the useCallback hook
+    }, [])
+  );
 
 // If recipe is null (data is still loading), return a View with the same background color
 if (!recipe) {
@@ -123,6 +58,7 @@ if (!recipe) {
     </>
   );
 }
+
 
 // Function to save recipe to the database
 const saveRecipeToDatabase = async () => {
@@ -155,6 +91,7 @@ const saveRecipeToDatabase = async () => {
         headerStyle: {
           backgroundColor: Colors.dark.mainColorDark,
         },
+        navigationBarColor: Colors.dark.mainColorDark,
         headerRight: () =>
           <Pressable onPress={router.back} style={({ pressed }) => [{ padding: 5, borderRadius: 20, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
             <X color={Colors.dark.text} size={28} />
@@ -180,7 +117,7 @@ const saveRecipeToDatabase = async () => {
                 <Alata24 style={gStyles.flex}>{recipe.name}</Alata24>
                 <View style={[gStyles.mapHorizontal, gStyles.alignCenter]}>
                   {/* Rate recipe button */}
-                  <Pressable onPress={() => setIsRatingModalVisible(true)} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                  <Pressable onPress={() => router.push({ pathname: "/modals/RatingModal", params: { recipeID: params.recipeID } })} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
                     <MessageSquareIcon color={Colors.dark.text} size={24} />
                   </Pressable>
                   {/* Share recipe button */}
@@ -249,20 +186,13 @@ const saveRecipeToDatabase = async () => {
                 ))}
               </View>
             </View>
-
-          </View>
-
-          {/* Add your opinion button */}
-          <View>
-            {/* Rating modal */}
-            <RatingModal
-              isVisible={isRatingModalVisible}
-              onClose={() => setIsRatingModalVisible(false)}
-              onSubmit={handleRatingSubmit}
-            />
           </View>
         </ScrollView>
       </View>
     </>
   )
 }
+function setForceRender(arg0: (prevState: any) => boolean) {
+  throw new Error('Function not implemented.');
+}
+
