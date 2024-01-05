@@ -13,16 +13,24 @@ type SelectionProps = {
     selectedUnit: string;
     selectedAmount: string;
     onSelect: (unit: string, amount: string) => void;
+    onDropDown: () => void;
 };
 
 
-export default function DropDown({ item, selectedUnit, selectedAmount, onSelect }: SelectionProps) {
+export default function DropDown({ item, selectedUnit, selectedAmount, onSelect, onDropDown }: SelectionProps) {
     const [dropDown, setDropDrown] = React.useState(false);
     const [unit, setUnit] = React.useState(selectedUnit || 'x');
     const [amount, setAmount] = React.useState(selectedAmount || '');
+    const [inputWidth, setInputWidth] = React.useState(0);
+
+    const handleInputLayout = (event: { nativeEvent: { layout: { width: any; }; }; }) => {
+        const { width } = event.nativeEvent.layout;
+        setInputWidth(width);
+      };
 
     const activateDropDown = () => {
         setDropDrown(true);
+        onDropDown();
     }
 
     const deactivateDropDown = () => {
@@ -42,7 +50,7 @@ export default function DropDown({ item, selectedUnit, selectedAmount, onSelect 
 
     return (
         <View style={styles.horizontalLayout}>
-            <View style={gStyles.cardInput}>
+            <View style={gStyles.cardInput} onLayout={handleInputLayout}>
                 <TextInput
                     placeholder={`00`}
                     inputMode='numeric'
@@ -52,7 +60,7 @@ export default function DropDown({ item, selectedUnit, selectedAmount, onSelect 
                     onChangeText={handleAmountChange}
                     style={[gStyles.textInput]}
                 />
-                <Alata14 style={[gStyles.alignCenter, styles.marginRight]}>{unit}</Alata14>
+                <Alata14 style={[gStyles.alignCenter, styles.marginRight, {flex: 3}]} numberOfLines={1} ellipsizeMode='tail'>{unit}</Alata14>
                 {
                     dropDown ?
                         <Pressable onPress={deactivateDropDown} style={gStyles.alignCenter}>
@@ -67,7 +75,7 @@ export default function DropDown({ item, selectedUnit, selectedAmount, onSelect 
 
             {
                 dropDown ?
-                    <View style={gStyles.dropDownContainer}>
+                    <View style={[gStyles.dropDownContainer, {width: inputWidth}]}>
                         {item.map((unitItem) => (
                             <Pressable
                                 key={unitItem.key}

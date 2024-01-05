@@ -68,6 +68,10 @@ export default function AddRecipeScreen() {
   const [chooseImageAlertVisible, setChooseImageAlertVisible] = useState(false);
   const [galeriePermissionAlertVisible, setGaleriePermissionAlertVisible] = useState(false);
   const [cameraPermissionAlertVisible, setCameraPermissionAlertVisible] = useState(false);
+  
+  const [multiLineHeights, setMultiLineHeights] = useState(new Array(steps.length).fill(80));
+  
+  const [activeDropdown, setActiveDropdown] = useState(0);
 
 
   const units = [
@@ -205,6 +209,14 @@ export default function AddRecipeScreen() {
     setSteps(steps.filter((_, index) => index !== indexToRemove));
   };
 
+  const handleContentSizeChange = (index, height) => {
+    setMultiLineHeights(prevHeights => {
+      const newHeights = [...prevHeights];
+      newHeights[index] = height + 20; // 20 is the extra space
+      return newHeights;
+    });
+  };
+
   // If recipe is null (data is still loading), return a View with the same background color
   if (params.recipeID && !recipe) {
     return (
@@ -309,8 +321,8 @@ export default function AddRecipeScreen() {
             <Alata20>Ingredients:</Alata20>
             <View style={styles.gap}>
               {ingredients.map((ingredient, index) => (
-                <View key={index} style={[gStyles.HorizontalLayout, { gap: 12, zIndex: 1 }]}>
-                  <View style={[gStyles.cardInput, { flex: 3 }]}>
+                <View key={index} style={[gStyles.HorizontalLayout, { gap: 12, zIndex: activeDropdown === index ? 1 : 0 }]}>
+                  <View style={[gStyles.cardInput, { flex: 1 }]}>
                     <TextInput
                       placeholder={`Ingredient ${index + 1}`}
                       placeholderTextColor={Colors.dark.text}
@@ -336,6 +348,7 @@ export default function AddRecipeScreen() {
                         newIngredients[index] = { ...newIngredients[index], unit, amount };
                         setIngredients(newIngredients);
                       }}
+                      onDropDown={() => setActiveDropdown(index)}
                     />
                   </View>
                 </View>
@@ -350,10 +363,10 @@ export default function AddRecipeScreen() {
             <Alata20>Instructions:</Alata20>
             <View style={styles.gap}>
               {steps.map((step, index) => (
-                <View key={index} style={[gStyles.cardInput, gStyles.cardInputMultiline]}>
+                <View key={index} style={[gStyles.cardInput, {height: multiLineHeights[index]}]}>
                   <TextInput
                     multiline
-                    numberOfLines={3}
+                    onContentSizeChange={(e) => handleContentSizeChange(index, e.nativeEvent.contentSize.height)}
                     placeholder={`Step ${index + 1}`}
                     value={step}
                     placeholderTextColor={Colors.dark.text}
@@ -420,7 +433,8 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   flex2: {
-    flex: 2,
+    flex: 1,
+    flexDirection: 'column',
   },
   marginRight: {
     marginRight: -4,

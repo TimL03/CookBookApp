@@ -117,7 +117,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0)',
-    backdropFilter: 'blur(5px)',
   },
   modalContent: {
     backgroundColor: Colors.dark.mainColorDark,
