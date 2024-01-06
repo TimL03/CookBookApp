@@ -26,7 +26,7 @@ export default function aboutScreen() {
         />
         <View style={[gStyles.defaultContainer, styles.gap]}>
           <View style={styles.center}>
-            <Image source={require('../../assets/images/icon.png')} style={styles.logo}/>
+            <Image source={require('../../assets/images/icon_round.png')} style={styles.logo}/>
             <Alata12 style={styles.moreMarginBottom}>CookBook-App v1.0</Alata12>
           </View>
 

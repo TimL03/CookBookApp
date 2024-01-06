@@ -105,7 +105,7 @@ const saveRecipeToDatabase = async () => {
           {/* Recipe image */}
           <Image
             style={gStyles.image}
-            source={recipe.imageUrl == '' ? require("../../assets/images/no-image.png") : { uri: recipe.imageUrl }}
+            source={recipe.imageUrl == null ? require("../../assets/images/no-image.png") : { uri: recipe.imageUrl }}
           />
 
           <View style={gStyles.fullScreenContentContainer}>

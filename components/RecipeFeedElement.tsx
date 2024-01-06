@@ -40,7 +40,7 @@ export default function Recipe({ item, averageRating }: RecipeProps) {
         <TouchableOpacity onPress={() => router.push({ pathname: "/modals/viewFeedRecipeModal", params: { recipeID: item.id } })} style={styles.outerBox} activeOpacity={0.2}>
             <Image
                 style={gStyles.imageSmall}
-                source={item.imageUrl == '' ? require("../assets/images/no-image.png") : { uri: item.imageUrl }}
+                source={item.imageUrl == null ? require("../assets/images/no-image.png") : { uri: item.imageUrl }}
             />
 
             <View style={[styles.innerBox, { flex: 2 }]}>

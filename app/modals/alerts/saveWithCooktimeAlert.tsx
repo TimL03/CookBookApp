@@ -15,7 +15,7 @@ interface AlertModalProps {
   setAlertModalVisible: (visible: boolean) => void;
 }
 
-export default function AlertModal(props: AlertModalProps) {
+export default function AlertModal(this: any, props: AlertModalProps) {
   const { minutes, setMinutes, hours, setHours, alertModalVisible, setAlertModalVisible, onConfirm} = props;
 
   return (
@@ -36,6 +36,9 @@ export default function AlertModal(props: AlertModalProps) {
                     <TextInput
                       inputMode="numeric"
                       maxLength={2}
+                      returnKeyType="next"
+                      blurOnSubmit={false}
+                      onSubmitEditing={() => { this.minuteInput.focus(); }}
                       placeholder="00"
                       value={hours}
                       onChangeText={setHours}
@@ -48,6 +51,7 @@ export default function AlertModal(props: AlertModalProps) {
                     <TextInput
                       inputMode="numeric"
                       maxLength={2}
+                      ref={(input) => { this.minuteInput = input; }}
                       placeholder="00"
                       value={minutes}
                       onChangeText={setMinutes}

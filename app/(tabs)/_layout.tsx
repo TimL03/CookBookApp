@@ -76,7 +76,6 @@ export default function TabLayout() {
           },
           tabBarIcon: ({ color }) => <Utensils color={color} size={28} style={{ marginBottom: -10 }} />,
         }}
-        params={{ newRecipeFlag: '0' }}
       />
       <Tabs.Screen
         name="two"

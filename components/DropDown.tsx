@@ -6,6 +6,7 @@ import Colors from '../constants/Colors';
 import { Alata12, Alata14 } from './StyledText';
 
 type SelectionProps = {
+    index: number;
     item: {
         key: string;
         value: string;
@@ -16,12 +17,15 @@ type SelectionProps = {
     onDropDown: () => void;
 };
 
+this.dropDownInputs = [];
 
-export default function DropDown({ item, selectedUnit, selectedAmount, onSelect, onDropDown }: SelectionProps) {
+export default function DropDown(this: any, { index, item, selectedUnit, selectedAmount, onSelect, onDropDown }: SelectionProps) {
     const [dropDown, setDropDrown] = React.useState(false);
     const [unit, setUnit] = React.useState(selectedUnit || 'x');
     const [amount, setAmount] = React.useState(selectedAmount || '');
     const [inputWidth, setInputWidth] = React.useState(0);
+
+    
 
     const handleInputLayout = (event: { nativeEvent: { layout: { width: any; }; }; }) => {
         const { width } = event.nativeEvent.layout;
@@ -50,17 +54,21 @@ export default function DropDown({ item, selectedUnit, selectedAmount, onSelect,
 
     return (
         <View style={styles.horizontalLayout}>
-            <View style={gStyles.cardInput} onLayout={handleInputLayout}>
+            <View style={[gStyles.cardInput, {gap: 5}]} onLayout={handleInputLayout}>
                 <TextInput
                     placeholder={`00`}
                     inputMode='numeric'
                     value={amount}
+                    ref={(input) => { this.dropDownInputs[index] = input; }}
+                    returnKeyType="next"
+                    blurOnSubmit={true}
+                    onSubmitEditing={() => { this.ingredientInputs[index + 1] != undefined ? this.ingredientInputs[index + 1].focus() : null; }}
                     maxLength={4}
                     placeholderTextColor={Colors.dark.text}
                     onChangeText={handleAmountChange}
                     style={[gStyles.textInput]}
                 />
-                <Alata14 style={[gStyles.alignCenter, styles.marginRight, {flex: 3}]} numberOfLines={1} ellipsizeMode='tail'>{unit}</Alata14>
+                <Alata14 style={[gStyles.alignCenter, styles.marginRight, {flex: 2}]} numberOfLines={1} ellipsizeMode='tail'>{unit}</Alata14>
                 {
                     dropDown ?
                         <Pressable onPress={deactivateDropDown} style={gStyles.alignCenter}>

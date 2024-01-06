@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TextInput, StyleSheet, ScrollView, View, Pressable, Text, Image, Alert } from 'react-native';
+import { TextInput, StyleSheet, ScrollView, View, Pressable, Text, Image, Alert, KeyboardAvoidingView } from 'react-native';
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
 import { db } from '../../FirebaseConfig'
@@ -17,8 +17,11 @@ import ChooseImageAlert from '../modals/alerts/chooseImageAlert';
 import InfoAlert from '../modals/alerts/infoAlert';
 import { RecipeData } from '../../api/cookBookRecipesFirebase/model';
 
-export default function AddRecipeScreen() {
+export default function AddRecipeScreen(this: any) {
   const router = useRouter();
+  this.categorieInputs = [];
+  this.ingredientInputs = [];
+  this.stepsInputs = [];
 
   // Get user id from session
   const { session } = useSession();
@@ -72,6 +75,7 @@ export default function AddRecipeScreen() {
   const [multiLineHeights, setMultiLineHeights] = useState(new Array(steps.length).fill(80));
   
   const [activeDropdown, setActiveDropdown] = useState(0);
+  const [saveDisabled, setSaveDisabled] = useState(false);
 
 
   const units = [
@@ -81,8 +85,8 @@ export default function AddRecipeScreen() {
     { key: '4', value: 'ml' },
     { key: '5', value: 'l' },
     { key: '6', value: 'g' },
-    { key: '7', value: 'kg' },
-    { key: '8', value: 'x' },
+    { key: '7', value: 'x' },
+    { key: '8', value: 'pinch'}
   ];
 
   const addImage = async () => {
@@ -126,6 +130,7 @@ export default function AddRecipeScreen() {
 
   const handleSave = async () => {
     if (categories.length === 0 || categories.some(category => !category)) {
+      setSaveDisabled(false);
       alert('Please add at least one category.');
       return;
     }
@@ -134,7 +139,7 @@ export default function AddRecipeScreen() {
       // Bild nur hochladen, wenn ein neues Bild ausgewählt wurde
       if (imageUri && !recipe?.imageUrl) {
         imageUrl = await uploadImage(imageUri, name);
-      }
+      } 
 
       const recipeData = {
         name,
@@ -160,6 +165,7 @@ export default function AddRecipeScreen() {
       }
       router.push('/(tabs)/two');
     } catch (e) {
+      setSaveDisabled(false);
       console.error('Fehler beim Speichern des Rezepts: ', e);
     }
   };
@@ -172,7 +178,7 @@ export default function AddRecipeScreen() {
     }
   }, [ingredients]);
   
-  function arraysEqual(arr1, arr2) {
+  function arraysEqual(arr1: string | any[], arr2: string | any[]) {
     if (arr1.length !== arr2.length) return false;
     for (let i = 0; i < arr1.length; i++) {
       if (arr1[i] !== arr2[i]) return false;
@@ -185,6 +191,9 @@ export default function AddRecipeScreen() {
 
   const addCategory = () => {
     setCategories([...categories, '']);
+    setTimeout(() => {
+      this.categorieInputs[this.categorieInputs.length - 1].focus();
+    }, 100);
   };
 
   const removeCategory = (indexToRemove: number) => {
@@ -194,6 +203,10 @@ export default function AddRecipeScreen() {
   const addIngredient = () => {
     setIngredients([...ingredients, { name: '', amount: '', unit: '' }]);
     setIngredientNames(names);
+    
+    setTimeout(() => {
+      this.ingredientInputs[this.ingredientInputs.length - 1].focus();
+    }, 100);
   };
 
   const removeIngredient = (indexToRemove: number) => {
@@ -203,13 +216,16 @@ export default function AddRecipeScreen() {
 
   const addStep = () => {
     setSteps([...steps, '']);
+    setTimeout(() => {
+      this.stepsInputs[this.stepsInputs.length - 1].focus();
+    }, 100);
   };
 
   const removeStep = (indexToRemove: number) => {
     setSteps(steps.filter((_, index) => index !== indexToRemove));
   };
 
-  const handleContentSizeChange = (index, height) => {
+  const handleContentSizeChange = (index: number, height: number) => {
     setMultiLineHeights(prevHeights => {
       const newHeights = [...prevHeights];
       newHeights[index] = height + 20; // 20 is the extra space
@@ -247,7 +263,7 @@ export default function AddRecipeScreen() {
       }}
       />
 
-      <View style={[gStyles.defaultContainer, { backgroundColor: Colors.dark.mainColorDark }]}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : null} style={[gStyles.defaultContainer, { backgroundColor: Colors.dark.mainColorDark }]}>
         {/* Main content */}
         <ScrollView style={[gStyles.fullScreenBackgroundContainer, { backgroundColor: Colors.dark.background }]} keyboardShouldPersistTaps='handled' showsVerticalScrollIndicator={false}>
 
@@ -271,7 +287,15 @@ export default function AddRecipeScreen() {
             {/* adding Recipe name */}
             <Alata20>Name:</Alata20>
             <View style={gStyles.cardInput}>
-              <TextInput placeholder="Name" value={name} onChangeText={setName} style={gStyles.textInput} placeholderTextColor={Colors.dark.text} />
+              <TextInput 
+                placeholder="Name" 
+                value={name} 
+                returnKeyType="next"
+                blurOnSubmit={false}
+                onSubmitEditing={() => { this.categorieInputs[0].focus(); }}
+                onChangeText={setName} 
+                style={gStyles.textInput} 
+                placeholderTextColor={Colors.dark.text} />
             </View>
 
 
@@ -283,6 +307,10 @@ export default function AddRecipeScreen() {
                   <TextInput
                     placeholder={`Category ${index + 1}`}
                     value={category}
+                    returnKeyType="next"
+                    blurOnSubmit={true}
+                    onSubmitEditing={() => { this.categorieInputs[index + 1] != undefined ? this.categorieInputs[index + 1].focus() : null; }}
+                    ref={(input) => { this.categorieInputs[index] = input; }}
                     placeholderTextColor={Colors.dark.text}
                     onChangeText={(text) => {
                       const newCategories = [...categories];
@@ -307,12 +335,33 @@ export default function AddRecipeScreen() {
             <Alata20>Preperation Time:</Alata20>
             <View style={[gStyles.HorizontalLayout, { gap: 12 }]}>
               <View style={[gStyles.cardInput, gStyles.flex]}>
-                <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookHTime} onChangeText={setCookHTime} style={gStyles.textInput} placeholderTextColor={Colors.dark.text} />
+                <TextInput 
+                  inputMode="numeric" 
+                  returnKeyType="next"
+                  blurOnSubmit={false}
+                  onSubmitEditing={() => { this.minuteInput.focus(); }}
+                  maxLength={2} 
+                  placeholder="00" 
+                  value={cookHTime} 
+                  onChangeText={setCookHTime} 
+                  style={gStyles.textInput} 
+                  placeholderTextColor={Colors.dark.text} />
                 <Alata16 style={gStyles.alignCenter}>hours</Alata16>
               </View>
 
               <View style={[gStyles.cardInput, gStyles.flex]}>
-                <TextInput inputMode="numeric" maxLength={2} placeholder="00" value={cookMinTime} onChangeText={setCookMinTime} style={gStyles.textInput} placeholderTextColor={Colors.dark.text} />
+                <TextInput 
+                  inputMode="numeric" 
+                  maxLength={2} 
+                  returnKeyType="next"
+                  blurOnSubmit={false}
+                  onSubmitEditing={() => { this.ingredientInputs[0].focus(); }}
+                  ref={(input) => { this.minuteInput = input; }}
+                  placeholder="00" 
+                  value={cookMinTime} 
+                  onChangeText={setCookMinTime} 
+                  style={gStyles.textInput} 
+                  placeholderTextColor={Colors.dark.text} />
                 <Alata16 style={gStyles.alignCenter}>minutes</Alata16>
               </View>
             </View>
@@ -326,6 +375,10 @@ export default function AddRecipeScreen() {
                     <TextInput
                       placeholder={`Ingredient ${index + 1}`}
                       placeholderTextColor={Colors.dark.text}
+                      returnKeyType="next"
+                      blurOnSubmit={false}
+                      onSubmitEditing={() => { this.dropDownInputs[index].focus(); }}
+                      ref={(input) => { this.ingredientInputs[index] = input; }}
                       value={ingredient.name}
                       onChangeText={(text) => {
                         const newIngredients = [...ingredients];
@@ -341,6 +394,7 @@ export default function AddRecipeScreen() {
                   <View style={styles.flex2}>
                     <DropDown
                       item={units}
+                      index={index}
                       selectedUnit={ingredient.unit}
                       selectedAmount={ingredient.amount}
                       onSelect={(unit, amount) => {
@@ -369,6 +423,7 @@ export default function AddRecipeScreen() {
                     onContentSizeChange={(e) => handleContentSizeChange(index, e.nativeEvent.contentSize.height)}
                     placeholder={`Step ${index + 1}`}
                     value={step}
+                    ref={(input) => { this.stepsInputs[index] = input; }}
                     placeholderTextColor={Colors.dark.text}
                     onChangeText={(text) => {
                       const newSteps = [...steps];
@@ -389,13 +444,13 @@ export default function AddRecipeScreen() {
             </View>
 
             {/* Save button */}
-            <Pressable onPress={handleSave} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { marginTop: 30, backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+            <Pressable disabled={saveDisabled} onPress={() => {handleSave(); setSaveDisabled(true);}} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { marginTop: 30, backgroundColor: saveDisabled ? Colors.dark.mainColorDark : pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
               <Save color={Colors.dark.text} size={28} style={gStyles.alignCenter} />
               <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>{editMode ? 'Save Changes' : 'Save Recipe'}</Alata20>
             </Pressable>
           </View>
         </ScrollView>
-      </View>
+      </KeyboardAvoidingView>
 
       {/* Alerts */}
       <InfoAlert

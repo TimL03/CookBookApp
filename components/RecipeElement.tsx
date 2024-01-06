@@ -40,7 +40,7 @@ export default function Recipe({ item }: RecipeProps) {
         <TouchableOpacity onPress={() => router.push({ pathname: "/screens/viewRecipeScreen", params: { recipeID: item.id, originScreen: 'two' } })} style={styles.outerBox} activeOpacity={0.2}>
             <Image
                 style={gStyles.imageSmall}
-                source={item.imageUrl == '' ? require("../assets/images/no-image.png") : { uri: item.imageUrl }}
+                source={item.imageUrl == null ? require("../assets/images/no-image.png") : { uri: item.imageUrl }}
             />
 
             <View style={[styles.innerBox, styles.flex]}>

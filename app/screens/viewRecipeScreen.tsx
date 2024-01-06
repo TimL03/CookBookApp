@@ -96,7 +96,7 @@ export default function ViewRecipeScreen() {
     <>
       <Stack.Screen options={{
         headerShown: true,
-        title: 'From your Cookbook',
+        title: params.originScreen === 'index' ? 'What\'s for dinner?' : 'From your Cookbook',
         headerShadowVisible: false,
         headerStyle: {
           backgroundColor: Colors.dark.mainColorDark,
@@ -110,13 +110,12 @@ export default function ViewRecipeScreen() {
       }}
       />
       <View style={[gStyles.defaultContainer, { backgroundColor: Colors.dark.mainColorDark }]}>
-
         {/* Main content */}
         <ScrollView style={gStyles.fullScreenBackgroundContainer} showsVerticalScrollIndicator={false}>
           {/* Recipe image */}
           <Image
             style={gStyles.image}
-            source={recipe.imageUrl == '' ? require("../../assets/images/no-image.png") : { uri: recipe.imageUrl }}
+            source={recipe.imageUrl == null ? require("../../assets/images/no-image.png") : { uri: recipe.imageUrl }}
           />
 
           {/* Recipe details */}
@@ -190,7 +189,6 @@ export default function ViewRecipeScreen() {
                 ))}
               </View>
             </View>
-
           </View>
         </ScrollView>
 

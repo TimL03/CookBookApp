@@ -9,7 +9,7 @@ import { TextInput } from 'react-native-gesture-handler';
 import { useSession } from '../../api/firebaseAuthentication/client';
 import { router } from 'expo-router';
 
-export default function LoginModalScreen() {
+export default function LoginModalScreen(this: any) {
   const [hidePassword, setHidePassword] = useState(true);
   const [loginMode, setLoginMode] = useState(true);
   const [email, setEmail] = useState('');

@@ -55,7 +55,7 @@ function RootLayoutNav() {
       <InvitationProvider>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false, navigationBarColor: Colors.dark.mainColorDark }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false, navigationBarColor: Colors.dark.mainColorDark, animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
             <Stack.Screen name="modals/actionModal" options={{ headerShown: false, presentation: 'transparentModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
             <Stack.Screen name="screens/viewRecipeScreen" options={{ navigationBarColor: Colors.dark.mainColorDark, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
             <Stack.Screen name="screens/addRecipeScreen" options={{ navigationBarColor: Colors.dark.background, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />

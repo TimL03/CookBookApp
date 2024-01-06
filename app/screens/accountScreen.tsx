@@ -193,14 +193,14 @@ export default function aboutScreen() {
             style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter,
             { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]}
             onPress={() => setAlertLogOutModalVisible(true)}>
-            <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Abmelden</Alata20>
+            <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Sign out</Alata20>
           </Pressable>
 
           <Pressable
             style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter,
             { backgroundColor: pressed ? Colors.dark.alertPressed : Colors.dark.alert }, {marginBottom: Platform.OS === 'ios' ? 50 : 0}]}
             onPress={() => setAlertDeleteAccountModalVisible(true)}>
-            <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Account löschen</Alata20>
+            <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Delete Account</Alata20>
           </Pressable>
           </>
         }
