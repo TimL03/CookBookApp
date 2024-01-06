@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TextInput, StyleSheet, ScrollView, View, Pressable, Text, Image, Alert, KeyboardAvoidingView } from 'react-native';
+import { TextInput, StyleSheet, ScrollView, View, Pressable, Text, Image, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
 import { db } from '../../FirebaseConfig'
@@ -68,6 +68,7 @@ export default function AddRecipeScreen(this: any) {
     }
   }, [recipe]);
 
+  const [oneCategoryAlertVisible, setOneCategoryAlertVisible] = useState(false);
   const [chooseImageAlertVisible, setChooseImageAlertVisible] = useState(false);
   const [galeriePermissionAlertVisible, setGaleriePermissionAlertVisible] = useState(false);
   const [cameraPermissionAlertVisible, setCameraPermissionAlertVisible] = useState(false);
@@ -129,9 +130,10 @@ export default function AddRecipeScreen(this: any) {
   };
 
   const handleSave = async () => {
+    setSaveDisabled(true);
     if (categories.length === 0 || categories.some(category => !category)) {
       setSaveDisabled(false);
-      alert('Please add at least one category.');
+      setOneCategoryAlertVisible(true);
       return;
     }
     try {
@@ -444,7 +446,7 @@ export default function AddRecipeScreen(this: any) {
             </View>
 
             {/* Save button */}
-            <Pressable disabled={saveDisabled} onPress={() => {handleSave(); setSaveDisabled(true);}} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { marginTop: 30, backgroundColor: saveDisabled ? Colors.dark.mainColorDark : pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+            <Pressable disabled={saveDisabled} onPress={() => {handleSave()}} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { marginTop: 30, backgroundColor: saveDisabled ? Colors.dark.mainColorDark : pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
               <Save color={Colors.dark.text} size={28} style={gStyles.alignCenter} />
               <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>{editMode ? 'Save Changes' : 'Save Recipe'}</Alata20>
             </Pressable>
@@ -453,6 +455,13 @@ export default function AddRecipeScreen(this: any) {
       </KeyboardAvoidingView>
 
       {/* Alerts */}
+      <InfoAlert
+        title='Error'
+        message='You need to add at least one category'
+        buttonText='ok'
+        alertModalVisible={oneCategoryAlertVisible}
+        setAlertModalVisible={setOneCategoryAlertVisible}
+      />
       <InfoAlert
         title='Error'
         message='You need to allow access to your galerie to take a photo'

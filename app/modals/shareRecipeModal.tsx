@@ -10,6 +10,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { getRecipeById } from '../../api/cookBookRecipesFirebase/client';
 import { RecipeData } from '../../api/cookBookRecipesFirebase/model';
 import { useSession } from '../../api/firebaseAuthentication/client';
+import InfoAlert from '../modals/alerts/infoAlert';
 
 const getUserIdByUsername = async (username: string) => {
   const usersRef = collection(db, 'users');
@@ -29,6 +30,9 @@ export default function ShareRecipeScreen() {
   const [message, setMessage] = useState('');
 
   const [recipe, setRecipe] = useState<RecipeData | null>(null);
+
+  const [alertNoUserModalVisible, setAlertNoUserModalVisible] = useState(false);
+  const [alertErrorUpdatingModalVisible, setAlertErrorUpdatingModalVisible] = useState(false);
 
   // Get recipe id from router params
   const params = useLocalSearchParams();
@@ -55,7 +59,7 @@ export default function ShareRecipeScreen() {
     try {
       const recipientUserId = await getUserIdByUsername(recipient);
       if (!recipientUserId) {
-        alert('Username not found!');
+        setAlertNoUserModalVisible(true);
         return;
       }
 
@@ -70,11 +74,12 @@ export default function ShareRecipeScreen() {
       router.back();
       await addDoc(invitationsCollection, invitationData);
     } catch (error) {
-      alert('Error by sending the recipe!');
+      setAlertErrorUpdatingModalVisible(true);
     }
   };
 
   return (
+    <>
     <Pressable onPress={router.back} style={gStyles.modalBackgroundContainer}>
       <View style={[gStyles.modalContentContainer,{backgroundColor: Colors.dark.background}]}>
         <Alata24 style={gStyles.alignCenter}>Share {recipe.name} Recipe</Alata24>
@@ -109,7 +114,24 @@ export default function ShareRecipeScreen() {
         </View>
         
       </View>
+      
     </Pressable>
+    <InfoAlert
+        title='Error'
+        message='User not found'
+        buttonText='retry'
+        alertModalVisible={alertNoUserModalVisible}
+        setAlertModalVisible={setAlertNoUserModalVisible}
+    />
+    <InfoAlert
+        title='Error'
+        message='Error updating the recipe'
+        buttonText='retry'
+        alertModalVisible={alertErrorUpdatingModalVisible}
+        setAlertModalVisible={setAlertErrorUpdatingModalVisible}
+    />
+
+    </>
   )
   
 }

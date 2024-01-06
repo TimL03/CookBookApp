@@ -4,7 +4,7 @@ import gStyles from "../constants/Global_Styles";
 import Colors from "../constants/Colors";
 import { Alata12 } from "./StyledText";
 
-export default function CategoryFilter({ categories, selectedCategories, onSelectCategory }) {
+export default function CategoryFilter({ categories, selectedCategories, onSelectCategory }: { categories: any[], selectedCategories: any[], onSelectCategory: (category: any) => void }) {
   return (
     <ScrollView showsHorizontalScrollIndicator={false} style={[gStyles.mapHorizontal, styles.scrollView]} horizontal>
       {categories.map((category) => (

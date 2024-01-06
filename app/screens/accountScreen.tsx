@@ -23,7 +23,7 @@ interface AuthData {
   uid: string;
 }
 
-export default function aboutScreen() {
+export default function aboutScreen(this:any) {
   const { session, signOut, deleteAccount } = useSession();
   const userID = session;
   const [userData, setUserData] = useState<UserData | null>(null);

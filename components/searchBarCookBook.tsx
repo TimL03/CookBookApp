@@ -3,7 +3,7 @@ import { TextInput, View, StyleSheet, Keyboard } from "react-native";
 import { Search } from "lucide-react-native";
 import gStyles from "../constants/Global_Styles";
 import Colors from "../constants/Colors";
-export default function SearchBarCookBook({ setSearchCriteria }) {
+export default function SearchBarCookBook({ setSearchCriteria }: { setSearchCriteria: any }) {
   return (
     <View style={[gStyles.cardInput]}>
       <TextInput

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import Colors from '../../../constants/Colors';
