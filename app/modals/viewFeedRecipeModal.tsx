@@ -24,6 +24,9 @@ export default function ViewFeedRecipeScreen() {
   const [recipe, setRecipe] = useState<RecipeData | null>(null);
   const [recipeSaved, setRecipeSaved] = useState(false);
 
+  const { session } = useSession();
+  const userID = session;
+  
   // Get recipe id from router params
   const params = useLocalSearchParams();
 
