@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, deleteUser } from "firebase/auth";
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut as firebaseSignOut, deleteUser } from "firebase/auth";
 import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { auth, db } from '../../FirebaseConfig';
 import { router } from 'expo-router';
@@ -42,6 +42,19 @@ interface SessionProviderProps {
 export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
   const [session, setSession] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setSession(user.uid);
+      } else {
+        setSession(null);
+      }
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe(); 
+  }, []);
 
   const signIn = async (email: string, password: string) => {
     setIsLoading(true);

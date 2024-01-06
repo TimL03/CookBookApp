@@ -16,7 +16,7 @@ const getUsernameByUserId = async (userId: string) => {
 
   if (!querySnapshot.empty) {
     return querySnapshot.docs[0].data().username;
-  } 
+  }
 };
 
 interface RecipeData {
@@ -27,7 +27,7 @@ interface RecipeData {
 export default function ShowSharedRecipeInvitationModalScreen() {
   const [recipeData, setRecipeData] = useState<RecipeData | null>(null);
   const [senderUsername, setSenderUsername] = useState('');
-  const { invitationData } = useContext(InvitationContext);
+  const { invitationData, processNextInvitation } = useContext(InvitationContext);
 
   useEffect(() => {
     async function getRecipeAndSenderData() {
@@ -56,26 +56,26 @@ export default function ShowSharedRecipeInvitationModalScreen() {
 
   const handleAccept = async () => {
     try {
-        await updateDoc(doc(db, 'invitations', invitationData.id), {
-            status: 'accepted',
-        });
+      await updateDoc(doc(db, 'invitations', invitationData.id), {
+        status: 'accepted',
+      });
 
-        if (recipeData) {
-            const newRecipeData = {
-                ...recipeData,
-                userID: invitationData.receiverId 
-            };
+      if (recipeData) {
+        const newRecipeData = {
+          ...recipeData,
+          userID: invitationData.receiverId
+        };
 
-            const newRecipeRef = await addDoc(collection(db, 'recipes'), newRecipeData);
+        const newRecipeRef = await addDoc(collection(db, 'recipes'), newRecipeData);
 
-            console.log('Neue Rezept-ID:', newRecipeRef.id);
-        }
+        console.log('Neue Rezept-ID:', newRecipeRef.id);
+      }
 
-        router.back();
-          } catch (error) {
-        console.error('Fehler beim Akzeptieren der Einladung:', error);
+      processNextInvitation();
+    } catch (error) {
+      console.error('Fehler beim Akzeptieren der Einladung:', error);
     }
-};
+  };
 
   const handleDecline = async () => {
     try {
@@ -83,20 +83,20 @@ export default function ShowSharedRecipeInvitationModalScreen() {
         status: 'declined',
       });
 
-      router.back();
-        } catch (error) {
+      processNextInvitation();
+    } catch (error) {
       console.error('Error declining invitation:', error);
     }
   };
 
   return (
     <Pressable style={gStyles.modalBackgroundContainer}>
-      <View style={[gStyles.modalContentContainer,{backgroundColor: Colors.dark.background}]}>
+      <View style={[gStyles.modalContentContainer, { backgroundColor: Colors.dark.background }]}>
         <Alata20 style={gStyles.alignCenter}>{senderUsername} shared a recipe with you!</Alata20>
         {recipeData && (
           <RecipeElement item={recipeData} />
         )}
-        <View style={[gStyles.cardHorizontal, {backgroundColor: Colors.dark.mainColorDark}]}>
+        <View style={[gStyles.cardHorizontal, { backgroundColor: Colors.dark.mainColorDark }]}>
           <Alata16>message: {invitationData.message}</Alata16>
         </View>
         <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]} onPress={handleAccept}>

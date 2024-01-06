@@ -8,7 +8,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { Alata20, Alata12, Alata16, Alata14, Alata24, Alata18 } from '../../components/StyledText';
 import ShareRecipeScreen from './shareRecipeModal';
 import { db, auth } from '../../FirebaseConfig'
-import { doc, setDoc, Timestamp, collection, getDocs } from 'firebase/firestore';
+import { doc, setDoc, Timestamp, collection, addDoc, getDocs } from 'firebase/firestore';
 import RatingModal from './RatingModal';
 import { RecipeData } from '../../api/cookBookRecipesFirebase/model';
 import { Stack, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
@@ -63,8 +63,16 @@ const saveRecipeToDatabase = async () => {
   console.log('Saving recipe to database')
   try {
     if (params.recipeID && recipe) {
-      const recipeRef = doc(db, 'recipes', params.recipeID.toString());
-      await setDoc(recipeRef, {
+      const recipesCollectionRef = collection(db, 'recipes');
+      await addDoc(recipesCollectionRef, {
+        name: recipe.name,
+        cookHTime: recipe.cookHTime,
+        cookMinTime: recipe.cookMinTime,
+        imageUrl: recipe.imageUrl,
+        ingredients: recipe.ingredients,
+        steps: recipe.steps,
+        userID: userID,
+        categories: recipe.categories,
         //... rest of your recipe data
       });
 
