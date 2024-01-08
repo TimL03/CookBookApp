@@ -13,13 +13,45 @@ export type IngredientView = {
 
 export type RecipeData = {
   id: string;
-  category: string;
+  categories: string[];
   name: string;
   cookHTime: string;
   cookMinTime: string;
-  description: string;
+  ingredientNames: string[];
   ingredients: IngredientView[];
+  ratings: string[];
   steps: string[];
   imageUrl: string;
   userID: string; 
+  averageRating: {
+    average: number;
+    totalRatings: number;
+};
 };  
+
+export type GroupedByCategory = {
+  [key: string]: RecipeData[];
+};
+
+export type RecipeProps = {
+  item: {
+      id: string;
+      name: string;
+      categories: string[];
+      cookHTime: string;
+      cookMinTime: string;
+      ingredients: IngredientView[];
+      ingredientNames: string[];
+      steps: string[];
+      imageUrl: string;
+      userID: string;
+  };
+  averageRating: {
+      average: number;
+      totalRatings: number;
+  };
+}
+
+export type CategoryIconProps = {
+  categories: string[];
+}

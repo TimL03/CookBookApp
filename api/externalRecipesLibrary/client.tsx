@@ -16,7 +16,6 @@ export const useIngredients = () => {
             value: ingredient.strIngredient,
             selected: false,
           }));
-          
           setCurrentList(ingredientsList);
         } else {
           console.error('Fehler beim Abrufen der Zutatenliste.');
@@ -35,27 +34,25 @@ export const useIngredients = () => {
 export const useCategories = () => {
   const [currentList, setCurrentList] = useState([]);
 
-
   useEffect(() => {
     const fetchCategoriesList = async () => {
       try {
         const response = await fetch('https://www.themealdb.com/api/json/v1/1/list.php?c=list');
         const data = await response.json();
-        
+
         if (data.meals) {
-          const categorieList = data.meals.map((categorie: any) => ({
-            key: categorie.strCategory,
+          const categorieList = data.meals.map((categorie: any, index: number) => ({
+            key: index.toString(),
             value: categorie.strCategory,
             selected: false,
-            
           }));
-          
+
           setCurrentList(categorieList);
         } else {
-          console.error('Fehler beim Abrufen der Zutatenliste.');
+          console.error('Fehler beim Abrufen der Kategorienliste.');
         }
       } catch (error) {
-        console.error('Fehler beim Abrufen der Zutatenliste:', error);
+        console.error('Fehler beim Abrufen der Kategorienliste:', error);
       }
     };
 
@@ -65,52 +62,67 @@ export const useCategories = () => {
   return currentList;
 };
 
-export const useGetRandomMeal = (selectedIngredients: string, selectedCategories: string) => {
-  const [selectedMeal, setSelectedMeal] = useState(null);
+export const useGetRandomMealId = () => {
+  const [selectedMealId, setSelectedMealId] = useState(null);
 
-  const fetchMeal = async () => {
+  const fetchMeal = async (selectedIngredients: string, selectedCategories: string) => {
     try {
-      console.log('Selected Ingredients:', selectedIngredients);
-      console.log('Selected Categories:', selectedCategories);
-      const responseIngredients = await fetch(`https://www.themealdb.com/api/json/v2/9973533/filter.php?i=${selectedIngredients}`);
-      const dataIngredients = await responseIngredients.json();
-
-      const responseCategories = await fetch(`https://www.themealdb.com/api/json/v2/9973533/filter.php?c=${selectedCategories}`);
-      const dataCategories = await responseCategories.json();
-
-      let data = null;
-      if(selectedCategories != '' && selectedIngredients != '') {
-        console.log('both');
-        data = dataIngredients.meals.filter((ingredientMeal : any) => 
-          dataCategories.meals.some((categoryMeal : any) => categoryMeal.idMeal === ingredientMeal.idMeal)
-        );
-      } else if (selectedIngredients != '') {
-        console.log('nur ingredients');
-        data = dataIngredients.meals;
-      } else if (selectedCategories != '') {
-        console.log('nur categories');
-        data = dataCategories.meals;
-      } 
-
-      if (data != null) {
-        const randomMealId = data[Math.floor(Math.random() * data.length)].idMeal;
-        const detailedResponse = await fetch(`https://www.themealdb.com/api/json/v2/9973533/lookup.php?i=${randomMealId}`);
-        const detailedData = await detailedResponse.json();
-        if (detailedData.meals) {
-          setSelectedMeal(detailedData.meals[0]);
+      if (!selectedIngredients && !selectedCategories) {
+        const response = await fetch('https://www.themealdb.com/api/json/v1/1/random.php');
+        const data = await response.json();
+        if (data.meals && data.meals.length > 0) {
+          const randomMealId = data.meals[0].idMeal;
+          setSelectedMealId(randomMealId); 
+          return randomMealId; 
         } else {
-          alert("Details for the selected meal not found!");
+          console.error("Random meal API returned no meals");
+          return null;
         }
       } else {
-        alert("Sorry, we didn't find any meal!");
+        let mealsByIngredients = null;
+        let mealsByCategories = null;
+
+        if (selectedIngredients) {
+          const response = await fetch(`https://www.themealdb.com/api/json/v2/9973533/filter.php?i=${selectedIngredients}`);
+          const data = await response.json();
+          mealsByIngredients = data.meals;
+        }
+
+        if (selectedCategories) {
+          const response = await fetch(`https://www.themealdb.com/api/json/v2/9973533/filter.php?c=${selectedCategories}`);
+          const data = await response.json();
+          mealsByCategories = data.meals;
+        }
+
+        let matchedMeals = [];
+        if (mealsByIngredients && mealsByCategories) {
+          matchedMeals = mealsByIngredients.filter(ingredientMeal => 
+            mealsByCategories.some(categoryMeal => categoryMeal.idMeal === ingredientMeal.idMeal)
+          );
+        } else {
+          matchedMeals = mealsByIngredients || mealsByCategories || [];
+        }
+
+        console.log("Matched Meals:", matchedMeals);
+        if (matchedMeals.length > 0) {
+          const randomMealId = matchedMeals[Math.floor(Math.random() * matchedMeals.length)].idMeal;
+          setSelectedMealId(randomMealId);
+          console.log("Selected Meal:", randomMealId)
+          return randomMealId;
+        } else {
+          console.log("No matching meals found");
+          return null;
+        }
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error in fetchMeal:", error);
+      return false;
     }
   };
 
-  return { selectedMeal, fetchMeal };
+  return { selectedMealId, fetchMeal };
 };
+
 
 export const useGetMealById = (mealId: string) => {
   const [selectedMeal, setSelectedMeal] = useState(null);
@@ -135,8 +147,8 @@ export const useGetMealById = (mealId: string) => {
 
 export function ItemListToCSVString(itemList: Item[]) {
   return itemList
-  .filter(item => item.selected)
-  .map(item => item.value.toLowerCase())
-  .join(',');
+    .filter(item => item.selected)
+    .map(item => item.value.toLowerCase())
+    .join(',');
 }
 

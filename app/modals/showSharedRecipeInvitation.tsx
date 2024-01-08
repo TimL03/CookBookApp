@@ -1,45 +1,58 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, StyleSheet, Pressable, Image } from 'react-native';
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
 import { db } from '../../FirebaseConfig'
-import { collection, addDoc, updateDoc, getDoc, doc } from 'firebase/firestore';
-import { Alata20, } from '../../components/StyledText';
+import { collection, addDoc, updateDoc, getDoc, doc, query, where, getDocs } from 'firebase/firestore';
+import { Alata16, Alata20, } from '../../components/StyledText';
+import RecipeElement from '../../components/RecipeElement';
+import { InvitationContext } from '../../api/firebaseRecipeInvitations/client';
+import { router } from 'expo-router';
 
+const getUsernameByUserId = async (userId: string) => {
+  const usersRef = collection(db, 'users');
+  const q = query(usersRef, where("uid", "==", userId));
+  const querySnapshot = await getDocs(q);
 
-interface ShowSharedRecipeProps {
-  invitationData: any;
-  onClose: () => void;
-}
+  if (!querySnapshot.empty) {
+    return querySnapshot.docs[0].data().username;
+  }
+};
 
 interface RecipeData {
   imageUrl: string;
   name: string;
 }
 
-export default function ShowSharedRecipeInvitationModalScreen({ invitationData, onClose }: ShowSharedRecipeProps) {
+export default function ShowSharedRecipeInvitationModalScreen() {
   const [recipeData, setRecipeData] = useState<RecipeData | null>(null);
+  const [senderUsername, setSenderUsername] = useState('');
+  const { invitationData, processNextInvitation } = useContext(InvitationContext);
 
   useEffect(() => {
-    async function getRecipeData(recipeId: string) {
+    async function getRecipeAndSenderData() {
       try {
-        const docRef = doc(db, 'recipes', recipeId);
-        const docSnapshot = await getDoc(docRef);
-        if (docSnapshot.exists()) {
-          const recipeData = docSnapshot.data() as RecipeData;
-          setRecipeData(recipeData);
-        } else {
-          console.log('Das Rezept wurde nicht gefunden.');
+        if (invitationData.recipeId) {
+          const recipeDocRef = doc(db, 'recipes', invitationData.recipeId);
+          const recipeDocSnapshot = await getDoc(recipeDocRef);
+          if (recipeDocSnapshot.exists()) {
+            setRecipeData(recipeDocSnapshot.data() as RecipeData);
+          } else {
+            console.log('Das Rezept wurde nicht gefunden.');
+          }
+        }
+
+        if (invitationData.senderId) {
+          const username = await getUsernameByUserId(invitationData.senderId);
+          setSenderUsername(username);
         }
       } catch (error) {
-        console.error('Fehler beim Abrufen des Rezepts:', error);
+        console.error('Fehler beim Abrufen der Daten:', error);
       }
     }
 
-    if (invitationData.recipeId) {
-      getRecipeData(invitationData.recipeId);
-    }
-  }, [invitationData.recipeId]);
+    getRecipeAndSenderData();
+  }, [invitationData.recipeId, invitationData.senderId]);
 
   const handleAccept = async () => {
     try {
@@ -48,21 +61,19 @@ export default function ShowSharedRecipeInvitationModalScreen({ invitationData, 
       });
 
       if (recipeData) {
-        const recipeToDuplicate = await getDoc(doc(db, 'recipes', invitationData.recipeId));
-        if (recipeToDuplicate.exists()) {
-          const recipeData = recipeToDuplicate.data();
+        const newRecipeData = {
+          ...recipeData,
+          userID: invitationData.receiverId
+        };
 
-          const duplicatedRecipeData = { ...recipeData, userID: invitationData.receiverId };
+        const newRecipeRef = await addDoc(collection(db, 'recipes'), newRecipeData);
 
-          const newRecipeRef = await addDoc(collection(db, 'recipes'), duplicatedRecipeData);
-
-          console.log('Duplicated Recipe ID:', newRecipeRef.id);
-        }
+        console.log('Neue Rezept-ID:', newRecipeRef.id);
       }
 
-      onClose();
+      processNextInvitation();
     } catch (error) {
-      console.error('Error accepting invitation:', error);
+      console.error('Fehler beim Akzeptieren der Einladung:', error);
     }
   };
 
@@ -72,28 +83,27 @@ export default function ShowSharedRecipeInvitationModalScreen({ invitationData, 
         status: 'declined',
       });
 
-      onClose();
+      processNextInvitation();
     } catch (error) {
       console.error('Error declining invitation:', error);
     }
   };
 
   return (
-    <Pressable style={styles.modalContainer}>
-      <View style={styles.modalContent}>
-        <Alata20 style={gStyles.alignCenter}>Somebody shared a recipe with you!</Alata20>
+    <Pressable style={gStyles.modalBackgroundContainer}>
+      <View style={[gStyles.modalContentContainer, { backgroundColor: Colors.dark.background }]}>
+        <Alata20 style={gStyles.alignCenter}>{senderUsername} shared a recipe with you!</Alata20>
         {recipeData && (
-          <View>
-            <Image source={{ uri: recipeData.imageUrl }} style={{ width: 100, height: 100 }} />
-            <Alata20>{recipeData.name}</Alata20>
-          </View>
+          <RecipeElement item={recipeData} />
         )}
-        <Pressable onPress={handleAccept}>
-          <Alata20>Accept</Alata20>
+        <View style={[gStyles.cardHorizontal, { backgroundColor: Colors.dark.mainColorDark }]}>
+          <Alata16>message: {invitationData.message}</Alata16>
+        </View>
+        <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]} onPress={handleAccept}>
+          <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Accept Shared Recipe</Alata20>
         </Pressable>
-
-        <Pressable onPress={handleDecline}>
-          <Alata20 style={{ paddingBottom: 4 }}>Decline</Alata20>
+        <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.alertPressed : Colors.dark.alert }]} onPress={handleDecline}>
+          <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Decline Shared Recipe</Alata20>
         </Pressable>
       </View>
     </Pressable>
@@ -107,7 +117,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0)',
-    backdropFilter: 'blur(5px)',
   },
   modalContent: {
     backgroundColor: Colors.dark.mainColorDark,

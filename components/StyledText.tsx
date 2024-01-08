@@ -24,6 +24,10 @@ export function Alata16(props: TextProps) {
   return <Text {...props} style={[props.style, { fontFamily: 'Alata', fontSize: 16, color: Colors.dark.text }]} />;
 }
 
+export function Alata18(props: TextProps) {
+  return <Text {...props} style={[props.style, { fontFamily: 'Alata', fontSize: 18, color: Colors.dark.text }]} />;
+}
+
 export function Alata20(props: TextProps) {
   return <Text {...props} style={[props.style, { fontFamily: 'Alata', fontSize: 20, color: Colors.dark.text }]} />;
 }

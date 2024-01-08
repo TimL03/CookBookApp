@@ -41,7 +41,6 @@ export default StyleSheet.create({
         borderRadius: 15, 
         paddingVertical: 15, 
         marginTop: 50, 
-        width: 125, 
         position: 'absolute', 
         zIndex: 1
     },
@@ -82,8 +81,8 @@ export default StyleSheet.create({
         gap: 10,
     },
     cardInputMultiline: {
-        height: 80,
         textAlignVertical: 'top',
+        height: 100,
     },
     image: {
         width: '100%',
@@ -154,6 +153,8 @@ export default StyleSheet.create({
         borderTopRightRadius: 20,
         gap: 15,
         width: '100%',
+        shadowColor: 'black',
+        elevation: 15,
     },
 
 

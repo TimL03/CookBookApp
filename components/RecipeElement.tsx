@@ -1,63 +1,46 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, Image, Modal, Pressable } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Carrot, Soup, Vegan } from 'lucide-react-native';
+import { StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
+import { Carrot, EggOff, Fish, MilkOff, Soup, Vegan } from 'lucide-react-native';
 import Colors from '../constants/Colors';
 import gStyles from '../constants/Global_Styles'
-import { DarkTheme } from '@react-navigation/native';
 import { View } from './Themed';
 import { Alata20, Alata12 } from './StyledText';
-import ViewRecipeScreen from '../app/modals/viewRecipeModal';
+import { router } from 'expo-router';
+import { RecipeProps, CategoryIconProps } from '../api/cookBookRecipesFirebase/model';
 
-interface Ingredient {
-    name: string;
-    amount: string;
-    unit: string;
-}
 
-interface RecipeProps {
-    item: {
-        id: string;
-        category: string;
-        name: string;
-        cookHTime: string;
-        cookMinTime: string;
-        description: string;
-        ingredients: Ingredient[];
-        steps: string[];
-        imageUrl: string;
-        userID: string;
-    };
-}
-
-interface CategoryIconProps {
-    category: string;
-}
-
-const CategoryIcon: React.FC<CategoryIconProps> = ({ category }) => {
-    switch (category) {
-        case 'Soup':
-            return <Soup color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
-        case 'Vegetarian':
-            return <Carrot color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
-        case 'Vegan':
-            return <Vegan color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
-        default:
-            return null;
-    }
+const CategoryIcon: React.FC<CategoryIconProps> = ({ categories }) => {
+    return (
+        <View style={{ flexDirection: 'row', backgroundColor: 'transparent' }}>
+            {categories.map((category, index) => {
+                switch (category) {
+                    case 'Soup':
+                        return <Soup color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                    case 'Vegetarian':
+                        return <Carrot color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                    case 'Vegan':
+                        return <Vegan color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                    case 'Fish':
+                        return <Fish color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                    case 'No-Egg':
+                        return <EggOff color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                    case 'No-Milk':
+                        return <MilkOff color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                    default:
+                        return null;
+                }
+            })}
+        </View>
+    );
 };
-export default function Recipe({ item }: RecipeProps) {
-    const [isModalVisible, setModalVisible] = useState(false);
 
-    const toggleModal = () => {
-        setModalVisible(!isModalVisible);
-    };
+export default function Recipe({ item }: RecipeProps) {
 
     return (
-        <TouchableOpacity onPress={toggleModal} style={styles.outerBox} activeOpacity={0.2}>
+        <TouchableOpacity onPress={() => router.push({ pathname: "/screens/viewRecipeScreen", params: { recipeID: item.id, originScreen: 'two' } })} style={styles.outerBox} activeOpacity={0.2}>
             <Image
                 style={gStyles.imageSmall}
-                source={item.imageUrl == '' ? require("../assets/images/no-image.png") : { uri: item.imageUrl }}
+                source={item.imageUrl == null ? require("../assets/images/no-image.png") : { uri: item.imageUrl }}
             />
 
             <View style={[styles.innerBox, styles.flex]}>
@@ -68,18 +51,10 @@ export default function Recipe({ item }: RecipeProps) {
 
             <View style={[styles.innerBox, styles.marginRight]}>
                 <View style={styles.icons}>
-                    <CategoryIcon category={item.category} />
+                    <CategoryIcon categories={item.categories} />
                 </View>
             </View>
 
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={isModalVisible}
-                onRequestClose={toggleModal}
-            >
-                <ViewRecipeScreen closeModal={toggleModal} recipe={item} />
-            </Modal>
         </TouchableOpacity>
     )
 }
@@ -102,12 +77,12 @@ const styles = StyleSheet.create({
     },
     innerBox: {
         backgroundColor: Colors.dark.seeThrough,
-        margin: 8,
     },
     icons: {
         backgroundColor: Colors.dark.seeThrough,
         flex: 2,
         margin: 8,
+        alignSelf: 'flex-end',
         justifyContent: 'flex-end',
         flexDirection: 'row',
         alignItems: 'flex-end',
