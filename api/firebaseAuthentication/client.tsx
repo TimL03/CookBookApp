@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut as firebaseSignOut, deleteUser } from "firebase/auth";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut as firebaseSignOut, deleteUser, setPersistence, browserLocalPersistence, indexedDBLocalPersistence } from "firebase/auth";
 import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { auth, db } from '../../FirebaseConfig';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface AuthContextType {
   session: any;
@@ -44,17 +45,33 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const checkPreviousSession = async () => {
+      setIsLoading(true);
+      const userID = await AsyncStorage.getItem('userID');
+      if (userID) {
+        setSession(userID);
+        setIsLoading(false);
+        console.log("checked Previous session and set loading false");
+      }
+    };
+
+    checkPreviousSession();
+
+  const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    if(session === null){
+      console.log("unsubscribe");
       if (user) {
         setSession(user.uid);
       } else {
         setSession(null);
       }
       setIsLoading(false);
-    });
+    }
+  });
 
-    return () => unsubscribe(); 
-  }, []);
+  return () => unsubscribe(); 
+}, []);
+
 
   const signIn = async (email: string, password: string) => {
     setIsLoading(true);
@@ -63,6 +80,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const userID = userCredential.user.uid;
       setSession(userID);
+      await AsyncStorage.setItem('userID', userID);
     } catch (error) {
       alert("E-Mail or password is wrong");
       setSession(null);
@@ -101,6 +119,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     setIsLoading(true);
     try {
       await firebaseSignOut(auth);
+      await AsyncStorage.removeItem('userID');
     } catch (error) {
       alert("Error while sign out");
     } finally {

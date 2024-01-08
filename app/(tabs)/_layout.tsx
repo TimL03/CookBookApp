@@ -1,10 +1,12 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Library, Utensils, Menu, FileSearch } from 'lucide-react-native'
 import { Tabs, router, Redirect } from 'expo-router';
+import { useEffect } from 'react';
 import { Pressable, View, Text } from 'react-native';
 import { useSession } from '../../api/firebaseAuthentication/client';
 import Colors from '../../constants/Colors';
 import React from 'react';
+
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof MaterialCommunityIcons>['name'];
   color: string;
@@ -15,13 +17,13 @@ function TabBarIcon(props: {
 export default function TabLayout() {
   const { session, isLoading } = useSession();
 
+  console.log("session start: " + session);
+
   if (isLoading) {
     return <Text>Loading...</Text>;
-  }
-
-  if (!session) {
+  } else if (session === null) {
     return <Redirect href="/screens/authentificationScreen" />;
-  }
+  } else{
 
   return (
     <View style={{ flex: 1 }}>
@@ -100,4 +102,5 @@ export default function TabLayout() {
     </Tabs>
     </View>
   );
+  }
 }
