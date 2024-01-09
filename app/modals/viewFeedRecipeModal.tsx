@@ -76,7 +76,6 @@ const saveRecipeToDatabase = async () => {
         steps: recipe.steps,
         userID: userID,
         categories: recipe.categories,
-        //... rest of your recipe data
       });
 
       console.log('Recipe successfully saved!');
@@ -88,7 +87,6 @@ const saveRecipeToDatabase = async () => {
     console.error('Error saving recipe:', error);
   }
 };
-
 
   // Return the JSX for the component
   return (

@@ -12,10 +12,14 @@ import SearchBarCookBook from '../../components/searchBarCookBook'
 import CategoryFilter from '../../components/CategoryFilter';
 
 export default function TabTwoScreen() {
+  // Initialize state for search criteria and selected categories
   const [searchCriteria, setSearchCriteria] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  
+  // Fetch cookBook recipes data
   const data = useCookBookRecipes();
 
+  // Function to toggle selected categories
   const toggleCategory = (category: string) => {
     if (selectedCategories.includes(category)) {
       setSelectedCategories(selectedCategories.filter((c) => c !== category));
@@ -24,7 +28,7 @@ export default function TabTwoScreen() {
     }
   };  
   
-  // Filter the sections based on selected categories
+  // Filter the sections based on selected categories and search criteria
   const filteredSections = data
     .filter((section) =>
       selectedCategories.length === 0 || selectedCategories.includes(section.title)

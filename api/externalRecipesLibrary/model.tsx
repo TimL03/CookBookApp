@@ -1,11 +1,11 @@
-
+// Type for Search bar selection
 export type Item = {
     key: string;
     value: string;
     selected: boolean;
   };
 
-  // Define the Ingredient interface
+// Define the Ingredient interface
 export interface Ingredient {
   name: string;
   amount: string;

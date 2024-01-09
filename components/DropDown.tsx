@@ -5,6 +5,7 @@ import gStyles from '../constants/Global_Styles';
 import Colors from '../constants/Colors';
 import { Alata12, Alata14 } from './StyledText';
 
+// Define the type for the SelectionProps
 type SelectionProps = {
     index: number;
     item: {
@@ -17,44 +18,50 @@ type SelectionProps = {
     onDropDown: () => void;
 };
 
+// Initialize the property dropDownInputs (this will be an array)
 this.dropDownInputs = [];
 
+// Define and export the DropDown component function
 export default function DropDown(this: any, { index, item, selectedUnit, selectedAmount, onSelect, onDropDown }: SelectionProps) {
+    // Initialize state variables
     const [dropDown, setDropDrown] = React.useState(false);
     const [unit, setUnit] = React.useState(selectedUnit || 'x');
     const [amount, setAmount] = React.useState(selectedAmount || '');
     const [inputWidth, setInputWidth] = React.useState(0);
 
-    
-
+    // Function to handle input layout
     const handleInputLayout = (event: { nativeEvent: { layout: { width: any; }; }; }) => {
         const { width } = event.nativeEvent.layout;
         setInputWidth(width);
-      };
+    };
 
+    // Function to activate the dropdown
     const activateDropDown = () => {
         setDropDrown(true);
         onDropDown();
     }
 
+    // Function to deactivate the dropdown
     const deactivateDropDown = () => {
         setDropDrown(false);
     }
 
+    // Function to handle unit selection
     const handleSelectUnit = (selectedUnit: string) => {
         setUnit(selectedUnit);
-        onSelect(selectedUnit, amount);  
+        onSelect(selectedUnit, amount);
         setDropDrown(false);
-      };
-    
-      const handleAmountChange = (text: string) => {
+    };
+
+    // Function to handle amount change
+    const handleAmountChange = (text: string) => {
         setAmount(text);
-        onSelect(unit, text);  
-      };
+        onSelect(unit, text);
+    };
 
     return (
         <View style={styles.horizontalLayout}>
-            <View style={[gStyles.cardInput, {gap: 5}]} onLayout={handleInputLayout}>
+            <View style={[gStyles.cardInput, { gap: 5 }]} onLayout={handleInputLayout}>
                 <TextInput
                     placeholder={`00`}
                     inputMode='numeric'
@@ -68,11 +75,11 @@ export default function DropDown(this: any, { index, item, selectedUnit, selecte
                     onChangeText={handleAmountChange}
                     style={[gStyles.textInput]}
                 />
-                <Alata14 style={[gStyles.alignCenter, styles.marginRight, {flex: 2}]} numberOfLines={1} ellipsizeMode='tail'>{unit}</Alata14>
+                <Alata14 style={[gStyles.alignCenter, styles.marginRight, { flex: 2 }]} numberOfLines={1} ellipsizeMode='tail'>{unit}</Alata14>
                 {
                     dropDown ?
                         <Pressable onPress={deactivateDropDown} style={gStyles.alignCenter}>
-                            <ChevronUp color={Colors.dark.text} size={28} strokeWidth='2.5'  />
+                            <ChevronUp color={Colors.dark.text} size={28} strokeWidth='2.5' />
                         </Pressable>
                         :
                         <Pressable onPress={activateDropDown} style={gStyles.alignCenter}>
@@ -83,7 +90,7 @@ export default function DropDown(this: any, { index, item, selectedUnit, selecte
 
             {
                 dropDown ?
-                    <View style={[gStyles.dropDownContainer, {width: inputWidth}]}>
+                    <View style={[gStyles.dropDownContainer, { width: inputWidth }]}>
                         {item.map((unitItem) => (
                             <Pressable
                                 key={unitItem.key}
@@ -110,9 +117,9 @@ const styles = StyleSheet.create({
     dropDownElement: {
         padding: 10,
         paddingLeft: 15
-    }, 
+    },
     horizontalLayout: {
-        flex: 2, 
+        flex: 2,
         flexDirection: 'column'
     }
 })

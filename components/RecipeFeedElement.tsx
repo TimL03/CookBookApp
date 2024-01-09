@@ -8,7 +8,7 @@ import { Alata20, Alata12 } from './StyledText';
 import { RecipeProps, CategoryIconProps } from '../api/cookBookRecipesFirebase/model';
 import { router } from 'expo-router';
 
-
+// Category icon's based on categories of a recipe
 const CategoryIcon: React.FC<CategoryIconProps> = ({ categories }) => {
     return (
         <View style={{ flexDirection: 'row', backgroundColor: 'transparent', gap: 2 }}>
@@ -34,6 +34,7 @@ const CategoryIcon: React.FC<CategoryIconProps> = ({ categories }) => {
     );
 };
 
+// Recipe element in the section list
 export default function Recipe({ item, averageRating }: RecipeProps) {
 
     return (

@@ -14,7 +14,9 @@ import { Link, Stack, router, useLocalSearchParams } from 'expo-router';
 import { RecipeData } from '../../api/cookBookRecipesFirebase/model';
 import ConfirmationAlert from '../modals/alerts/confirmationAlert';
 
+// Define and export the ViewRecipeScreen function
 export default function ViewRecipeScreen() {
+  // Initialize state variables
   const [recipe, setRecipe] = useState<RecipeData | null>(null);
   const [alertDeleteModalVisible, setAlertDeleteModalVisible] = useState(false);
   const [alertPublishModalVisible, setAlertPublishModalVisible] = useState(false);
@@ -22,22 +24,26 @@ export default function ViewRecipeScreen() {
   // Get recipe id from router params
   const params = useLocalSearchParams();
 
-  // Get user id from session
+  // Get the User's ID
   const { session } = useSession();
   const userID = session;
 
+  // Effect to fetch and set the recipe data
   useEffect(() => {
     const fetchRecipe = async () => {
       if (params && params.recipeID && typeof params.recipeID === 'string') {
         let fetchedRecipe;
-  
+
         if (params.originScreen === 'index') {
+          // Fetch a random recipe by its ID if the origin screen is 'index'
           fetchedRecipe = await getRandomRecipeById(params.recipeID);
         } else if (params.originScreen === 'two') {
+          // Fetch a recipe by its ID if the origin screen is 'two'
           fetchedRecipe = await getRecipeById(userID.toString(), params.recipeID);
         }
-  
+
         if (fetchedRecipe) {
+          // Set the fetched recipe data in the state
           setRecipe(fetchedRecipe);
         } else {
           console.log('Rezept konnte nicht geladen werden.');
@@ -46,10 +52,11 @@ export default function ViewRecipeScreen() {
         console.log('Ungültige oder fehlende recipeID:', params.recipeID);
       }
     };
-  
+
+    // Call the fetchRecipe function when the component mounts or when userID or params change
     fetchRecipe();
   }, [userID, params]);
-  
+
 
   // If recipe is null (data is still loading), return a View with the same background color
   if (!recipe) {
@@ -125,20 +132,20 @@ export default function ViewRecipeScreen() {
               {/* Recipe name and action buttons */}
               <View style={gStyles.HorizontalLayout}>
                 <Alata24 style={gStyles.flex}>{recipe.name}</Alata24>
-                { params.originScreen === 'index' ?
-                <Pressable onPress={() => router.push({ pathname: "/(tabs)/", params: { newRecipeFlag: '1' } })} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                  <RefreshCcw color={Colors.dark.text} />
-                </Pressable> :
-                <>
-                  <Pressable onPress={() => router.push({ pathname: "/modals/shareRecipeModal", params: { recipeID: recipe.id } })} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                    <Share2 color={Colors.dark.text} size={24} />
-                  </Pressable>
+                {params.originScreen === 'index' ?
+                  <Pressable onPress={() => router.push({ pathname: "/(tabs)/", params: { newRecipeFlag: '1' } })} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                    <RefreshCcw color={Colors.dark.text} />
+                  </Pressable> :
+                  <>
+                    <Pressable onPress={() => router.push({ pathname: "/modals/shareRecipeModal", params: { recipeID: recipe.id } })} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                      <Share2 color={Colors.dark.text} size={24} />
+                    </Pressable>
 
-                  {/* publish recipe to feed button */}
-                  <Pressable onPress={() => setAlertPublishModalVisible(true)} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                    <ArrowUpToLine color={Colors.dark.text} size={24} />
-                  </Pressable>
-                </>
+                    {/* publish recipe to feed button */}
+                    <Pressable onPress={() => setAlertPublishModalVisible(true)} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                      <ArrowUpToLine color={Colors.dark.text} size={24} />
+                    </Pressable>
+                  </>
                 }
 
                 {/* Delete button */}
