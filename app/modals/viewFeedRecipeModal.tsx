@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Image, Pressable, Modal } from "react-native";
+import { View, Image, Pressable, Modal, Platform } from "react-native";
 import TopModalBar from "../../components/topModalBar";
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
@@ -53,7 +53,7 @@ export default function ViewFeedRecipeScreen() {
 if (!recipe) {
   return (
     <>
-    <Stack.Screen/>
+    <Stack.Screen options={{headerShown: Platform.OS === 'ios' ? true : false}}/>
     <View style={{flex: 1, backgroundColor: Colors.dark.mainColorDark}} />
     </>
   );
@@ -125,10 +125,6 @@ const saveRecipeToDatabase = async () => {
                   {/* Rate recipe button */}
                   <Pressable onPress={() => router.push({ pathname: "/modals/RatingModal", params: { recipeID: params.recipeID } })} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
                     <MessageSquareIcon color={Colors.dark.text} size={24} />
-                  </Pressable>
-                  {/* Share recipe button */}
-                  <Pressable onPress={() => router.push({ pathname: "/modals/shareRecipeModal", params: { recipeID: recipe.id } })} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
-                    <Share2 color={Colors.dark.text} size={24} />
                   </Pressable>
                   {/* Save recipe button */}
                   <Pressable onPress={saveRecipeToDatabase} style={({ pressed }) => [gStyles.iconButton, { backgroundColor:pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]} disabled={recipeSaved}>

@@ -59,7 +59,6 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
       if (userID) {
         setSession(userID);
         setIsLoading(false);
-        console.log("Checked previous session and set loading to false");
       }
     };
 
@@ -68,7 +67,6 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({ children }) =>
     // Subscribe to authentication state changes
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (session === null) {
-        console.log("Unsubscribed from authentication state changes");
         if (user) {
           setSession(user.uid);
         } else {
