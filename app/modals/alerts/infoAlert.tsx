@@ -1,19 +1,25 @@
-import React, { useEffect } from 'react';
-import AwesomeAlert from 'react-native-awesome-alerts';
-import { Modal, Pressable, StyleSheet, View } from 'react-native';
-import Colors from '../../../constants/Colors';
-import { Alata22, Alata16, Alata14 } from '../../../components/StyledText';
+import React, { useEffect } from 'react'
+import AwesomeAlert from 'react-native-awesome-alerts'
+import { Modal, Pressable, StyleSheet, View } from 'react-native'
+import Colors from '../../../constants/Colors'
+import { Alata22, Alata16, Alata14 } from '../../../components/StyledText'
 
 interface AlertModalProps {
-  title: string;
-  message: string;
-  buttonText: string;
-  alertModalVisible: boolean;
-  setAlertModalVisible: (visible: boolean) => void;
+  title: string
+  message: string
+  buttonText: string
+  alertModalVisible: boolean
+  setAlertModalVisible: (visible: boolean) => void
 }
 
 export default function AlertModal(props: AlertModalProps) {
-  const { title, message, buttonText, alertModalVisible, setAlertModalVisible } = props;
+  const {
+    title,
+    message,
+    buttonText,
+    alertModalVisible,
+    setAlertModalVisible,
+  } = props
 
   return (
     <Modal
@@ -21,19 +27,27 @@ export default function AlertModal(props: AlertModalProps) {
       transparent={true}
       onRequestClose={() => setAlertModalVisible(false)}
     >
-      <Pressable onPress={() => setAlertModalVisible(false)} style={styles.background}>
+      <Pressable
+        onPress={() => setAlertModalVisible(false)}
+        style={styles.background}
+      >
         <View style={styles.alertCard}>
           <Alata22>{title}</Alata22>
           <Alata16>{message}</Alata16>
           <View style={styles.horizontal}>
-            <Pressable style={styles.button} onPress={() => { setAlertModalVisible(false); }}>
-              <Alata14>{buttonText}</Alata14>  
+            <Pressable
+              style={styles.button}
+              onPress={() => {
+                setAlertModalVisible(false)
+              }}
+            >
+              <Alata14>{buttonText}</Alata14>
             </Pressable>
           </View>
         </View>
       </Pressable>
     </Modal>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -63,5 +77,4 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     paddingHorizontal: 20,
   },
-
-  });
+})

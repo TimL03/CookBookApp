@@ -1,39 +1,48 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { View, StyleSheet, Pressable, Image } from 'react-native';
-import Colors from '../../constants/Colors';
-import gStyles from '../../constants/Global_Styles';
+import React, { useState, useEffect, useContext } from 'react'
+import { View, StyleSheet, Pressable, Image } from 'react-native'
+import Colors from '../../constants/Colors'
+import gStyles from '../../constants/Global_Styles'
 import { db } from '../../FirebaseConfig'
-import { collection, addDoc, updateDoc, getDoc, doc, query, where, getDocs } from 'firebase/firestore';
-import { Alata16, Alata20, } from '../../components/StyledText';
-import RecipeElement from '../../components/RecipeElement';
-import { InvitationContext } from '../../api/firebaseRecipeInvitations/client';
-import { router } from 'expo-router';
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  getDoc,
+  doc,
+  query,
+  where,
+  getDocs,
+} from 'firebase/firestore'
+import { Alata16, Alata20 } from '../../components/StyledText'
+import RecipeElement from '../../components/RecipeElement'
+import { InvitationContext } from '../../api/firebaseRecipeInvitations/client'
+import { router } from 'expo-router'
 
 // Function to get the username by user ID from the database
 const getUsernameByUserId = async (userId: string) => {
-  const usersRef = collection(db, 'users');
-  const q = query(usersRef, where("uid", "==", userId));
-  const querySnapshot = await getDocs(q);
+  const usersRef = collection(db, 'users')
+  const q = query(usersRef, where('uid', '==', userId))
+  const querySnapshot = await getDocs(q)
 
   if (!querySnapshot.empty) {
     // If the query result is not empty, return the username of the user
-    return querySnapshot.docs[0].data().username;
+    return querySnapshot.docs[0].data().username
   }
-};
+}
 
 // Define the RecipeData interface
 interface RecipeData {
-  imageUrl: string;
-  name: string;
+  imageUrl: string
+  name: string
 }
 
 // Define the ShowSharedRecipeInvitationModalScreen component
 export default function ShowSharedRecipeInvitationModalScreen() {
   // State variables to store recipe data, sender username, and invitation data
-  const [recipeData, setRecipeData] = useState<RecipeData | null>(null);
-  const [senderUsername, setSenderUsername] = useState('');
-  const { invitationData, processNextInvitation } = useContext(InvitationContext);
-  
+  const [recipeData, setRecipeData] = useState<RecipeData | null>(null)
+  const [senderUsername, setSenderUsername] = useState('')
+  const { invitationData, processNextInvitation } =
+    useContext(InvitationContext)
 
   // useEffect to fetch recipe and sender data when the component mounts
   useEffect(() => {
@@ -41,27 +50,27 @@ export default function ShowSharedRecipeInvitationModalScreen() {
       try {
         if (invitationData.recipeId) {
           // Fetch the recipe data based on the recipe ID
-          const recipeDocRef = doc(db, 'recipes', invitationData.recipeId);
-          const recipeDocSnapshot = await getDoc(recipeDocRef);
+          const recipeDocRef = doc(db, 'recipes', invitationData.recipeId)
+          const recipeDocSnapshot = await getDoc(recipeDocRef)
           if (recipeDocSnapshot.exists()) {
-            setRecipeData(recipeDocSnapshot.data() as RecipeData);
+            setRecipeData(recipeDocSnapshot.data() as RecipeData)
           } else {
-            console.log('The recipe was not found.');
+            console.log('The recipe was not found.')
           }
         }
 
         if (invitationData.senderId) {
           // Fetch the sender's username based on the sender's user ID
-          const username = await getUsernameByUserId(invitationData.senderId);
-          setSenderUsername(username);
+          const username = await getUsernameByUserId(invitationData.senderId)
+          setSenderUsername(username)
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching data:', error)
       }
     }
 
-    getRecipeAndSenderData();
-  }, [invitationData.recipeId, invitationData.senderId]);
+    getRecipeAndSenderData()
+  }, [invitationData.recipeId, invitationData.senderId])
 
   // Function to handle accepting the invitation
   const handleAccept = async () => {
@@ -69,25 +78,28 @@ export default function ShowSharedRecipeInvitationModalScreen() {
       // Update the invitation status to 'accepted' in the database
       await updateDoc(doc(db, 'invitations', invitationData.id), {
         status: 'accepted',
-      });
+      })
 
       if (recipeData) {
         // If recipe data exists, create a new recipe with the receiver's ID
         const newRecipeData = {
           ...recipeData,
-          userID: invitationData.receiverId
-        };
+          userID: invitationData.receiverId,
+        }
 
         // Add the new recipe to the database and get the new recipe's ID
-        const newRecipeRef = await addDoc(collection(db, 'recipes'), newRecipeData);
+        const newRecipeRef = await addDoc(
+          collection(db, 'recipes'),
+          newRecipeData
+        )
       }
 
       // Process the next invitation in the queue
-      processNextInvitation();
+      processNextInvitation()
     } catch (error) {
-      console.error('Error accepting the invitation:', error);
+      console.error('Error accepting the invitation:', error)
     }
-  };
+  }
 
   // Function to handle declining the invitation
   const handleDecline = async () => {
@@ -95,35 +107,70 @@ export default function ShowSharedRecipeInvitationModalScreen() {
       // Update the invitation status to 'declined' in the database
       await updateDoc(doc(db, 'invitations', invitationData.id), {
         status: 'declined',
-      });
+      })
       // Process the next invitation in the queue
-      processNextInvitation();
+      processNextInvitation()
     } catch (error) {
-      console.error('Error declining the invitation:', error);
+      console.error('Error declining the invitation:', error)
     }
-  };
+  }
 
   return (
     <Pressable style={gStyles.modalBackgroundContainer}>
-      <View style={[gStyles.modalContentContainer, { backgroundColor: Colors.dark.background }]}>
-        <Alata20 style={gStyles.alignCenter}>{senderUsername} shared a recipe with you!</Alata20>
-        {recipeData && (
-          <RecipeElement item={recipeData} />
-        )}
-        <View style={[gStyles.cardHorizontal, { backgroundColor: Colors.dark.mainColorDark }]}>
+      <View
+        style={[
+          gStyles.modalContentContainer,
+          { backgroundColor: Colors.dark.background },
+        ]}
+      >
+        <Alata20 style={gStyles.alignCenter}>
+          {senderUsername} shared a recipe with you!
+        </Alata20>
+        {recipeData && <RecipeElement item={recipeData} />}
+        <View
+          style={[
+            gStyles.cardHorizontal,
+            { backgroundColor: Colors.dark.mainColorDark },
+          ]}
+        >
           <Alata16>message: {invitationData.message}</Alata16>
         </View>
-        <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.tint }]} onPress={handleAccept}>
-          <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Accept Shared Recipe</Alata20>
+        <Pressable
+          style={({ pressed }) => [
+            gStyles.cardHorizontal,
+            gStyles.justifyCenter,
+            {
+              backgroundColor: pressed
+                ? Colors.dark.mainColorLight
+                : Colors.dark.tint,
+            },
+          ]}
+          onPress={handleAccept}
+        >
+          <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>
+            Accept Shared Recipe
+          </Alata20>
         </Pressable>
-        <Pressable style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { backgroundColor: pressed ? Colors.dark.alertPressed : Colors.dark.alert }]} onPress={handleDecline}>
-          <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>Decline Shared Recipe</Alata20>
+        <Pressable
+          style={({ pressed }) => [
+            gStyles.cardHorizontal,
+            gStyles.justifyCenter,
+            {
+              backgroundColor: pressed
+                ? Colors.dark.alertPressed
+                : Colors.dark.alert,
+            },
+          ]}
+          onPress={handleDecline}
+        >
+          <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>
+            Decline Shared Recipe
+          </Alata20>
         </Pressable>
       </View>
     </Pressable>
-  );
+  )
 }
-
 
 const styles = StyleSheet.create({
   modalContainer: {
@@ -157,5 +204,5 @@ const styles = StyleSheet.create({
     height: 45,
     borderRadius: 10,
     gap: 10,
-  }
-});
+  },
+})
