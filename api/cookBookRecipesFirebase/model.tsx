@@ -5,6 +5,10 @@ export type Ingredient = {
   selected: boolean;
 };
 
+export type CategoryIconProps = {
+  categories: string[];
+};
+
 // Ingredient Structure
 export type IngredientView = {
   name: string;

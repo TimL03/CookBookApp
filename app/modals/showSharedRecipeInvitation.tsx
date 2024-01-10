@@ -7,6 +7,7 @@ import { collection, addDoc, updateDoc, getDoc, doc, query, where, getDocs } fro
 import { Alata16, Alata20, } from '../../components/StyledText';
 import RecipeElement from '../../components/RecipeElement';
 import { InvitationContext } from '../../api/firebaseRecipeInvitations/client';
+import { router } from 'expo-router';
 
 // Function to get the username by user ID from the database
 const getUsernameByUserId = async (userId: string) => {
@@ -32,6 +33,7 @@ export default function ShowSharedRecipeInvitationModalScreen() {
   const [recipeData, setRecipeData] = useState<RecipeData | null>(null);
   const [senderUsername, setSenderUsername] = useState('');
   const { invitationData, processNextInvitation } = useContext(InvitationContext);
+  
 
   // useEffect to fetch recipe and sender data when the component mounts
   useEffect(() => {
@@ -78,8 +80,6 @@ export default function ShowSharedRecipeInvitationModalScreen() {
 
         // Add the new recipe to the database and get the new recipe's ID
         const newRecipeRef = await addDoc(collection(db, 'recipes'), newRecipeData);
-
-        console.log('New recipe ID:', newRecipeRef.id);
       }
 
       // Process the next invitation in the queue
@@ -96,7 +96,6 @@ export default function ShowSharedRecipeInvitationModalScreen() {
       await updateDoc(doc(db, 'invitations', invitationData.id), {
         status: 'declined',
       });
-
       // Process the next invitation in the queue
       processNextInvitation();
     } catch (error) {

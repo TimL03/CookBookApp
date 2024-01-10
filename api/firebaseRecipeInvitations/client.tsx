@@ -3,6 +3,7 @@ import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { useSession } from '../../api/firebaseAuthentication/client';
 import { db } from '../../FirebaseConfig'
 import { router } from 'expo-router';
+import { update } from 'pullstate';
 
 // Define the interface for the invitation context
 interface InvitationContextType {
@@ -54,8 +55,8 @@ export const InvitationProvider: React.FC<InvitationProviderProps> = ({ children
 
   // Function to process the next invitation in the queue
   const processNextInvitation = () => {
+    setInvitationQueue((prevQueue) => prevQueue.slice(1));
     if (invitationQueue.length > 0) {
-      setInvitationQueue((prevQueue) => prevQueue.slice(1));
       openNextInvitation();
     } else {
       router.back();
@@ -65,32 +66,34 @@ export const InvitationProvider: React.FC<InvitationProviderProps> = ({ children
   // Effect to listen for new invitations and update the invitation queue
   useEffect(() => {
     if (userID) {
-      // Create a query to fetch pending invitations for the current user
       const q = query(collection(db, "invitations"), where("receiverId", "==", userID), where("status", "==", "pending"));
-      
-      // Subscribe to changes in the query result
+  
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const newInvitations = [];
-        querySnapshot.forEach((doc) => {
-          const invitationData = doc.data();
-          newInvitations.push({ id: doc.id, ...invitationData });
-        });
-
         setInvitationQueue((prevQueue) => {
-          // Check if new invitations were added and the queue was empty
+          const prevQueueIds = new Set(prevQueue.map(invitation => invitation.id));
+          const newInvitations = [];
+  
+          querySnapshot.forEach((doc) => {
+            if (!prevQueueIds.has(doc.id)) {
+              const invitationData = doc.data();
+              newInvitations.push({ id: doc.id, ...invitationData });
+            }
+          });
+  
           const shouldOpenNextInvitation = prevQueue.length === 0 && newInvitations.length > 0;
-          const updatedQueue = [...prevQueue, ...newInvitations];
+          let updatedQueue = [...newInvitations];
+  
 
-          // If the queue was empty and new invitations were added
           if (shouldOpenNextInvitation) {
             setInvitationData(updatedQueue[0]);
+            updatedQueue = updatedQueue.slice(1);
             router.push("/modals/showSharedRecipeInvitation");
           }
-
+  
           return updatedQueue;
         });
       });
-
+  
       return () => unsubscribe();
     }
   }, [userID]);

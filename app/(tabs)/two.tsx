@@ -54,8 +54,8 @@ export default function TabTwoScreen() {
       <SectionList
         style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
-        sections={filteredSections}
-        keyExtractor={(item) => item.id.toString() + item.name}
+        sections={data}
+        keyExtractor={(item, index) => item.id.toString() + index.toString()}
         renderItem={({ item }) => (
           <Recipe item={item} />
         )}

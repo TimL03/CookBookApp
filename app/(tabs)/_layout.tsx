@@ -17,8 +17,6 @@ function TabBarIcon(props: {
 export default function TabLayout() {
   const { session, isLoading } = useSession();
 
-  console.log("session start: " + session);
-
   if (isLoading) {
     return <Text>Loading...</Text>;
   } else if (session === null) {

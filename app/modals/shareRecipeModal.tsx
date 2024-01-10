@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TextInput, StyleSheet, View, Pressable } from 'react-native';
+import { TextInput, StyleSheet, View, Pressable, KeyboardAvoidingView } from 'react-native';
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
 import { db } from '../../FirebaseConfig'
@@ -96,7 +96,8 @@ export default function ShareRecipeScreen() {
   return (
     <>
     <Pressable onPress={router.back} style={gStyles.modalBackgroundContainer}>
-      <View style={[gStyles.modalContentContainer,{backgroundColor: Colors.dark.background}]}>
+    </Pressable>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : null} style={[gStyles.modalContentContainer,{backgroundColor: Colors.dark.background}]}>
         <Alata24 style={gStyles.alignCenter}>Share {recipe.name} Recipe</Alata24>
         <Alata20>Message:</Alata20>
         <View style={[gStyles.cardInput, gStyles.cardInputMultiline]}>
@@ -128,9 +129,9 @@ export default function ShareRecipeScreen() {
           </Pressable>
         </View>
         
-      </View>
+      </KeyboardAvoidingView>
       
-    </Pressable>
+
     <InfoAlert
         title='Error'
         message='User not found'

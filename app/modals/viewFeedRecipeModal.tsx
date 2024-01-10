@@ -53,8 +53,7 @@ export default function ViewFeedRecipeScreen() {
 if (!recipe) {
   return (
     <>
-    <Stack.Screen options={{
-      headerShown: false, }} />
+    <Stack.Screen/>
     <View style={{flex: 1, backgroundColor: Colors.dark.mainColorDark}} />
     </>
   );
@@ -63,7 +62,6 @@ if (!recipe) {
 
 // Function to save recipe to the database
 const saveRecipeToDatabase = async () => {
-  console.log('Saving recipe to database')
   try {
     if (params.recipeID && recipe) {
       const recipesCollectionRef = collection(db, 'recipes');
@@ -73,6 +71,7 @@ const saveRecipeToDatabase = async () => {
         cookMinTime: recipe.cookMinTime,
         imageUrl: recipe.imageUrl,
         ingredients: recipe.ingredients,
+        ingredientNames: recipe.ingredientNames,
         steps: recipe.steps,
         userID: userID,
         categories: recipe.categories,
@@ -128,7 +127,7 @@ const saveRecipeToDatabase = async () => {
                     <MessageSquareIcon color={Colors.dark.text} size={24} />
                   </Pressable>
                   {/* Share recipe button */}
-                  <Pressable onPress={() => router.push({ pathname: "/modals/shareRecipeModal", params: { recipeID: params.recipeID } })} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
+                  <Pressable onPress={() => router.push({ pathname: "/modals/shareRecipeModal", params: { recipeID: recipe.id } })} style={({ pressed }) => [gStyles.iconButton, { backgroundColor: pressed ? Colors.dark.mainColorLight : Colors.dark.seeThrough }]}>
                     <Share2 color={Colors.dark.text} size={24} />
                   </Pressable>
                   {/* Save recipe button */}

@@ -225,16 +225,10 @@ export async function getRecipeById(userId: string, recipeId: string): Promise<R
   // Fetch the document snapshot for the specified recipe
   const recipeSnap = await getDoc(recipeRef);
 
-  // Log the recipe data for debugging purposes
-  console.log("RecipeSnap: ", recipeSnap.data());
-
   // Check if the recipe document exists and belongs to the specified user
   if (recipeSnap.exists() && recipeSnap.data()?.userID === userId) {
     // Extract the recipe data, excluding the 'id' field, and add the 'id' back
     const recipeData = recipeSnap.data() as Omit<RecipeData, 'id'>;
-
-    // Log the extracted recipe data for debugging purposes
-    console.log("RecipeData: ", recipeData);
 
     // Return the recipe data with the 'id' field
     return { id: recipeSnap.id, ...recipeData };
@@ -248,8 +242,6 @@ export async function getRecipeById(userId: string, recipeId: string): Promise<R
 
 // Fetches a recipe by its ID from the database (CookBook)
 export async function getRandomRecipeById(recipeId: string): Promise<RecipeData | null> {
-  // Log a message for debugging purposes to indicate an attempt to fetch a recipe by ID
-  console.log("Attempting to retrieve recipe, ID: ", recipeId);
 
   try {
     // Get a reference to the specific recipe document in the "recipes" collection
@@ -257,10 +249,6 @@ export async function getRandomRecipeById(recipeId: string): Promise<RecipeData 
     
     // Fetch the document snapshot for the specified recipe
     const recipeSnap = await getDoc(recipeRef);
-
-    // Log whether the recipe snapshot exists and its data for debugging purposes
-    console.log("RecipeSnap exists: ", recipeSnap.exists());
-    console.log("RecipeSnap data: ", recipeSnap.data());
 
     // Check if the recipe document exists
     if (recipeSnap.exists()) {

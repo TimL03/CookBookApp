@@ -74,7 +74,6 @@ export default function TabOneScreen() {
 
   // CookBookSearch
 const handleSearchInFirebase = async () => {
-  console.log('handleSearchInFirebase called');
   // Extract selected ingredients and categories from the user's choices
   const selectedCookBookIngredients = selectedFirebaseIngredients
     .filter(item => item.selected)
@@ -84,12 +83,8 @@ const handleSearchInFirebase = async () => {
     .filter(item => item.selected)
     .map(item => item.value);
 
-  console.log('Selected Ingredients for Firebase Search:', selectedCookBookIngredients);
-  console.log('Selected Categories for Firebase Search:', selectedCookBookCategories);
-
   // Call the searchRecipesInFirebase function with selected ingredients and categories
   const matchingRecipeId = await searchRecipesInFirebase(selectedCookBookIngredients, selectedCookBookCategories, userID);
-  console.log('Recipes found in Firebase:', matchingRecipeId);
 
   // Navigate to the viewRecipeScreen if a matching recipe is found, otherwise show an alert
   if (matchingRecipeId) {

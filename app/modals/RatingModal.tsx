@@ -50,7 +50,6 @@ const RatingModal = (): ReactElement => {
 
   // Handle the rating input from the user
   const handleRating = (value: number) => {
-    console.log('Received rating:', value);
     setRating(value);
   };
 

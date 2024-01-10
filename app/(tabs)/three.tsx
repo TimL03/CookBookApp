@@ -42,7 +42,7 @@ export default function TabThreeScreen() {
       <SectionList
         showsVerticalScrollIndicator={false}
         sections={data}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item, index) => item.id.toString() + index.toString()}
         renderItem={({ item }) => (
           <Recipe item={item} averageRating={averageRatings[item.id] || { average: 0, totalRatings: 0 }} />
         )}

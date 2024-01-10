@@ -135,15 +135,11 @@ export const useGetRandomMealId = () => {
           // Use the meals from either ingredients or categories, or an empty array
           matchedMeals = mealsByIngredients || mealsByCategories || [];
         }
-
-        // Log the matched meals for debugging
-        console.log("Matched Meals:", matchedMeals);
         
         // Select a random meal ID from the matched meals
         if (matchedMeals.length > 0) {
           const randomMealId = matchedMeals[Math.floor(Math.random() * matchedMeals.length)].idMeal;
           setSelectedMealId(randomMealId);
-          console.log("Selected Meal:", randomMealId)
           return randomMealId;
         } else {
           console.log("No matching meals found");
