@@ -36,6 +36,8 @@ import {
   RecipeData,
   IngredientView,
 } from '../../api/cookBookRecipesFirebase/model'
+import InfoAlert from './alerts/infoAlert'
+import InfoActionAlert from './alerts/infoActionAlert'
 
 // Define the main component
 export default function ViewFeedRecipeScreen() {
@@ -52,6 +54,8 @@ export default function ViewFeedRecipeScreen() {
 
   const [recipe, setRecipe] = useState<RecipeData | null>(null)
   const [recipeSaved, setRecipeSaved] = useState(false)
+
+  const [successfullySavedAlert, setSuccessfullySavedAlert] = useState(false)
 
   const { session } = useSession()
   const userID = session
@@ -109,6 +113,7 @@ export default function ViewFeedRecipeScreen() {
 
         console.log('Recipe successfully saved!')
         setRecipeSaved(true)
+        setSuccessfullySavedAlert(true)
       } else {
         console.error('No recipe ID or recipe data found')
       }
@@ -328,6 +333,14 @@ export default function ViewFeedRecipeScreen() {
           </View>
         </ScrollView>
       </View>
+      <InfoActionAlert
+        title="Recipe Saved"
+        message="The recipe has been saved to your cookbook."
+        buttonText="OK"
+        onButtonPress={() => router.push('/(tabs)/two')}
+        alertModalVisible={successfullySavedAlert}
+        setAlertModalVisible={setSuccessfullySavedAlert}
+      />
     </>
   )
 }

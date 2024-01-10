@@ -18,6 +18,7 @@ import {
   useGetMealById,
 } from '../../api/externalRecipesLibrary/client'
 import SaveWithCooktimeAlert from '../modals/alerts/saveWithCooktimeAlert'
+import InfoActionAlert from './alerts/infoActionAlert'
 
 // Main component function
 export default function ViewRandomRecipeScreen() {
@@ -28,7 +29,7 @@ export default function ViewRandomRecipeScreen() {
   // State variables
   const [cookHTime, setCookHTime] = useState('')
   const [cookMinTime, setCookMinTime] = useState('')
-  const [showInputs, setShowInputs] = useState(false)
+
   const [hasBeenSaved, setHasBeenSaved] = useState(false)
   const params = useLocalSearchParams()
   const recipeID = Array.isArray(params.recipeID)
@@ -37,6 +38,7 @@ export default function ViewRandomRecipeScreen() {
   const { selectedMeal, fetchMeal: fetchMealById } = useGetMealById(recipeID) as { selectedMeal: any, fetchMeal: any }
 
   const [alertSaveVisible, setAlertSaveVisible] = useState(false)
+  const [successfullySavedAlert, setSuccessfullySavedAlert] = useState(false)
 
   useEffect(() => {
     if (params.recipeID) {
@@ -113,17 +115,13 @@ export default function ViewRandomRecipeScreen() {
     }
   }
 
-  // Event handler for the "Save" button click
-  const handleSaveButtonClick = () => {
-    setShowInputs(true)
-  }
-
   // Event handler for the final save button click
   const handleFinalSaveClick = () => {
     if (selectedMeal && !hasBeenSaved) {
       // Save the recipe to the database
       saveRecipeToDatabase(selectedMeal)
       setHasBeenSaved(true)
+      setSuccessfullySavedAlert(true)
     }
   }
 
@@ -265,6 +263,14 @@ export default function ViewRandomRecipeScreen() {
         setMinutes={setCookMinTime}
         hours={cookHTime}
         setHours={setCookHTime}
+      />
+      <InfoActionAlert
+        title="Recipe Saved"
+        message="The recipe has been saved to your cookbook."
+        buttonText="OK"
+        onButtonPress={() => router.push('/(tabs)/two')}
+        alertModalVisible={successfullySavedAlert}
+        setAlertModalVisible={setSuccessfullySavedAlert}
       />
     </>
   )

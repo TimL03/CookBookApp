@@ -13,6 +13,7 @@ import {
   where,
   getDocs,
   average,
+  deleteDoc,
 } from 'firebase/firestore'
 import { Alata16, Alata20 } from '../../components/StyledText'
 import RecipeElement from '../../components/RecipeElement'
@@ -93,6 +94,9 @@ export default function ShowSharedRecipeInvitationModalScreen() {
         )
       }
 
+      //delete the invitation from the database
+      await deleteDoc(doc(db, 'invitations', invitationData.id))
+
       // Process the next invitation in the queue
       processNextInvitation()
     } catch (error) {
@@ -107,6 +111,8 @@ export default function ShowSharedRecipeInvitationModalScreen() {
       await updateDoc(doc(db, 'invitations', invitationData.id), {
         status: 'declined',
       })
+      //delete the invitation from the database
+      await deleteDoc(doc(db, 'invitations', invitationData.id))
       // Process the next invitation in the queue
       processNextInvitation()
     } catch (error) {

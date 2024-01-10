@@ -11,8 +11,9 @@ import {
   onAuthStateChanged,
   signOut as firebaseSignOut,
   deleteUser,
+  sendSignInLinkToEmail
 } from 'firebase/auth'
-import { collection, addDoc, query, where, getDocs } from 'firebase/firestore'
+import { collection, addDoc, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore'
 import { auth, db } from '../../FirebaseConfig'
 import { router } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -165,6 +166,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
     if (user) {
       try {
         await deleteUser(user)
+        await AsyncStorage.removeItem('userID')
+        await deleteDoc(doc(db, 'users', user.uid))
         setSession(null)
         router.push('/')
         alert('Account deleted')
