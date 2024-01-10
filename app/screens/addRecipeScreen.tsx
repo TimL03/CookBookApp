@@ -18,12 +18,14 @@ import InfoAlert from '../modals/alerts/infoAlert';
 import { RecipeData } from '../../api/cookBookRecipesFirebase/model';
 
 export default function AddRecipeScreen(this: any) {
+
+  // Initialize state variables
   const router = useRouter();
   this.categorieInputs = [];
   this.ingredientInputs = [];
   this.stepsInputs = [];
 
-  // Get user id from session
+  // Get the User's ID
   const { session } = useSession();
   const userID = session;
 
@@ -43,8 +45,10 @@ export default function AddRecipeScreen(this: any) {
     }, [userID, params.recipeID]);
   }
 
+  // Set edit mode
   const [editMode, setEditMode] = useState(false);
 
+  // Initialize and set state variables for recipe data
   const [name, setName] = useState('');
   const [cookHTime, setCookHTime] = useState('');
   const [cookMinTime, setCookMinTime] = useState('');
@@ -54,6 +58,7 @@ export default function AddRecipeScreen(this: any) {
   const [steps, setSteps] = useState(['']);
   const [imageUri, setImageUri] = useState<string | null>(null);
 
+  // Populate state variables with recipe data if it exists
   React.useEffect(() => {
     if (recipe != null) {
       setEditMode(true);
@@ -68,17 +73,20 @@ export default function AddRecipeScreen(this: any) {
     }
   }, [recipe]);
 
+  // Initialize and set state variables for alert visibility
   const [oneCategoryAlertVisible, setOneCategoryAlertVisible] = useState(false);
   const [chooseImageAlertVisible, setChooseImageAlertVisible] = useState(false);
   const [galeriePermissionAlertVisible, setGaleriePermissionAlertVisible] = useState(false);
   const [cameraPermissionAlertVisible, setCameraPermissionAlertVisible] = useState(false);
-  
+
+  // Initialize and set state variables for multi-line input heights
   const [multiLineHeights, setMultiLineHeights] = useState(new Array(steps.length).fill(80));
-  
+
+  // Initialize and set state variables for active dropdown and save button disable
   const [activeDropdown, setActiveDropdown] = useState(0);
   const [saveDisabled, setSaveDisabled] = useState(false);
 
-
+  // Define an array of units for ingredient measurement
   const units = [
     { key: '1', value: 'tbsp' },
     { key: '2', value: 'tsp' },
@@ -87,9 +95,10 @@ export default function AddRecipeScreen(this: any) {
     { key: '5', value: 'l' },
     { key: '6', value: 'g' },
     { key: '7', value: 'x' },
-    { key: '8', value: 'pinch'}
+    { key: '8', value: 'pinch' }
   ];
 
+  // Function to add an image from the device's gallery
   const addImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -110,6 +119,7 @@ export default function AddRecipeScreen(this: any) {
     }
   };
 
+  // Function to take a photo using the device's camera
   const takePhoto = async () => {
     const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
     if (cameraPermission.status !== 'granted') {
@@ -129,8 +139,11 @@ export default function AddRecipeScreen(this: any) {
     }
   };
 
+  // Function to handle saving the recipe
   const handleSave = async () => {
     setSaveDisabled(true);
+
+    // Check if at least one category is provided
     if (categories.length === 0 || categories.some(category => !category)) {
       setSaveDisabled(false);
       setOneCategoryAlertVisible(true);
@@ -138,10 +151,10 @@ export default function AddRecipeScreen(this: any) {
     }
     try {
       let imageUrl = imageUri;
-      // Bild nur hochladen, wenn ein neues Bild ausgewählt wurde
+      // Upload the image only if a new image is selected
       if (imageUri && !recipe?.imageUrl) {
         imageUrl = await uploadImage(imageUri, name);
-      } 
+      }
 
       const recipeData = {
         name,
@@ -155,16 +168,17 @@ export default function AddRecipeScreen(this: any) {
         userID
       };
 
-      // Bestehendes Rezept aktualisieren, falls eine ID vorhanden ist
+      // Update an existing recipe if an ID is available
       if (recipe && recipe.id) {
         const recipeRef = doc(db, 'recipes', recipe.id);
         await setDoc(recipeRef, recipeData);
         console.log('Rezept aktualisiert mit ID: ', recipe.id);
       } else {
-        // Neues Rezept hinzufügen
+        // Add a new recipe
         const docRef = await addDoc(collection(db, 'recipes'), recipeData);
         console.log('Dokument geschrieben mit ID: ', docRef.id);
       }
+      // Redirect to a CookBook after saving
       router.push('/(tabs)/two');
     } catch (e) {
       setSaveDisabled(false);
@@ -172,14 +186,16 @@ export default function AddRecipeScreen(this: any) {
     }
   };
 
+  // Update ingredient names when ingredients change
   useEffect(() => {
     const newIngredientNames = ingredients.map(ingredient => ingredient.name);
-  
+
     if (!arraysEqual(newIngredientNames, ingredientNames)) {
       setIngredientNames(newIngredientNames);
     }
   }, [ingredients]);
-  
+
+  // Function to compare two arrays for equality
   function arraysEqual(arr1: string | any[], arr2: string | any[]) {
     if (arr1.length !== arr2.length) return false;
     for (let i = 0; i < arr1.length; i++) {
@@ -187,10 +203,11 @@ export default function AddRecipeScreen(this: any) {
     }
     return true;
   }
-  
-  
+
+  // Define an array of ingredient names for search in Selection
   const names = ingredients.map(ingredient => ingredient.name);
 
+  // Function to add a new category
   const addCategory = () => {
     setCategories([...categories, '']);
     setTimeout(() => {
@@ -198,24 +215,28 @@ export default function AddRecipeScreen(this: any) {
     }, 100);
   };
 
+  // Function to remove a category
   const removeCategory = (indexToRemove: number) => {
     setCategories(categories.filter((_, index) => index !== indexToRemove));
   };
 
+  // Function to add a new ingredient
   const addIngredient = () => {
     setIngredients([...ingredients, { name: '', amount: '', unit: '' }]);
     setIngredientNames(names);
-    
+
     setTimeout(() => {
       this.ingredientInputs[this.ingredientInputs.length - 1].focus();
     }, 100);
   };
 
+  // Function to remove an ingredient
   const removeIngredient = (indexToRemove: number) => {
     setIngredients(ingredients.filter((_, index) => index !== indexToRemove));
     setIngredientNames(names.filter((_, index) => index !== indexToRemove));
   };
 
+  // Function to add a new step
   const addStep = () => {
     setSteps([...steps, '']);
     setTimeout(() => {
@@ -223,10 +244,12 @@ export default function AddRecipeScreen(this: any) {
     }, 100);
   };
 
+  // Function to remove a step
   const removeStep = (indexToRemove: number) => {
     setSteps(steps.filter((_, index) => index !== indexToRemove));
   };
 
+  // Function to handle content size change for multi-line inputs
   const handleContentSizeChange = (index: number, height: number) => {
     setMultiLineHeights(prevHeights => {
       const newHeights = [...prevHeights];
@@ -289,14 +312,14 @@ export default function AddRecipeScreen(this: any) {
             {/* adding Recipe name */}
             <Alata20>Name:</Alata20>
             <View style={gStyles.cardInput}>
-              <TextInput 
-                placeholder="Name" 
-                value={name} 
+              <TextInput
+                placeholder="Name"
+                value={name}
                 returnKeyType="next"
                 blurOnSubmit={false}
                 onSubmitEditing={() => { this.categorieInputs[0].focus(); }}
-                onChangeText={setName} 
-                style={gStyles.textInput} 
+                onChangeText={setName}
+                style={gStyles.textInput}
                 placeholderTextColor={Colors.dark.text} />
             </View>
 
@@ -337,32 +360,32 @@ export default function AddRecipeScreen(this: any) {
             <Alata20>Preperation Time:</Alata20>
             <View style={[gStyles.HorizontalLayout, { gap: 12 }]}>
               <View style={[gStyles.cardInput, gStyles.flex]}>
-                <TextInput 
-                  inputMode="numeric" 
+                <TextInput
+                  inputMode="numeric"
                   returnKeyType="next"
                   blurOnSubmit={false}
                   onSubmitEditing={() => { this.minuteInput.focus(); }}
-                  maxLength={2} 
-                  placeholder="00" 
-                  value={cookHTime} 
-                  onChangeText={setCookHTime} 
-                  style={gStyles.textInput} 
+                  maxLength={2}
+                  placeholder="00"
+                  value={cookHTime}
+                  onChangeText={setCookHTime}
+                  style={gStyles.textInput}
                   placeholderTextColor={Colors.dark.text} />
                 <Alata16 style={gStyles.alignCenter}>hours</Alata16>
               </View>
 
               <View style={[gStyles.cardInput, gStyles.flex]}>
-                <TextInput 
-                  inputMode="numeric" 
-                  maxLength={2} 
+                <TextInput
+                  inputMode="numeric"
+                  maxLength={2}
                   returnKeyType="next"
                   blurOnSubmit={false}
                   onSubmitEditing={() => { this.ingredientInputs[0].focus(); }}
                   ref={(input) => { this.minuteInput = input; }}
-                  placeholder="00" 
-                  value={cookMinTime} 
-                  onChangeText={setCookMinTime} 
-                  style={gStyles.textInput} 
+                  placeholder="00"
+                  value={cookMinTime}
+                  onChangeText={setCookMinTime}
+                  style={gStyles.textInput}
                   placeholderTextColor={Colors.dark.text} />
                 <Alata16 style={gStyles.alignCenter}>minutes</Alata16>
               </View>
@@ -419,7 +442,7 @@ export default function AddRecipeScreen(this: any) {
             <Alata20>Instructions:</Alata20>
             <View style={styles.gap}>
               {steps.map((step, index) => (
-                <View key={index} style={[gStyles.cardInput, {height: multiLineHeights[index]}]}>
+                <View key={index} style={[gStyles.cardInput, { height: multiLineHeights[index] }]}>
                   <TextInput
                     multiline
                     onContentSizeChange={(e) => handleContentSizeChange(index, e.nativeEvent.contentSize.height)}
@@ -446,7 +469,7 @@ export default function AddRecipeScreen(this: any) {
             </View>
 
             {/* Save button */}
-            <Pressable disabled={saveDisabled} onPress={() => {handleSave()}} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { marginTop: 30, backgroundColor: saveDisabled ? Colors.dark.mainColorDark : pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
+            <Pressable disabled={saveDisabled} onPress={() => { handleSave() }} style={({ pressed }) => [gStyles.cardHorizontal, gStyles.justifyCenter, { marginTop: 30, backgroundColor: saveDisabled ? Colors.dark.mainColorDark : pressed ? Colors.dark.mainColorLight : Colors.dark.tint },]}>
               <Save color={Colors.dark.text} size={28} style={gStyles.alignCenter} />
               <Alata20 style={[gStyles.alignCenter, gStyles.marginBottom]}>{editMode ? 'Save Changes' : 'Save Recipe'}</Alata20>
             </Pressable>

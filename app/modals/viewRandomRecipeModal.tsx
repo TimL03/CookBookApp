@@ -19,7 +19,6 @@ import SaveWithCooktimeAlert from '../modals/alerts/saveWithCooktimeAlert';
 export default function ViewRandomRecipeScreen() {
 
   // userID
-  // userID
   const { session } = useSession();
   const userID = session;
 

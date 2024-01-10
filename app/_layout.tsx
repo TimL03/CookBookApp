@@ -57,7 +57,7 @@ function RootLayoutNav() {
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false, navigationBarColor: Colors.dark.mainColorDark, animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
             <Stack.Screen name="modals/actionModal" options={{ headerShown: false, presentation: 'transparentModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
-            <Stack.Screen name="screens/viewRecipeScreen" options={{ navigationBarColor: Colors.dark.mainColorDark, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
+            <Stack.Screen name="screens/viewRecipeScreen" options={{ navigationBarColor: Colors.dark.mainColorDark, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
             <Stack.Screen name="screens/addRecipeScreen" options={{ navigationBarColor: Colors.dark.background, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
             <Stack.Screen name="modals/shareRecipeModal" options={{ navigationBarColor: Colors.dark.background, headerShown: false, presentation: 'transparentModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
             <Stack.Screen name="screens/settingsScreen" options={{ navigationBarColor: Colors.dark.background, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
@@ -68,7 +68,7 @@ function RootLayoutNav() {
             <Stack.Screen name="modals/showSharedRecipeInvitation" options={{ navigationBarColor: Colors.dark.background, headerShown: false, presentation: 'transparentModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
             <Stack.Screen name="modals/RatingModal" options={{ navigationBarColor: Colors.dark.background, headerShown: false, presentation: 'transparentModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
             <Stack.Screen name="modals/viewRandomRecipeModal" options={{ navigationBarColor: Colors.dark.mainColorDark, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
-            <Stack.Screen name="modals/viewFeedRecipeModal" options={{ navigationBarColor: Colors.dark.mainColorDark, headerShown: true, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
+            <Stack.Screen name="modals/viewFeedRecipeModal" options={{ navigationBarColor: Colors.dark.mainColorDark, presentation: 'fullScreenModal', animation: 'fade_from_bottom', animationTypeForReplace: 'pop' }} />
           </Stack>
         </ThemeProvider>
       </InvitationProvider>

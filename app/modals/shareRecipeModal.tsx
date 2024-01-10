@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TextInput, StyleSheet, View, Pressable } from 'react-native';
+import { TextInput, StyleSheet, View, Pressable, KeyboardAvoidingView } from 'react-native';
 import Colors from '../../constants/Colors';
 import gStyles from '../../constants/Global_Styles';
 import { db } from '../../FirebaseConfig'
@@ -12,36 +12,42 @@ import { RecipeData } from '../../api/cookBookRecipesFirebase/model';
 import { useSession } from '../../api/firebaseAuthentication/client';
 import InfoAlert from '../modals/alerts/infoAlert';
 
+// Function to get the user ID by username from the database
 const getUserIdByUsername = async (username: string) => {
   const usersRef = collection(db, 'users');
   const q = query(usersRef, where("username", "==", username));
   const querySnapshot = await getDocs(q);
 
   if (!querySnapshot.empty) {
+    // If the query result is not empty, return the first user's UID
     return querySnapshot.docs[0].data().uid;
   } else {
+    // If no matching user is found, return null
     return null;
   }
 };
 
-
+// Define the ShareRecipeScreen component
 export default function ShareRecipeScreen() {
+  // State variables to manage recipient and message input
   const [recipient, setRecipient] = useState('');
   const [message, setMessage] = useState('');
 
+  // State variable to store the fetched recipe data
   const [recipe, setRecipe] = useState<RecipeData | null>(null);
 
+  // State variables to manage alert modals for different scenarios
   const [alertNoUserModalVisible, setAlertNoUserModalVisible] = useState(false);
   const [alertErrorUpdatingModalVisible, setAlertErrorUpdatingModalVisible] = useState(false);
 
   // Get recipe id from router params
   const params = useLocalSearchParams();
   
-  // Get user id from session
+  // Get user id from the user session
   const { session } = useSession();
   const userID = session;
 
-  // Fetch recipe from database
+  // Fetch recipe data from the database based on the user ID and recipe ID
   useEffect(() => {
     const fetchRecipe = async () => {
       const fetchedRecipe = await getRecipeById(userID.toString(), params.recipeID.toString());
@@ -51,18 +57,24 @@ export default function ShareRecipeScreen() {
     fetchRecipe();
   }, [userID, params.recipeID]);
 
-  if(!recipe) {
+  // If recipe data is not available, return null
+  if (!recipe) {
     return null;
   }
 
+  // Function to save an invitation to share the recipe
   const saveInvitation = async () => {
     try {
+      // Get the recipient's user ID by their username
       const recipientUserId = await getUserIdByUsername(recipient);
+      
       if (!recipientUserId) {
+        // If no user is found with the recipient's username, show an alert modal
         setAlertNoUserModalVisible(true);
         return;
       }
 
+      // Create an invitation data object
       const invitationsCollection = collection(db, 'invitations');
       const invitationData = {
         message,
@@ -71,9 +83,12 @@ export default function ShareRecipeScreen() {
         senderId: recipe.userID,
         status: 'pending',
       };
+
+      // Navigate back to the previous screen and add the invitation to the database
       router.back();
       await addDoc(invitationsCollection, invitationData);
     } catch (error) {
+      // If there is an error while saving the invitation, show an error alert modal
       setAlertErrorUpdatingModalVisible(true);
     }
   };
@@ -81,7 +96,8 @@ export default function ShareRecipeScreen() {
   return (
     <>
     <Pressable onPress={router.back} style={gStyles.modalBackgroundContainer}>
-      <View style={[gStyles.modalContentContainer,{backgroundColor: Colors.dark.background}]}>
+    </Pressable>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : null} style={[gStyles.modalContentContainer,{backgroundColor: Colors.dark.background}]}>
         <Alata24 style={gStyles.alignCenter}>Share {recipe.name} Recipe</Alata24>
         <Alata20>Message:</Alata20>
         <View style={[gStyles.cardInput, gStyles.cardInputMultiline]}>
@@ -113,9 +129,9 @@ export default function ShareRecipeScreen() {
           </Pressable>
         </View>
         
-      </View>
+      </KeyboardAvoidingView>
       
-    </Pressable>
+
     <InfoAlert
         title='Error'
         message='User not found'

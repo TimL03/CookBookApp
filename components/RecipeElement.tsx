@@ -8,24 +8,24 @@ import { Alata20, Alata12 } from './StyledText';
 import { router } from 'expo-router';
 import { RecipeProps, CategoryIconProps } from '../api/cookBookRecipesFirebase/model';
 
-
+// Category icon's based on categories of a recipe
 const CategoryIcon: React.FC<CategoryIconProps> = ({ categories }) => {
     return (
-        <View style={{ flexDirection: 'row', backgroundColor: 'transparent' }}>
-            {categories.map((category, index) => {
+        <View  style={{ flexDirection: 'row', backgroundColor: 'transparent' }}>
+            {categories.map((category: any, index: any) => {
                 switch (category) {
                     case 'Soup':
-                        return <Soup color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                        return <Soup color={Colors.dark.text} key={index} size={20} style={{ marginBottom: 5 }} />;
                     case 'Vegetarian':
-                        return <Carrot color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                        return <Carrot color={Colors.dark.text} key={index} size={20} style={{ marginBottom: 5 }} />;
                     case 'Vegan':
-                        return <Vegan color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                        return <Vegan color={Colors.dark.text} key={index} size={20} style={{ marginBottom: 5 }} />;
                     case 'Fish':
-                        return <Fish color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                        return <Fish color={Colors.dark.text} key={index} size={20} style={{ marginBottom: 5 }} />;
                     case 'No-Egg':
-                        return <EggOff color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                        return <EggOff color={Colors.dark.text} key={index} size={20} style={{ marginBottom: 5 }} />;
                     case 'No-Milk':
-                        return <MilkOff color={Colors.dark.text} size={20} style={{ marginBottom: 5 }} />;
+                        return <MilkOff color={Colors.dark.text} key={index} size={20} style={{ marginBottom: 5 }} />;
                     default:
                         return null;
                 }
@@ -34,6 +34,7 @@ const CategoryIcon: React.FC<CategoryIconProps> = ({ categories }) => {
     );
 };
 
+// Recipe element in the section list
 export default function Recipe({ item }: RecipeProps) {
 
     return (

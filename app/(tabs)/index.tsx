@@ -23,6 +23,7 @@ export default function TabOneScreen() {
   const apiCategories: Item[] = useCategories();
   const [selectedApiCategories, setSelectedApiCategories] = useState<Item[]>([]);
 
+  // Get params
   const params = useLocalSearchParams();
 
   // CookBook categories and ingredients
@@ -33,8 +34,8 @@ export default function TabOneScreen() {
 
   const [searchMode, setSearchMode] = useState<'database' | 'cookbook'>('database');
   const { fetchMeal } = useGetRandomMealId();
-  const [selectedFirebaseRecipe, setSelectedFirebaseRecipe] = useState(null);
-  const [isModalVisible, setModalVisible] = useState(false);
+
+  // Get the User's ID
   const { session } = useSession();
   const userID = session;
 
@@ -61,7 +62,6 @@ export default function TabOneScreen() {
   }, [apiCategories, firebaseCategories, searchMode]);
 
 
-  
   const isFocused = useIsFocused();
 
   useEffect(() => {
@@ -73,54 +73,57 @@ export default function TabOneScreen() {
 
 
   // CookBookSearch
-  const handleSearchInFirebase = async () => {
-    console.log('handleSearchInFirebase aufgerufen');
-    const selectedCookBookIngredients = selectedFirebaseIngredients
-      .filter(item => item.selected)
-      .map(item => item.value);
+const handleSearchInFirebase = async () => {
+  // Extract selected ingredients and categories from the user's choices
+  const selectedCookBookIngredients = selectedFirebaseIngredients
+    .filter(item => item.selected)
+    .map(item => item.value);
 
-    const selectedCookBookCategories = selectedFirebaseCategories
-      .filter(item => item.selected)
-      .map(item => item.value);
+  const selectedCookBookCategories = selectedFirebaseCategories
+    .filter(item => item.selected)
+    .map(item => item.value);
 
-    console.log('Selected Ingredients for Firebase Search:', selectedCookBookIngredients);
-    console.log('Selected Categories for Firebase Search:', selectedCookBookCategories);
+  // Call the searchRecipesInFirebase function with selected ingredients and categories
+  const matchingRecipeId = await searchRecipesInFirebase(selectedCookBookIngredients, selectedCookBookCategories, userID);
 
-    const matchingRecipeId = await searchRecipesInFirebase(selectedCookBookIngredients, selectedCookBookCategories, userID);
-    console.log('Gefundene Rezepte in Firebase:', matchingRecipeId);
-    if (matchingRecipeId) {
-      router.push({ pathname: "/screens/viewRecipeScreen", params: { recipeID: matchingRecipeId.toString(), originScreen: 'index' }});
-    } else {
-      setAlertModalVisible(true);
-    }
-  };
+  // Navigate to the viewRecipeScreen if a matching recipe is found, otherwise show an alert
+  if (matchingRecipeId) {
+    router.push({ pathname: "/screens/viewRecipeScreen", params: { recipeID: matchingRecipeId.toString(), originScreen: 'index' }});
+  } else {
+    setAlertModalVisible(true);
+  }
+};
 
-  const getMeal = async () => {
-    const mealId = await fetchMeal(ItemListToCSVString(selectedApiIngredients), ItemListToCSVString(selectedApiCategories));
-    if (mealId) {
-      router.push({
-        pathname: "/modals/viewRandomRecipeModal",
-        params: {
-          recipeID: mealId,
-          selectedIngredients: ItemListToCSVString(selectedApiIngredients),
-          selectedCategories: ItemListToCSVString(selectedApiCategories),
-          refresh: params.newRecipeFlag,
-        }
-      });
-    } else {
-      setAlertModalVisible(true);
-    }
-  };
-
-  const findNewRecipe = () => {
-    if (searchMode === 'database') {
-      getMeal();
-    } else if (searchMode === 'cookbook') {
-      handleSearchInFirebase();
-    }
-  };
+const getMeal = async () => {
+  // Fetch a meal ID based on selected API ingredients and categories
+  const mealId = await fetchMeal(ItemListToCSVString(selectedApiIngredients), ItemListToCSVString(selectedApiCategories));
   
+  // Navigate to the viewRandomRecipeModal with the fetched meal ID
+  if (mealId) {
+    router.push({
+      pathname: "/modals/viewRandomRecipeModal",
+      params: {
+        recipeID: mealId,
+        selectedIngredients: ItemListToCSVString(selectedApiIngredients),
+        selectedCategories: ItemListToCSVString(selectedApiCategories),
+        refresh: params.newRecipeFlag,
+      }
+    });
+  } else {
+    setAlertModalVisible(true);
+  }
+};
 
+const findNewRecipe = () => {
+  // Determine the search mode (either 'database' or 'cookbook') and perform the search accordingly
+  if (searchMode === 'database') {
+    getMeal(); // Search for a random recipe from the API
+  } else if (searchMode === 'cookbook') {
+    handleSearchInFirebase(); // Search for a recipe in the user's cookbook
+  }
+};
+
+  
 return (
   <View style={gStyles.screenContainer}>
     <SearchSwitch onToggle={(isDatabaseSearch) => setSearchMode(isDatabaseSearch ? 'database' : 'cookbook')} />

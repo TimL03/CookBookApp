@@ -11,21 +11,33 @@ import { useSession } from '../../api/firebaseAuthentication/client';
 import { doc, collection, getDocs, setDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../../FirebaseConfig';
 
+// Import the star image
+const starImage = require('../../assets/images/star.png');
 
-  const starImage = require('../../assets/images/star.png');
+// Define the RatingModal component
+const RatingModal = (): ReactElement => {
+  // State variables to manage rating and comment input
+  const [rating, setRating] = useState<number>(0);
+  const [comment, setComment] = useState<string>('');
 
-  const RatingModal = (): ReactElement => {
-    const [rating, setRating] = useState<number>(0);
-    const [comment, setComment] = useState<string>('');
-    const { session } = useSession();
-    const userID = session;
-    const [recipe, setRecipe] = useState<RecipeData | null>(null);
-    const [sortedRatings, setSortedRatings] = useState<Array<{ id: string; username: string; rating: number; comment: string; timestamp: Timestamp }>>([]);
+  // Get the user session from the context
+  const { session } = useSession();
+  const userID = session;
 
-  // Get recipe id from router params
+  // State variables to store recipe and sorted ratings
+  const [recipe, setRecipe] = useState<RecipeData | null>(null);
+  const [sortedRatings, setSortedRatings] = useState<Array<{
+    id: string;
+    username: string;
+    rating: number;
+    comment: string;
+    timestamp: Timestamp;
+  }>>([]);
+
+  // Get recipe id from router parameters
   const params = useLocalSearchParams();
 
-  // Fetch recipe from database
+  // Fetch the recipe data from the database based on the recipe ID
   useEffect(() => {
     if (params.recipeID) {
       const fetchRecipe = async () => {
@@ -36,15 +48,17 @@ import { db } from '../../FirebaseConfig';
     }
   }, [params.recipeID]);
 
+  // Handle the rating input from the user
   const handleRating = (value: number) => {
-    console.log('Received rating:', value);
     setRating(value);
   };
 
+  // Handle changes in the comment input field
   const handleCommentChange = (text: string) => {
     setComment(text);
   };
 
+  // Handle the submission of the rating and comment
   const handleSubmit = async () => {
     const ratingData = {
       rating,
@@ -54,10 +68,12 @@ import { db } from '../../FirebaseConfig';
     await handleRatingSubmit(ratingData);
   };
 
+  // Fetch the ratings for the recipe from the database
   useEffect(() => {
     fetchRatings(params.recipeID, setSortedRatings);
   }, [params.recipeID]);
 
+  // Handle the submission of the rating and comment to the database
   const handleRatingSubmit = async (ratingData: { rating: number; comment: string }) => {
     try {
       if (params.recipeID) {
@@ -67,15 +83,19 @@ import { db } from '../../FirebaseConfig';
         const ratingCount = ratingsSnapshot.size;
         const ratingID = `rating${ratingCount + 1}`;
         const ratingDocRef = doc(ratingsCollectionRef, ratingID);
-  
+
+        // Add the rating data to the database
         await setDoc(ratingDocRef, {
           userID,
           timestamp: Timestamp.now(),
           ...ratingData,
         });
-        
+
+        // Fetch updated ratings and set them in the state
         await fetchRatings(params.recipeID, setSortedRatings);
         console.log('Rating successfully added!');
+        
+        // Navigate back to the previous screen
         router.back();
       } else {
         console.error('No recipe ID found');
@@ -84,7 +104,6 @@ import { db } from '../../FirebaseConfig';
       console.error('Error adding rating:', error);
     }
   };
-
 
   return (
     <Pressable onPress={() => router.back()} style={gStyles.modalBackgroundContainer}>

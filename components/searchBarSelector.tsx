@@ -6,21 +6,26 @@ import gStyles from "../constants/Global_Styles";
 import Colors from "../constants/Colors";
 import { Alata12 } from "./StyledText";
 
+// Define and export the SearchBarSelector component function
 export default function SearchBarSelector({ selectedItems, setSelectedItems, singleSelection }: { selectedItems: Item[], setSelectedItems: React.Dispatch<React.SetStateAction<Item[]>>, singleSelection?: boolean }) {
+  // Initialize state variables for search functionality
   const [search, setSearch] = useState(false);
   const [searchCriteria, setSearchCriteria] = useState('');
 
+  // Filter items based on search criteria
+  const filteredItems = selectedItems.filter((item: Item) =>
+    item != undefined &&
+    item.value.toLowerCase().includes(searchCriteria.toLowerCase())
+  );
 
-  const filteredItems = selectedItems.filter((item: Item) => 
-  item != undefined && 
-  item.value.toLowerCase().includes(searchCriteria.toLowerCase())
-);
+  // Function to handle the end of the search
   const searchFinished = () => {
     setSearch(false);
     setSearchCriteria('');
     Keyboard.dismiss();
   }
 
+  // Function to toggle the selected state of an item
   const toggleSelected = (key: string) => {
     setSelectedItems(prevItems =>
       prevItems.map(item => {
@@ -35,6 +40,7 @@ export default function SearchBarSelector({ selectedItems, setSelectedItems, sin
     );
   };
 
+  // Function to check if an item is selected
   const isSelected = (key: string) => {
     return selectedItems.find(item => item.key === key)?.selected;
   }

@@ -10,29 +10,36 @@ import { Alata20, Alata22 } from '../../components/StyledText';
 import { TextInput } from 'react-native-gesture-handler';
 
 
+// Define the LoginModalProps interface
 interface LoginModalProps {
   onClose: () => void;
   setIsAuthenticated: (authenticated: boolean) => void;
   onLoginSuccess: (user: any) => void;
-  setUserID: (userID: string | null) => void;}
+  setUserID: (userID: string | null) => void;
+}
 
 export default function LoginModalScreen({ onClose, setIsAuthenticated, setUserID, onLoginSuccess }: LoginModalProps) {
+  // Initialize state for hiding the password, login mode, email, and password
   const [hidePassword, setHidePassword] = React.useState(true);
   const [loginMode, setLoginMode] = React.useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  // Function to show the password
   const showPassword = () => {
     setHidePassword(false);
   };
 
+  // Function to hide the password
   const dontShowPassword = () => {
     setHidePassword(true);
   };
 
+  // Function for logging in
   const logIn = async () => {
     if (loginMode) {
       try {
+        // Sign in with email and password
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const userID = userCredential.user.uid; 
         setUserID(userID); 
@@ -40,23 +47,25 @@ export default function LoginModalScreen({ onClose, setIsAuthenticated, setUserI
         setIsAuthenticated(true);
         onClose();
       } catch (error) {
-        console.error("Fehler bei der Anmeldung: ", error);
+        console.error("Error during login: ", error);
       }
     } else {
       setLoginMode(true);
     }
   };
 
+  // Function for signing up
   const signUp = async () => {
     if (!loginMode) {
       try {
+        // Create a new user account with email and password
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const userID = userCredential.user.uid; 
         setUserID(userID); 
         setIsAuthenticated(true);
         onClose();
       } catch (error) {
-        console.error("Fehler bei der Registrierung: ", error);
+        console.error("Error during registration: ", error);
       }
     } else {
       setLoginMode(false);
