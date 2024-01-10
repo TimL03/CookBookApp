@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Image, Pressable, Modal } from 'react-native'
+import { View, Image, Pressable, Modal, Platform } from 'react-native'
 import TopModalBar from '../../components/topModalBar'
 import Colors from '../../constants/Colors'
 import gStyles from '../../constants/Global_Styles'
@@ -19,18 +19,8 @@ import {
   Alata24,
   Alata18,
 } from '../../components/StyledText'
-import ShareRecipeScreen from './shareRecipeModal'
-import { db, auth } from '../../FirebaseConfig'
-import {
-  doc,
-  setDoc,
-  Timestamp,
-  collection,
-  addDoc,
-  getDocs,
-} from 'firebase/firestore'
-import RatingModal from './RatingModal'
-import { RecipeData } from '../../api/cookBookRecipesFirebase/model'
+import { db } from '../../FirebaseConfig'
+import { Timestamp, collection, addDoc, getDocs } from 'firebase/firestore'
 import {
   Stack,
   router,
@@ -42,6 +32,10 @@ import {
   getRecipeByIdForFeed,
 } from '../../api/cookBookRecipesFirebase/client'
 import { useSession } from '../../api/firebaseAuthentication/client'
+import {
+  RecipeData,
+  IngredientView,
+} from '../../api/cookBookRecipesFirebase/model'
 
 // Define the main component
 export default function ViewFeedRecipeScreen() {
@@ -90,7 +84,7 @@ export default function ViewFeedRecipeScreen() {
   if (!recipe) {
     return (
       <>
-        <Stack.Screen />
+        <Stack.Screen options={{headerShown: Platform.OS === 'ios' ? true : false}}/>
         <View style={{ flex: 1, backgroundColor: Colors.dark.mainColorDark }} />
       </>
     )
@@ -200,25 +194,6 @@ export default function ViewFeedRecipeScreen() {
                   >
                     <MessageSquareIcon color={Colors.dark.text} size={24} />
                   </Pressable>
-                  {/* Share recipe button */}
-                  <Pressable
-                    onPress={() =>
-                      router.push({
-                        pathname: '/modals/shareRecipeModal',
-                        params: { recipeID: recipe.id },
-                      })
-                    }
-                    style={({ pressed }) => [
-                      gStyles.iconButton,
-                      {
-                        backgroundColor: pressed
-                          ? Colors.dark.mainColorLight
-                          : Colors.dark.seeThrough,
-                      },
-                    ]}
-                  >
-                    <Share2 color={Colors.dark.text} size={24} />
-                  </Pressable>
                   {/* Save recipe button */}
                   <Pressable
                     onPress={saveRecipeToDatabase}
@@ -262,7 +237,7 @@ export default function ViewFeedRecipeScreen() {
 
             {/* Display current categories */}
             <View style={gStyles.mapHorizontal}>
-              {recipe.categories.map((category, index) => (
+              {recipe.categories.map((category: string, index: number) => (
                 <View key={index} style={gStyles.switchButton}>
                   <Alata12>{category}</Alata12>
                 </View>
@@ -322,16 +297,18 @@ export default function ViewFeedRecipeScreen() {
             <View style={gStyles.card}>
               <Alata20>Ingredients:</Alata20>
               <View style={gStyles.VerticalLayout}>
-                {recipe.ingredients.map((ingredient, index) => (
-                  <View key={index} style={gStyles.IngredientLayout}>
-                    <Alata16 style={gStyles.flex}>
-                      {index + 1}. {ingredient.name}
-                    </Alata16>
-                    <Alata16>
-                      {ingredient.amount} {ingredient.unit}
-                    </Alata16>
-                  </View>
-                ))}
+                {recipe.ingredients.map(
+                  (ingredient, index) => (
+                    <View key={index} style={gStyles.IngredientLayout}>
+                      <Alata16 style={gStyles.flex}>
+                        {index + 1}. {ingredient.name}
+                      </Alata16>
+                      <Alata16>
+                        {ingredient.amount} {ingredient.unit}
+                      </Alata16>
+                    </View>
+                  )
+                )}
               </View>
             </View>
 
@@ -339,7 +316,7 @@ export default function ViewFeedRecipeScreen() {
             <View style={gStyles.card}>
               <Alata20>Steps:</Alata20>
               <View style={gStyles.VerticalLayout}>
-                {recipe.steps.map((step, index) => (
+                {recipe.steps.map((step: string, index: number) => (
                   <View key={index} style={gStyles.IngredientLayout}>
                     <Alata16>
                       {index + 1}. {step}

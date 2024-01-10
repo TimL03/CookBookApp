@@ -53,7 +53,7 @@ export default function LoginModalScreen(this: any) {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : null}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={[gStyles.defaultContainer, styles.center]}
     >
       <View>

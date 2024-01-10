@@ -158,7 +158,7 @@ export default function aboutScreen(this: any) {
         <Alata16>UID: {authData ? authData.uid : 'Lädt...'}</Alata16>
       </View>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : null}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         contentContainerStyle={styles.buttonContainer}
         style={styles.buttonContainer}
       >

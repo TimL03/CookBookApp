@@ -12,10 +12,15 @@ import {
   query,
   where,
   getDocs,
+  average,
 } from 'firebase/firestore'
 import { Alata16, Alata20 } from '../../components/StyledText'
 import RecipeElement from '../../components/RecipeElement'
 import { InvitationContext } from '../../api/firebaseRecipeInvitations/client'
+import {
+  RecipeData,
+  RecipeProps,
+} from '../../api/cookBookRecipesFirebase/model'
 import { router } from 'expo-router'
 
 // Function to get the username by user ID from the database
@@ -28,12 +33,6 @@ const getUsernameByUserId = async (userId: string) => {
     // If the query result is not empty, return the username of the user
     return querySnapshot.docs[0].data().username
   }
-}
-
-// Define the RecipeData interface
-interface RecipeData {
-  imageUrl: string
-  name: string
 }
 
 // Define the ShowSharedRecipeInvitationModalScreen component
@@ -126,7 +125,15 @@ export default function ShowSharedRecipeInvitationModalScreen() {
         <Alata20 style={gStyles.alignCenter}>
           {senderUsername} shared a recipe with you!
         </Alata20>
-        {recipeData && <RecipeElement item={recipeData} />}
+        {recipeData && (
+          <RecipeElement
+            item={recipeData}
+            averageRating={{
+              average: 0,
+              totalRatings: 0,
+            }}
+          />
+        )}
         <View
           style={[
             gStyles.cardHorizontal,
@@ -171,38 +178,3 @@ export default function ShowSharedRecipeInvitationModalScreen() {
     </Pressable>
   )
 }
-
-const styles = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0)',
-  },
-  modalContent: {
-    backgroundColor: Colors.dark.mainColorDark,
-    padding: 25,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    gap: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    width: '100%',
-  },
-  button: {
-    borderRadius: 10,
-    padding: 10,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 15,
-  },
-  input: {
-    flexDirection: 'row',
-    color: Colors.dark.text,
-    backgroundColor: Colors.dark.mainColorLight,
-    paddingHorizontal: 10,
-    height: 45,
-    borderRadius: 10,
-    gap: 10,
-  },
-})

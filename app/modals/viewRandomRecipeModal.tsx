@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { View, Image, Pressable, TextInput } from 'react-native'
-import TopModalBar from '../../components/topModalBar'
+import { View, Image, Pressable } from 'react-native'
 import Colors from '../../constants/Colors'
 import gStyles from '../../constants/Global_Styles'
 import { addDoc, collection } from 'firebase/firestore'
 import { db } from '../../FirebaseConfig'
 import {
-  Share2,
-  Save,
   ArrowDownToLine,
   RefreshCcw,
   X,
@@ -19,7 +16,6 @@ import { Ingredient, RecipeProps } from '../../api/externalRecipesLibrary/model'
 import { useLocalSearchParams, router, Stack } from 'expo-router'
 import {
   useGetMealById,
-  useGetRandomMealId,
 } from '../../api/externalRecipesLibrary/client'
 import SaveWithCooktimeAlert from '../modals/alerts/saveWithCooktimeAlert'
 
@@ -38,7 +34,7 @@ export default function ViewRandomRecipeScreen() {
   const recipeID = Array.isArray(params.recipeID)
     ? params.recipeID[0]
     : params.recipeID
-  const { selectedMeal, fetchMeal: fetchMealById } = useGetMealById(recipeID)
+  const { selectedMeal, fetchMeal: fetchMealById } = useGetMealById(recipeID) as { selectedMeal: any, fetchMeal: any }
 
   const [alertSaveVisible, setAlertSaveVisible] = useState(false)
 
@@ -88,12 +84,12 @@ export default function ViewRandomRecipeScreen() {
   const ingredientNames = ingredients.map((ingredient) => ingredient.name)
 
   const categories = selectedMeal.strCategory
-    ? selectedMeal.strCategory.split(',').map((cat) => cat.trim())
+    ? selectedMeal.strCategory.split(',').map((cat: string) => cat.trim())
     : []
 
   const steps = selectedMeal.strInstructions
     .split('\n')
-    .filter((step) => step.trim() !== '')
+    .filter((step: string) => step.trim() !== '')
 
   // Function to save recipe data to the database
   async function saveRecipeToDatabase(recipe: RecipeProps) {

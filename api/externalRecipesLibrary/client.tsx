@@ -118,7 +118,7 @@ export const useGetRandomMealId = () => {
         }
       } else {
         let mealsByIngredients = null
-        let mealsByCategories = null
+        let mealsByCategories: any[] | null = null
 
         // Fetch meals based on selected ingredients
         if (selectedIngredients) {
@@ -141,8 +141,8 @@ export const useGetRandomMealId = () => {
         let matchedMeals = []
         if (mealsByIngredients && mealsByCategories) {
           // Filter meals that match both selected ingredients and categories
-          matchedMeals = mealsByIngredients.filter((ingredientMeal) =>
-            mealsByCategories.some(
+          matchedMeals = mealsByIngredients.filter((ingredientMeal: { idMeal: any }) =>
+            mealsByCategories?.some(
               (categoryMeal) => categoryMeal.idMeal === ingredientMeal.idMeal
             )
           )

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import {
   TextInput,
-  StyleSheet,
   View,
   Pressable,
   KeyboardAvoidingView,
+  Platform,
 } from 'react-native'
 import Colors from '../../constants/Colors'
 import gStyles from '../../constants/Global_Styles'
@@ -110,7 +110,7 @@ export default function ShareRecipeScreen() {
         style={gStyles.modalBackgroundContainer}
       ></Pressable>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : null}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={[
           gStyles.modalContentContainer,
           { backgroundColor: Colors.dark.background },

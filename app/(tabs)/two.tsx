@@ -60,7 +60,10 @@ export default function TabTwoScreen() {
         showsVerticalScrollIndicator={false}
         sections={data}
         keyExtractor={(item, index) => item.id.toString() + index.toString()}
-        renderItem={({ item }) => <Recipe item={item} />}
+        renderItem={({ item }) => <Recipe item={item} averageRating={{
+          average: 0,
+          totalRatings: 0
+        }} />}
         renderSectionHeader={({ section: { title } }) => (
           <Alata20>{title}</Alata20>
         )}

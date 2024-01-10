@@ -19,7 +19,7 @@ type SelectionProps = {
 }
 
 // Initialize the property dropDownInputs (this will be an array)
-this.dropDownInputs = []
+this.dropDownInputs= []
 
 // Define and export the DropDown component function
 export default function DropDown(

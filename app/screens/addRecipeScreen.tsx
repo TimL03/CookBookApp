@@ -5,9 +5,7 @@ import {
   ScrollView,
   View,
   Pressable,
-  Text,
   Image,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native'
@@ -16,15 +14,11 @@ import gStyles from '../../constants/Global_Styles'
 import { db } from '../../FirebaseConfig'
 import { collection, addDoc, setDoc, doc } from 'firebase/firestore'
 import * as ImagePicker from 'expo-image-picker'
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import {
   Alata16,
   Alata20,
-  Alata12,
-  AlataText,
 } from '../../components/StyledText'
-import { X, PlusCircle, Plus, Save, ChevronDown } from 'lucide-react-native'
-import TopModalBar from '../../components/topModalBar'
+import { X, PlusCircle, Plus, Save } from 'lucide-react-native'
 import DropDown from '../../components/DropDown'
 import { useSession } from '../../api/firebaseAuthentication/client'
 import {
@@ -330,7 +324,7 @@ export default function AddRecipeScreen(this: any) {
       />
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : null}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={[
           gStyles.defaultContainer,
           { backgroundColor: Colors.dark.mainColorDark },

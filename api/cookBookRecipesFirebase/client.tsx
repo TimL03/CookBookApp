@@ -9,6 +9,7 @@ import {
   doc,
   getDoc,
   deleteDoc,
+  Timestamp,
 } from 'firebase/firestore'
 import { GroupedByCategory, RecipeData } from './model'
 import { getStorage, ref, uploadBytes, getDownloadURL } from '@firebase/storage'
@@ -177,7 +178,7 @@ export const searchRecipesInFirebase = async (
 
     // Fetch the snapshots for all the queries in parallel
     const querySnapshots = await Promise.all(queries.map((q) => getDocs(q)))
-    const recipeIds = []
+    const recipeIds: any[] = []
 
     // Extract the document IDs from the query snapshots
     querySnapshots.forEach((snapshot) => {
@@ -399,7 +400,7 @@ const sortRatingsByTimestamp = (
     timestamp: Timestamp
   }>
 ) => {
-  return ratings.sort((a, b) => b.timestamp - a.timestamp)
+  return ratings.sort((a, b) => b.timestamp.toMillis() - a.timestamp.toMillis())
 }
 
 // Fetch ratings for a recipe from the "feed" collection
@@ -519,7 +520,7 @@ export const calculateAverageRating = async (recipe: RecipeData) => {
 
     // Calculate the sum of all ratings
     const sum = ratingsData.reduce(
-      (acc, rating) => acc + (parseFloat(rating) || 0),
+      (acc, rating) => acc + rating || 0,
       0
     )
 
