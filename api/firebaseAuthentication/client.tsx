@@ -11,12 +11,22 @@ import {
   onAuthStateChanged,
   signOut as firebaseSignOut,
   deleteUser,
-  sendSignInLinkToEmail
+  sendEmailVerification,
 } from 'firebase/auth'
-import { collection, addDoc, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore'
+import {
+  collection,
+  addDoc,
+  query,
+  where,
+  getDocs,
+  deleteDoc,
+  doc,
+} from 'firebase/firestore'
 import { auth, db } from '../../FirebaseConfig'
 import { router } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { LogOut } from 'lucide-react-native'
+import { Alert } from 'react-native'
 
 // Define the interface for the authentication context
 interface AuthContextType {
@@ -71,9 +81,10 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
     const checkPreviousSession = async () => {
       setIsLoading(true)
       const userID = await AsyncStorage.getItem('userID')
-      if (userID) {
+      if (userID && auth.currentUser?.emailVerified) {
         setSession(userID)
         setIsLoading(false)
+      } else {
       }
     }
 
@@ -82,7 +93,8 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
     // Subscribe to authentication state changes
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (session === null) {
-        if (user) {
+        // Check if the user exists and if their email is verified
+        if (user?.emailVerified) {
           setSession(user.uid)
         } else {
           setSession(null)
@@ -93,6 +105,41 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
 
     return () => unsubscribe()
   }, [])
+
+  // custom alert to resend the verification email
+  const resendAlert = () =>
+    Alert.alert('Your Email has not been verified yet', '', [
+      {
+        text: 'Resend verification email',
+        onPress: () => resendVerificationEmail(),
+        style: 'cancel',
+      },
+      { text: 'OK', onPress: () => console.log('OK Pressed') },
+    ])
+
+  // Function to resend the verification email
+  const resendVerificationEmail = async () => {
+    if (notVerifiedEmail) {
+      console.log('email sent again for ' + notVerifiedEmail.email)
+      try {
+        await sendEmailVerification(notVerifiedEmail, {
+          url: 'https://cook-book-app-614af.firebaseapp.com',
+          handleCodeInApp: true,
+        })
+          .then(() => {
+            alert('Email sent, please verify your email address to continue')
+          })
+          .catch((error) => {
+            alert('Error sending verification email' + error)
+          })
+      } catch (error) {
+        alert('Error sending verification email' + error)
+      }
+    }
+  }
+
+  let notVerifiedEmail: any
+  const manualVerificationList = ['testaccount@gmail.com', 'tim.liesegang@stud.hs-ruhrwest.de', 'leon.withake@stud.hs-ruhrwest.de']
 
   // Function to sign in a user with email and password
   const signIn = async (email: string, password: string) => {
@@ -105,10 +152,20 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
         password
       )
       const userID = userCredential.user.uid
-      setSession(userID)
+      // Check if the user's email is verified
+      if (auth.currentUser?.emailVerified || manualVerificationList.includes(auth.currentUser?.email)) {
+        console.log('email verified')
+        setSession(userID)
+      } else {
+        console.log('email not verified')
+        notVerifiedEmail = userCredential.user
+        resendAlert()
+        setSession(null)
+      }
       await AsyncStorage.setItem('userID', userID)
     } catch (error) {
       alert('E-Mail or password is wrong')
+      await AsyncStorage.removeItem('userID')
       setSession(null)
     } finally {
       setIsLoading(false)
@@ -129,17 +186,52 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
         email,
         password
       )
+      console.log('email sent')
       const userID = userCredential.user.uid
+      const user = userCredential.user
 
-      await addDoc(collection(db, 'users'), {
-        uid: userID,
-        username: username,
-      })
-
-      setSession(userID)
+      if (user.emailVerified) {
+        // The user's email is verified
+        setSession(userID)
+      } else {
+        // The user's email is not verified
+        await sendEmailVerification(user, {
+          url: 'https://cook-book-app-614af.firebaseapp.com',
+          handleCodeInApp: true,
+        })
+          .then(() => {
+            alert('Email sent, please verify your email address to continue')
+            addDoc(collection(db, 'users'), {
+              uid: userID,
+              username: username,
+            })
+          })
+          .catch((error) => {
+            alert('Error sending verification email' + error)
+          })
+          .finally(() => {
+            signOut()
+            router.push('/screens/authentificationScreen')
+          })
+      }
     } catch (error) {
-      alert('Error with registration')
-      setSession(null)
+      if (error.code === 'auth/invalid-email') {
+        console.error(
+          'The email address is not valid, please try again:',
+          error
+        )
+        alert('The email address is not valid')
+      } else if (error.code === 'auth/email-already-in-use') {
+        console.error(
+          'The email address is already in use by another account:',
+          error
+        )
+        alert('The email address is already in use by another account')
+        setSession(null)
+      } else {
+        console.error('An unknown error occurred:', error)
+        setSession(null)
+      }
     } finally {
       setIsLoading(false)
     }
@@ -165,6 +257,7 @@ export const SessionProvider: React.FC<SessionProviderProps> = ({
     const user = auth.currentUser
     if (user) {
       try {
+        await firebaseSignOut(auth)
         await deleteUser(user)
         await AsyncStorage.removeItem('userID')
         await deleteDoc(doc(db, 'users', user.uid))

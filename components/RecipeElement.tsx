@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, Image } from 'react-native'
-import { Carrot, EggOff, Fish, MilkOff, Soup, Vegan } from 'lucide-react-native'
+import { BeefIcon, Carrot, DrumstickIcon, EggOff, Fish, MilkOff, Soup, Vegan } from 'lucide-react-native'
 import Colors from '../constants/Colors'
 import gStyles from '../constants/Global_Styles'
 import { View } from './Themed'
@@ -47,6 +47,24 @@ const CategoryIcon: React.FC<CategoryIconProps> = ({ categories }) => {
           case 'Fish':
             return (
               <Fish
+                color={Colors.dark.text}
+                key={index}
+                size={20}
+                style={{ marginBottom: 5 }}
+              />
+            )
+          case 'Beef': 
+            return (
+              <BeefIcon 
+                color={Colors.dark.text}
+                key={index}
+                size={20}
+                style={{ marginBottom: 5 }}
+              />
+            )
+          case 'Chicken':
+            return (
+              <DrumstickIcon
                 color={Colors.dark.text}
                 key={index}
                 size={20}
