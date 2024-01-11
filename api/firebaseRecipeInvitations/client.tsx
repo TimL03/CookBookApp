@@ -1,89 +1,128 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import { useSession } from '../../api/firebaseAuthentication/client';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from 'react'
+import { collection, onSnapshot, query, where } from 'firebase/firestore'
+import { useSession } from '../../api/firebaseAuthentication/client'
 import { db } from '../../FirebaseConfig'
-import { router } from 'expo-router';
+import { router } from 'expo-router'
 
+// Define the interface for the invitation context
 interface InvitationContextType {
-    processNextInvitation:  () => void; 
-    invitationQueue: any[];
-    openNextInvitation: () => void;
-    invitationData: any; 
-  }
+  processNextInvitation: () => void
+  invitationQueue: any[]
+  openNextInvitation: () => void
+  invitationData: any
+}
 
-  const defaultInvitationContextValue: InvitationContextType = {
-    processNextInvitation: () => {},
-    invitationQueue: [null],
-    openNextInvitation: () => {},
-    invitationData: null,
-  };
+// Define the default values for the invitation context
+const defaultInvitationContextValue: InvitationContextType = {
+  processNextInvitation: () => {},
+  invitationQueue: [null],
+  openNextInvitation: () => {},
+  invitationData: null,
+}
 
-  const InvitationContext = createContext<InvitationContextType>(defaultInvitationContextValue);
+// Create an invitation context with default values
+const InvitationContext = createContext<InvitationContextType>(
+  defaultInvitationContextValue
+)
 
-export const useInvitation = () => useContext(InvitationContext);
+// Custom hook to use the invitation context
+export const useInvitation = () => useContext(InvitationContext)
 
-export { InvitationContext };
+export { InvitationContext }
 
+// Define props for the InvitationProvider component
 interface InvitationProviderProps {
-    children: ReactNode;
+  children: ReactNode
+}
+
+// Create an InvitationProvider component to manage invitation-related state
+export const InvitationProvider: React.FC<InvitationProviderProps> = ({
+  children,
+}) => {
+  // Get the current user's session
+  const { session } = useSession()
+  const userID = session
+
+  // State variables to store the invitation queue and the current invitation data
+  const [invitationQueue, setInvitationQueue] = useState<any[]>([])
+  const [invitationData, setInvitationData] = useState(null)
+
+  // Function to open the next invitation in the queue
+  const openNextInvitation = () => {
+    if (invitationQueue.length > 0) {
+      const nextInvitation = invitationQueue[0]
+      setInvitationData(nextInvitation)
+      router.push('/modals/showSharedRecipeInvitation')
+    }
   }
 
-  export const InvitationProvider: React.FC<InvitationProviderProps> = ({ children }) => {
-    const { session } = useSession();
-    const userID = session;
-    const [invitationQueue, setInvitationQueue] = useState<any[]>([]);
-    const [invitationData, setInvitationData] = useState(null);
+  // Function to process the next invitation in the queue
+  const processNextInvitation = () => {
+    setInvitationQueue((prevQueue) => prevQueue.slice(1))
+    if (invitationQueue.length > 0) {
+      openNextInvitation()
+    } else {
+      router.back()
+    }
+  }
 
-    const openNextInvitation = () => {
-        if (invitationQueue.length > 0) {
-          const nextInvitation = invitationQueue[0];
-          setInvitationData(nextInvitation); 
-          router.push("/modals/showSharedRecipeInvitation");
-        }
-      };
+  // Effect to listen for new invitations and update the invitation queue
+  useEffect(() => {
+    if (userID) {
+      const q = query(
+        collection(db, 'invitations'),
+        where('receiverId', '==', userID),
+        where('status', '==', 'pending')
+      )
 
-    const processNextInvitation = () => {
-        if (invitationQueue.length > 0) {
-        setInvitationQueue((prevQueue) => prevQueue.slice(1)); 
-        openNextInvitation();
-        } else {
-            router.back();
-        }
-      };
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        setInvitationQueue((prevQueue) => {
+          const prevQueueIds = new Set(
+            prevQueue.map((invitation) => invitation.id)
+          )
+          const newInvitations: any = []
 
-      useEffect(() => {
-        if (userID) {
-          const q = query(collection(db, "invitations"), where("receiverId", "==", userID), where("status", "==", "pending"));
-          const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            const newInvitations = [];
-            querySnapshot.forEach((doc) => {
-              const invitationData = doc.data();
-              newInvitations.push({ id: doc.id, ...invitationData });
-            });
-      
-            setInvitationQueue(prevQueue => {
-              // Überprüfen, ob neue Einladungen hinzugefügt wurden und die Queue leer war
-              const shouldOpenNextInvitation = prevQueue.length === 0 && newInvitations.length > 0;
-              const updatedQueue = [...prevQueue, ...newInvitations];
-      
-              // Wenn die Queue leer war und neue Einladungen hinzugefügt wurden
-              if (shouldOpenNextInvitation) {
-                setInvitationData(updatedQueue[0]);
-                router.push("/modals/showSharedRecipeInvitation");
-              }
-      
-              return updatedQueue;
-            });
-          });
-      
-          return () => unsubscribe();
-        }
-      }, [userID]);      
-    
+          querySnapshot.forEach((doc) => {
+            if (!prevQueueIds.has(doc.id)) {
+              const invitationData = doc.data()
+              newInvitations.push({ id: doc.id, ...invitationData })
+            }
+          })
 
-    return (
-        <InvitationContext.Provider value={{ invitationData, openNextInvitation, invitationQueue, processNextInvitation }}>
-            {children}
-        </InvitationContext.Provider>
-    );
-};
+          const shouldOpenNextInvitation =
+            prevQueue.length === 0 && newInvitations.length > 0
+          let updatedQueue = [...newInvitations]
+
+          if (shouldOpenNextInvitation) {
+            setInvitationData(updatedQueue[0])
+            updatedQueue = updatedQueue.slice(1)
+            router.push('/modals/showSharedRecipeInvitation')
+          }
+
+          return updatedQueue
+        })
+      })
+
+      return () => unsubscribe()
+    }
+  }, [userID])
+
+  return (
+    <InvitationContext.Provider
+      value={{
+        invitationData,
+        openNextInvitation,
+        invitationQueue,
+        processNextInvitation,
+      }}
+    >
+      {children}
+    </InvitationContext.Provider>
+  )
+}

@@ -1,18 +1,15 @@
 import React, { useEffect } from 'react'
+import AwesomeAlert from 'react-native-awesome-alerts'
 import { Modal, Pressable, StyleSheet, View } from 'react-native'
-import * as NavigationBar from 'expo-navigation-bar'
 import Colors from '../../../constants/Colors'
-import { Alata14, Alata16, Alata22 } from '../../../components/StyledText'
+import { Alata22, Alata16, Alata14 } from '../../../components/StyledText'
 
 interface AlertModalProps {
   title: string
   message: string
-  optionOneText: string
-  optionTwoText: string
-  cancelText: string
+  buttonText: string
+  onButtonPress: () => void
   alertModalVisible: boolean
-  optionOneConfirm: () => void
-  optionTwoConfirm: () => void
   setAlertModalVisible: (visible: boolean) => void
 }
 
@@ -20,23 +17,17 @@ export default function AlertModal(props: AlertModalProps) {
   const {
     title,
     message,
-    optionOneText,
-    optionTwoText,
-    cancelText,
+    buttonText,
+    onButtonPress,
     alertModalVisible,
     setAlertModalVisible,
-    optionOneConfirm,
-    optionTwoConfirm,
   } = props
 
   return (
     <Modal
       visible={alertModalVisible}
       transparent={true}
-      statusBarTranslucent={false}
-      onRequestClose={() => {
-        setAlertModalVisible(false)
-      }}
+      onRequestClose={() => setAlertModalVisible(false)}
     >
       <Pressable
         onPress={() => setAlertModalVisible(false)}
@@ -47,28 +38,13 @@ export default function AlertModal(props: AlertModalProps) {
           <Alata16>{message}</Alata16>
           <View style={styles.horizontal}>
             <Pressable
-              style={[styles.button, { backgroundColor: Colors.dark.alert }]}
+              style={styles.button}
               onPress={() => {
                 setAlertModalVisible(false)
+                onButtonPress()
               }}
             >
-              <Alata14>{cancelText}</Alata14>
-            </Pressable>
-            <Pressable
-              style={styles.button}
-              onPress={() => {
-                setAlertModalVisible(false), optionOneConfirm()
-              }}
-            >
-              <Alata14>{optionOneText}</Alata14>
-            </Pressable>
-            <Pressable
-              style={styles.button}
-              onPress={() => {
-                setAlertModalVisible(false), optionTwoConfirm()
-              }}
-            >
-              <Alata14>{optionTwoText}</Alata14>
+              <Alata14>{buttonText}</Alata14>
             </Pressable>
           </View>
         </Pressable>
@@ -90,7 +66,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   alertCard: {
-    backgroundColor: Colors.dark.mainColorDark,
+    backgroundColor: Colors.dark.background,
     gap: 20,
     borderRadius: 15,
     padding: 20,
@@ -102,6 +78,6 @@ const styles = StyleSheet.create({
     padding: 10,
     alignSelf: 'flex-end',
     borderRadius: 30,
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
   },
 })
