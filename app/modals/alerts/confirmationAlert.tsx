@@ -39,7 +39,7 @@ export default function AlertModal(props: AlertModalProps) {
         onPress={() => setAlertModalVisible(false)}
         style={styles.background}
       >
-        <View style={[styles.alertCard, { backgroundColor: cardColor }]}>
+        <Pressable style={[styles.alertCard, { backgroundColor: cardColor }]}>
           <Alata22>{title}</Alata22>
           <Alata16>{message}</Alata16>
           <View style={styles.horizontal}>
@@ -60,7 +60,7 @@ export default function AlertModal(props: AlertModalProps) {
               <Alata14>{confirmText}</Alata14>
             </Pressable>
           </View>
-        </View>
+        </Pressable>
       </Pressable>
     </Modal>
   )

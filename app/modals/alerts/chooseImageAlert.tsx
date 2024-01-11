@@ -1,6 +1,6 @@
-import React from 'react'
-import AwesomeAlert from 'react-native-awesome-alerts'
-import { Button, Modal, Pressable, StyleSheet, View } from 'react-native'
+import React, { useEffect } from 'react'
+import { Modal, Pressable, StyleSheet, View } from 'react-native'
+import * as NavigationBar from 'expo-navigation-bar'
 import Colors from '../../../constants/Colors'
 import { Alata14, Alata16, Alata22 } from '../../../components/StyledText'
 
@@ -33,13 +33,16 @@ export default function AlertModal(props: AlertModalProps) {
     <Modal
       visible={alertModalVisible}
       transparent={true}
-      onRequestClose={() => setAlertModalVisible(false)}
+      statusBarTranslucent={false}
+      onRequestClose={() => {
+        setAlertModalVisible(false)
+      }}
     >
       <Pressable
         onPress={() => setAlertModalVisible(false)}
         style={styles.background}
       >
-        <View style={styles.alertCard}>
+        <Pressable style={styles.alertCard}>
           <Alata22>{title}</Alata22>
           <Alata16>{message}</Alata16>
           <View style={styles.horizontal}>
@@ -68,7 +71,7 @@ export default function AlertModal(props: AlertModalProps) {
               <Alata14>{optionTwoText}</Alata14>
             </Pressable>
           </View>
-        </View>
+        </Pressable>
       </Pressable>
     </Modal>
   )

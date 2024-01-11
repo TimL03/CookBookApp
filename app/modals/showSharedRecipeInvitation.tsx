@@ -122,7 +122,7 @@ export default function ShowSharedRecipeInvitationModalScreen() {
 
   return (
     <Pressable style={gStyles.modalBackgroundContainer}>
-      <View
+      <Pressable
         style={[
           gStyles.modalContentContainer,
           { backgroundColor: Colors.dark.background },
@@ -180,7 +180,7 @@ export default function ShowSharedRecipeInvitationModalScreen() {
             Decline Shared Recipe
           </Alata20>
         </Pressable>
-      </View>
+      </Pressable>
     </Pressable>
   )
 }

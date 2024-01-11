@@ -147,16 +147,6 @@ function RootLayoutNav() {
               }}
             />
             <Stack.Screen
-              name="modals/logInModal"
-              options={{
-                navigationBarColor: Colors.dark.background,
-                headerShown: false,
-                presentation: 'fullScreenModal',
-                animation: 'fade_from_bottom',
-                animationTypeForReplace: 'pop',
-              }}
-            />
-            <Stack.Screen
               name="modals/showSharedRecipeInvitation"
               options={{
                 navigationBarColor: Colors.dark.background,

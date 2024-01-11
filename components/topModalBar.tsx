@@ -6,7 +6,6 @@ import { AlataText } from './StyledText'
 import { router } from 'expo-router'
 
 export default function TopModalBar({ title }: { title: string }) {
-  const titleAlign = Platform.OS === 'ios' ? 'center' : 'left'
   const paddingText = Platform.OS === 'ios' ? 40 : 0
 
   return (

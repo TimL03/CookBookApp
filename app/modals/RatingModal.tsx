@@ -129,7 +129,7 @@ const RatingModal = (): ReactElement => {
       onPress={() => router.back()}
       style={gStyles.modalBackgroundContainer}
     >
-      <View
+      <Pressable
         style={[
           gStyles.modalContentContainer,
           { backgroundColor: Colors.dark.background },
@@ -175,7 +175,7 @@ const RatingModal = (): ReactElement => {
             Submit Review
           </Alata20>
         </Pressable>
-      </View>
+      </Pressable>
     </Pressable>
   )
 }

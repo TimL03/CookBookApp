@@ -13,7 +13,11 @@ interface ActionsModalProps {
 
 const ActionsModal = ({ visible, onClose }: ActionsModalProps) => {
   return (
-    <Pressable style={gStyles.modalBackgroundContainer} onPress={router.back}>
+    <>
+      <Pressable
+        style={gStyles.modalBackgroundContainer}
+        onPress={router.back}
+      ></Pressable>
       <View style={gStyles.modalContentContainer}>
         <Alata22 style={gStyles.alignCenter}>Aktionen</Alata22>
         <Pressable
@@ -75,7 +79,7 @@ const ActionsModal = ({ visible, onClose }: ActionsModalProps) => {
           <Alata20 style={gStyles.marginBottom}>Open on Github</Alata20>
         </Pressable>
       </View>
-    </Pressable>
+    </>
   )
 }
 

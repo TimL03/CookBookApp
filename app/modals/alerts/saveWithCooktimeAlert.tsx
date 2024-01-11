@@ -41,7 +41,7 @@ export default function AlertModal(this: any, props: AlertModalProps) {
         onPress={() => setAlertModalVisible(false)}
         style={styles.background}
       >
-        <View
+        <Pressable
           style={[
             styles.alertCard,
             { backgroundColor: Colors.dark.background },
@@ -106,7 +106,7 @@ export default function AlertModal(this: any, props: AlertModalProps) {
               <Alata14>save to cookbook</Alata14>
             </Pressable>
           </View>
-        </View>
+        </Pressable>
       </Pressable>
     </Modal>
   )
